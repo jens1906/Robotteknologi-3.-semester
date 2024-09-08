@@ -1,0 +1,1 @@
+image = cv.imread(image_path)

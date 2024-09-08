@@ -16,7 +16,7 @@ def get_image_brightness(image):
         return round(np.average(image))
 
 def get_random_ExDark_image_path():
-    base_path = "LightEnhance\ExDark"
+    base_path = "ExDark"
     folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
     random_folder = random.choice(folders)
     folder_path = os.path.join(base_path, random_folder)

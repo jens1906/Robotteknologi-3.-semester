@@ -1,11 +1,12 @@
-
-import numpy as np # linear algebra
-import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import numpy as np
+import pandas as pd
 import os
+#clear terminal
+os.system('cls' if os.name == 'nt' else 'clear')
+os.environ["TF_ENABLE_ONEDNN_OPTS"]="FALSE"
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import cv2 as cv
 import matplotlib.pyplot as plt
-import random
 from keras.preprocessing import image
 from keras.applications.inception_resnet_v2 import InceptionResNetV2
 from keras.applications.inception_resnet_v2 import preprocess_input,decode_predictions
@@ -13,13 +14,10 @@ from keras import backend as K
 from keras.layers import add, Conv2D,MaxPooling2D,UpSampling2D,Input,BatchNormalization, RepeatVector, Reshape
 from keras.layers import concatenate
 from keras.models import Model
-#from keras.preprocessing.image import ImageDataGenerator
+import tensorflow
 
-
-
-
-#clear the terminal
-os.system('cls' if os.name == 'nt' else 'clear')
+tensorflow.random.set_seed(2)
+np.random.seed(1)
 
 def noisy(noise_typ,image):
     if noise_typ == "gauss":
@@ -49,7 +47,9 @@ def noisy(noise_typ,image):
         out[pepper_coords[0], pepper_coords[1], :] = 0  # Pepper mode
 
         return out
-    
+
+
+
     elif noise_typ == "poisson":
         vals = len(np.unique(image))
         vals = 2 ** np.ceil(np.log2(vals))
@@ -62,43 +62,31 @@ def noisy(noise_typ,image):
        
         noisy = image + image * gauss
         return noisy
-    
-def get_random_wmnowm_image_path():
-    base_path = "wm-nowm"
-    files = [f for f in os.listdir(base_path) if os.path.isfile(os.path.join(base_path, f))]
-    random_image = random.choice(files)
-    image_path = os.path.join(base_path, random_image)
-    return image_path
 
-def PreProcessData(DirPath):
+def PreProcessData(ImagePath):
     X_=[]
     y_=[]
     count=0
-    for imageName in os.listdir(DirPath):
+    for imageDir in os.listdir(ImagePath):
         if count<2131:
             try:
                 count=count+1
-                img = cv.imread(DirPath + imageName)
-                #img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
-                img = cv.resize(img,(500,500))
-                hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV) #convert it to hsv
+                img = cv.imread(ImagePath + imageDir)
+                img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+                img_y = cv.resize(img,(500,500))
+                hsv = cv.cvtColor(img_y, cv.COLOR_BGR2HSV) #convert it to hsv
                 hsv[...,2] = hsv[...,2]*0.2
                 img_1 = cv.cvtColor(hsv, cv.COLOR_HSV2BGR)
                 Noisey_img = noisy("s&p",img_1)
                 X_.append(Noisey_img)
-                y_.append(img)
+                y_.append(img_y)
             except:
                 pass
-    #X_ = np.array(X_)
-    #y_ = np.array(y_)
+    X_ = np.array(X_)
+    y_ = np.array(y_)
     
     return X_,y_
 
-#image_path = get_random_wmnowm_image_path()
-
-X,y = PreProcessData("wm-nowm/")
-
-K.clear_session()
 def InstantiateModel(in_):
     
     model_1 = Conv2D(16,(3,3), activation='relu',padding='same',strides=1)(in_)
@@ -135,21 +123,11 @@ def InstantiateModel(in_):
     
     return model_5
 
-Input_Sample = Input(shape=(500, 500,3))
-Output_ = InstantiateModel(Input_Sample)
-Model_Enhancer = Model(inputs=Input_Sample, outputs=Output_)
-Model_Enhancer.compile(optimizer="adam", loss='mean_squared_error')
-Model_Enhancer.summary()
-
-
 def GenerateInputs(X,y):
     for i in range(len(X)):
         X_input = X[i].reshape(1,500,500,3)
         y_input = y[i].reshape(1,500,500,3)
         yield (X_input,y_input)
-#Model_Enhancer.fit(GenerateInputs(X,y),epochs=53,verbose=1,steps_per_epoch=39,shuffle=True)
-Model_Enhancer.fit(GenerateInputs(X,y),epochs=5,verbose=1,steps_per_epoch=10,shuffle=True)
-TestPath="wm-nowm/"
 
 def ExtractTestInput(ImagePath):
     img = cv.imread(ImagePath)
@@ -162,65 +140,73 @@ def ExtractTestInput(ImagePath):
     Noise = Noise.reshape(1,500,500,3)
     return Noise
 
-ImagePath=TestPath+"bench-man-people-woman.jpg"
+def get_enhanced_image(ImagePath):
+    image_for_test = ExtractTestInput(ImagePath)
+    Prediction = Model_Enhancer.predict(image_for_test)
+
+    Image_test = ImagePath
+    img_ = cv.imread(Image_test)
+    img_ = cv.resize(img_, (500, 500))
+
+    img_ = img_
+    img_ = img_.reshape(500,500,3)
+    img_ = cv.cvtColor(img_, cv.COLOR_BGR2RGB)
+    img_ = img_.reshape(500,500,3)
+
+    img_[:,:,:] = Prediction[:,:,:]
+    img_ = cv.cvtColor(img_, cv.COLOR_BGR2RGB)
+    img_ = img_.reshape(500,500,3)
+    return img_
+
+InputPath="wm-nowm/"
+X_,y_ = PreProcessData(InputPath)
+
+K.clear_session()
+
+Input_Sample = Input(shape=(500, 500,3))
+Output_ = InstantiateModel(Input_Sample)
+Model_Enhancer = Model(inputs=Input_Sample, outputs=Output_)
+Model_Enhancer.compile(optimizer="adam", loss='mean_squared_error')
+Model_Enhancer.summary()
+
+user_input = "n" 
+if user_input == "y":
+    Model_Enhancer.fit(GenerateInputs(X_,y_),epochs=10,verbose=1,steps_per_epoch=39,shuffle=True)
+    Model_Enhancer.save("Enhancer.h5")
+else:
+    Model_Enhancer.load_weights("Enhancer.h5")
+
+""" test the model
+TestPath="wm-nowm/"
+ImagePath=TestPath+"adler-bird-bird-of-prey-raptor-53587.jpeg"
 image_for_test = ExtractTestInput(ImagePath)
 Prediction = Model_Enhancer.predict(image_for_test)
-Model_Enhancer.save("Model_Enhancer.h5")
-#how do i import the saved model
-K.models.load_model("Model_Enhancer.h5")
 
-Prediction = Prediction.reshape(500,500,3)
-plt.imshow(Prediction)
-plt.show()
+Image_test=TestPath+"adler-bird-bird-of-prey-raptor-53587.jpeg"
 
-Image_test=TestPath+"bench-man-people-woman.jpg"
-plt.figure(figsize=(30,30))
-plt.subplot(5,5,1)
 img_1 = cv.imread(Image_test)
-img_1 = cv.cvtColor(img_1, cv.COLOR_BGR2RGB)
 img_1 = cv.resize(img_1, (500, 500))
-plt.title("Ground Truth",fontsize=20)
-plt.imshow(img_1)
+cv.imshow("Ground Truth",img_1)
 
-
-plt.subplot(5,5,1+1)
 img_ = ExtractTestInput(Image_test)
+#change color of image to RGB
 img_ = img_.reshape(500,500,3)
-plt.title("Low Light Image",fontsize=20)
-plt.imshow(img_)
-
-
-plt.subplot(5,5,1+2)
-img_[:,:,:] = Prediction[:,:,:]
-plt.title("Enhanced Image",fontsize=20)
-plt.imshow(img_)
-
-
-TestPath2 = r"C:/Users/Morteza/OneDrive/Desktop/YouTube/coding/LLIE/travel and adventure/"
-
-Image_test2 = TestPath2 + "10.jpg"
-plt.figure(figsize=(30,30))
-plt.subplot(5,5,1)
-img_1 = cv.imread(Image_test2)
-img_1 = cv.cvtColor(img_1, cv.COLOR_BGR2RGB)
-img_1 = cv.resize(img_1, (500, 500))
-plt.title("Ground Truth",fontsize=20)
-plt.imshow(img_1)
-
-
-plt.subplot(5,5,1+1)
-img_ = ExtractTestInput(Image_test2)
-Prediction = Model_Enhancer.predict(img_)
+img_ = cv.cvtColor(img_, cv.COLOR_BGR2RGB)
 img_ = img_.reshape(500,500,3)
-plt.title("Low Light Image",fontsize=20)
-plt.imshow(img_)
+cv.imshow("Low Light Image",img_)
 
-
-plt.subplot(5,5,1+2)
-Prediction = Prediction.reshape(500,500,3)
 img_[:,:,:] = Prediction[:,:,:]
-plt.title("Enhanced Image",fontsize=20)
-plt.imshow(img_)
+img_ = cv.cvtColor(img_, cv.COLOR_BGR2RGB)
+img_ = img_.reshape(500,500,3)
+cv.imshow("Enhanced Image",img_)
+cv.waitKey(0)
+"""
+
+test_image = "ExDark/Car/2015_02412.jpg"
+cv.imshow("Original Image",cv.imread(test_image))
+cv.imshow("Enhanced Image",get_enhanced_image(test_image))
+cv.waitKey(0)
+
 
 
 
