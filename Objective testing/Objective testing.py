@@ -1,10 +1,65 @@
 import cv2
 import numpy as np
+import math
 
 # Load the image
 imageBefore = cv2.imread('Objective testing before.jpg')
 imageAfter = cv2.imread('Objective testing after.jpg')
 
+def MSE(imgX, imgY):
+    return np.mean((imgX - imgY)**2)   
+   
+#Following 2/3 functions is from https://cvnote.ddlee.cc/2019/09/12/psnr-ssim-python    
+def PSNR(imgX, imgY):
+    # img1 and img2 have range [0, 255]
+    imgX = imgX.astype(np.float64)
+    imgY = imgY.astype(np.float64)
+    if MSE(imgX, imgY) == 0:
+        return float('inf')
+    return 20 * math.log10(255.0 / math.sqrt(MSE(imgX, imgY)))
+
+def ssim(imgX, imgY):
+    C1 = (0.01 * 255)**2
+    C2 = (0.03 * 255)**2
+
+    imgX = imgX.astype(np.float64)
+    imgY = imgY.astype(np.float64)
+    kernel = cv2.getGaussianKernel(11, 1.5)
+    window = np.outer(kernel, kernel.transpose())
+
+    mu1 = cv2.filter2D(imgX, -1, window)[5:-5, 5:-5]  # valid
+    mu2 = cv2.filter2D(imgY, -1, window)[5:-5, 5:-5]
+    mu1_sq = mu1**2
+    mu2_sq = mu2**2
+    mu1_mu2 = mu1 * mu2
+    sigma1_sq = cv2.filter2D(imgX**2, -1, window)[5:-5, 5:-5] - mu1_sq
+    sigma2_sq = cv2.filter2D(imgY**2, -1, window)[5:-5, 5:-5] - mu2_sq
+    sigma12 = cv2.filter2D(imgX * imgY, -1, window)[5:-5, 5:-5] - mu1_mu2
+
+    ssim_map = ((2 * mu1_mu2 + C1) * (2 * sigma12 + C2)) / ((mu1_sq + mu2_sq + C1) *
+                                                            (sigma1_sq + sigma2_sq + C2))
+    return ssim_map.mean()
+
+
+def SSIM(imgX, imgY):
+    '''calculate SSIM
+    the same outputs as MATLAB's
+    img1, img2: [0, 255]
+    '''
+    if not imgX.shape == imgY.shape:
+        raise ValueError('Input images must have the same dimensions.')
+    if imgX.ndim == 2:
+        return ssim(imgX, imgY)
+    elif imgX.ndim == 3:
+        if imgX.shape[2] == 3:
+            ssims = []
+            for i in range(3):
+                ssims.append(ssim(imgX, imgY))
+            return np.array(ssims).mean()
+        elif imgX.shape[2] == 1:
+            return ssim(np.squeeze(imgX), np.squeeze(imgY))
+    else:
+        raise ValueError('Wrong input image dimensions.')
 
 def MeanBrightnessError(imgX, imgY):
     #In the start the before and after picture get converted into grey scale picture
@@ -15,7 +70,6 @@ def MeanBrightnessError(imgX, imgY):
     #After the convertion the formula can be calculated for the 2 pictures by doing as seen down under.
     result = abs(np.mean(imgXGrey)-np.mean(imgYGrey))
     return result
-    
 
 def AverageGradient(imgX, imgY):
     #Firstly the images har converted into greyscale so that there is less information to work with.
@@ -103,6 +157,9 @@ def UnderwaterQualityEvaluation(imgX, imgY):
                    c[0] * Chroma[1] + c[1] * Contrast[1] + c[2] * AverageSaturation[1]]
     return resultUCIQE
 
+print(f'Mean Square Error: {MSE(imageBefore, imageAfter)}')
+print(f'Peak Signal to Noise Ratio: {PSNR(imageBefore, imageAfter)}')
+print(f'Structure Similarity Index Method:0 {SSIM(imageBefore, imageAfter)}')
 print(f'Mean Brightness Error: {MeanBrightnessError(imageBefore, imageAfter)}')
 print(f'Average Gradient: {AverageGradient(imageBefore, imageAfter)}')
 print(f'Patch-based Contrast Quality Index (PCQI): {ContrastQualityIndex(imageBefore, imageAfter, 32)}')
