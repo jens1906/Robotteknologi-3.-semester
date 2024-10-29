@@ -1,7 +1,9 @@
 import cv2 as cv
 import numpy as np
+import os
 
-def dark_channel(image, size=15):
+def dark_channel(image):
+    size=15
     """Compute the dark channel prior of the image."""
     min_channel = np.amin(image, axis=2)
     kernel = cv.getStructuringElement(cv.MORPH_RECT, (size, size))
@@ -23,23 +25,26 @@ def atmospheric_light(image, dark_channel):
     A = np.mean(brightest_pixels, axis=0)
     return A
 
-def transmission_map(image, A, omega=0.95, size=15):
+def transmission_map(image, A):
+    omega=0.95
+    size=15
     """Estimate the transmission map."""
     norm_image = image / A
     dark_channel_norm = dark_channel(norm_image, size)
     transmission = 1 - omega * dark_channel_norm
     return transmission
 
-def recover_image(image, transmission, A, t0=0.1):
+def recover_image(image, transmission, A):
+    t0=0.1
     """Recover the scene radiance."""
     transmission = np.maximum(transmission, t0)
     J = (image - A) / transmission[:, :, np.newaxis] + A
     J = np.clip(J, 0, 1)
     return J
 
-def dehaze(image_path):
+def dehaze(hazy_image):
     """Main function to dehaze an image."""
-    image = cv.imread(image_path) / 255.0
+    image = hazy_image / 255.0
     
     # Split the image into R, G, B channels
     b_channel, g_channel, r_channel = cv.split(image)
@@ -66,8 +71,9 @@ def dehaze(image_path):
     
     return dehazed_image
 
-hazy_image_path = "P3/Dehazing/Image_Dehazing_test/Dehaze_Samples/road.jpg"
-hazy_image = cv.imread(hazy_image_path)
+script_dir = os.path.dirname(__file__)
+image_path = os.path.join(script_dir, 'Dehaze_Samples', 'underwater2.png')
+hazy_image = cv.imread(image_path)
 if hazy_image is None:
     print(f"Error: Unable to load image at {hazy_image_path}")
 else:
