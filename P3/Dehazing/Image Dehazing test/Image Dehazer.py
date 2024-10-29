@@ -41,14 +41,31 @@ def dehaze(image_path):
     """Main function to dehaze an image."""
     image = cv.imread(image_path) / 255.0
     
-    dark = dark_channel(image)
-    A = atmospheric_light(image, dark)
-    transmission = transmission_map(image, A)
+    # Split the image into R, G, B channels
+    b_channel, g_channel, r_channel = cv.split(image)
     
-    dehazed_image = recover_image(image, transmission, A)
+    # Apply dehazing functions on each channel
+    dark_r = dark_channel(r_channel)
+    dark_g = dark_channel(g_channel)
+    dark_b = dark_channel(b_channel)
     
-    return (dehazed_image * 255).astype(np.uint8)
+    A_r = atmospheric_light(r_channel, dark_r)
+    A_g = atmospheric_light(g_channel, dark_g)
+    A_b = atmospheric_light(b_channel, dark_b)
+    
+    transmission_r = transmission_map(r_channel, A_r)
+    transmission_g = transmission_map(g_channel, A_g)
+    transmission_b = transmission_map(b_channel, A_b)
+    
+    dehazed_r = recover_image(r_channel, transmission_r, A_r)
+    dehazed_g = recover_image(g_channel, transmission_g, A_g)
+    dehazed_b = recover_image(b_channel, transmission_b, A_b)
+    
+    # Merge the dehazed channels back into a single image
+    dehazed_image = cv.merge((dehazed_b, dehazed_g, dehazed_r))
+    
+    return dehazed_image
 
-# Example usage
-dehazed_image = dehaze('hazy_image.jpg')
+hazy_image = cv.imread('hazy_image.jpg')
+dehazed_image = dehaze(hazy_image)
 cv.imwrite('dehazed_image.jpg', dehazed_image)
