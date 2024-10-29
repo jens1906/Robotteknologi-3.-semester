@@ -10,9 +10,9 @@ if CCtesting:
     os.system('cls')
     print("Color Correction Testing:", CCtesting)
     print("---------------Import Test Boards--------------")
-    normboard = cv.imread('P3/ColorCorrection/Color-Checker.jpg')  # Use '/' for paths
+    normboard = cv.imread('P3/ColorCorrection/Color-Checker.jpg')
     normboard = cv.cvtColor(normboard, cv.COLOR_BGR2RGB)
-    fuckboard = cv.imread('P3/ColorCorrection/Color-Checker-1.png')  # Use '/' for paths
+    fuckboard = cv.imread('P3/ColorCorrection/Color-Checker-1.png')
     fuckboard = cv.cvtColor(fuckboard, cv.COLOR_BGR2RGB)
 
     #f, axarr = plt.subplots(1, 2)  # Creates a 1x2 grid
@@ -66,6 +66,6 @@ if CCtesting:
     print("adjusted fuckboard_scheme")
     print(np.dot(Mcc, IRGB.T).T)
 
-
+#print hello world
 
 
