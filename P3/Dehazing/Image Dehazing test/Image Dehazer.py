@@ -66,6 +66,6 @@ def dehaze(image_path):
     
     return dehazed_image
 
-hazy_image = cv.imread('hazy_image.jpg')
+hazy_image = 'Robotteknologi-3.-semester\P3\Dehazing\Image Dehazing test\Dehaze_Samples\Playground.png'
 dehazed_image = dehaze(hazy_image)
 cv.imwrite('dehazed_image.jpg', dehazed_image)
