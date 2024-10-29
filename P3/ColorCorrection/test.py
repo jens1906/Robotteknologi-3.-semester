@@ -26,6 +26,7 @@ IRGB = np.array([
     (78, 88, 75)
 ])
 
+
 def calculate_mcc(SRGB, IRGB):
     # Convert SRGB and IRGB to 8x3 matrices for matrix calculations
     SRGB_matrix = np.vstack(SRGB)
