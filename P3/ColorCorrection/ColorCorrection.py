@@ -48,10 +48,10 @@ if CCtesting:
     print(get_color_scheme(fuckboard))
 
 def calculate_mcc(SRGB, IRGB):
-    # Step 1: Compute SRGB * IRGB^T
+    # Step 1: Compute SRGB^T * IRGB
     s_rgb_i_rgb_t = np.dot(SRGB.T, IRGB)
     
-    # Step 2: Compute IRGB * IRGB^T
+    # Step 2: Compute IRGB^T * IRGB
     i_rgb_i_rgb_t = np.dot(IRGB.T, IRGB)
     
     # Step 3: Take the inverse of IRGB * IRGB^T
