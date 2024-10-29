@@ -4,7 +4,7 @@ import numpy as np
 def dark_channel(image, size=15):
     """Compute the dark channel prior of the image."""
     min_channel = np.amin(image, axis=2)
-    kernel = cv.getStructuringElement(cv2.MORPH_RECT, (size, size))
+    kernel = cv.getStructuringElement(cv.MORPH_RECT, (size, size))
     dark_channel = cv.erode(min_channel, kernel)
     return dark_channel
 
