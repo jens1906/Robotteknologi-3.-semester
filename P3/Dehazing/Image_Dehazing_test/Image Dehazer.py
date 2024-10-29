@@ -2,10 +2,13 @@ import cv2 as cv
 import numpy as np
 import os
 
-def dark_channel(image):
-    size=15
+def dark_channel(image, size=3): #size=15
     """Compute the dark channel prior of the image."""
-    min_channel = np.amin(image, axis=2)
+    if len(image.shape) == 3:
+        min_channel = np.amin(image, axis=2)
+    else:
+        min_channel = image  # If the image is already single-channel
+
     kernel = cv.getStructuringElement(cv.MORPH_RECT, (size, size))
     dark_channel = cv.erode(min_channel, kernel)
     return dark_channel
@@ -17,7 +20,7 @@ def atmospheric_light(image, dark_channel):
     num_brightest = int(max(num_pixels * 0.001, 1))
     
     dark_vec = dark_channel.ravel()
-    image_vec = image.reshape(num_pixels, 3)
+    image_vec = image.reshape(num_pixels, -1)  # Reshape to (num_pixels, channels)
     
     indices = np.argsort(dark_vec)[-num_brightest:]
     brightest_pixels = image_vec[indices]
@@ -25,21 +28,17 @@ def atmospheric_light(image, dark_channel):
     A = np.mean(brightest_pixels, axis=0)
     return A
 
-def transmission_map(image, A):
-    omega=0.95
-    size=15
+def transmission_map(image, A, omega=0.95, size=3): #sizw=15
     """Estimate the transmission map."""
     norm_image = image / A
     dark_channel_norm = dark_channel(norm_image, size)
     transmission = 1 - omega * dark_channel_norm
     return transmission
 
-def recover_image(image, transmission, A):
-    t0=0.1
-    """Recover the scene radiance."""
+def recover_image(image, transmission, A, t0=0.1):
+    """Recover the dehazed image."""
     transmission = np.maximum(transmission, t0)
-    J = (image - A) / transmission[:, :, np.newaxis] + A
-    J = np.clip(J, 0, 1)
+    J = (image - A) / transmission + A
     return J
 
 def dehaze(hazy_image):
@@ -49,19 +48,22 @@ def dehaze(hazy_image):
     # Split the image into R, G, B channels
     b_channel, g_channel, r_channel = cv.split(image)
     
-    # Apply dehazing functions on each channel
+    # Compute the dark channel for each channel
     dark_r = dark_channel(r_channel)
     dark_g = dark_channel(g_channel)
     dark_b = dark_channel(b_channel)
-
+    
+    # Estimate the atmospheric light for each channel
     A_r = atmospheric_light(r_channel, dark_r)
     A_g = atmospheric_light(g_channel, dark_g)
     A_b = atmospheric_light(b_channel, dark_b)
     
+    # Estimate the transmission map for each channel
     transmission_r = transmission_map(r_channel, A_r)
     transmission_g = transmission_map(g_channel, A_g)
     transmission_b = transmission_map(b_channel, A_b)
     
+    # Recover the dehazed image for each channel
     dehazed_r = recover_image(r_channel, transmission_r, A_r)
     dehazed_g = recover_image(g_channel, transmission_g, A_g)
     dehazed_b = recover_image(b_channel, transmission_b, A_b)
@@ -71,14 +73,18 @@ def dehaze(hazy_image):
     
     return dehazed_image
 
+# Example usage
 script_dir = os.path.dirname(__file__)
-image_path = os.path.join(script_dir, 'Dehaze_Samples', 'underwater.jpg')
+image_path = os.path.join(script_dir, 'Dehaze_Samples', 'road3.jpg')
 hazy_image = cv.imread(image_path)
 if hazy_image is None:
     print(f"Error: Unable to load image at {image_path}")
 else:
     dehazed_image = dehaze(hazy_image)
-    cv.imshow('Hazy Image', hazy_image)
-    cv.imshow('Dehazed Image', dehazed_image)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
+    if dehazed_image is not None:
+        cv.imshow('Hazy Image', hazy_image)
+        cv.imshow('Dehazed Image', dehazed_image)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+    else:
+        print("Failed to dehaze the image.")
