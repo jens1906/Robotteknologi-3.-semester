@@ -15,6 +15,7 @@ IRGB = np.array([
     [70, 128, 155, 65, 175, 168, 40, 75]
 ])
 
+
 def calculate_mcc(SRGB, IRGB):
     # Step 1: Compute SRGB * IRGB^T
     s_rgb_i_rgb_t = np.dot(SRGB, IRGB.T)

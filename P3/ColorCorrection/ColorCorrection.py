@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 global CCtesting
-CCtesting = True
+CCtesting = False
 import os
 os.system('cls')
 
@@ -11,33 +11,31 @@ print("-----------------------------")
 
 normboard = cv.imread('P3\ColorCorrection\Color-Checker.jpg')
 normboard = cv.cvtColor(normboard, cv.COLOR_BGR2RGB)
-#fuckboard = 
+fuckboard = cv.imread('P3\ColorCorrection\Color-Checker-1.png')
+fuckboard = cv.cvtColor(fuckboard, cv.COLOR_BGR2RGB)
+
 if CCtesting == True:
     plt.imshow(normboard) 
-    #plt.show()
+    plt.show()
 
 #find rgb value for each middle in each tile
-rows = 4
-cols = 6
-pixwidth, pixheight, dim = normboard.shape
-print("image size", pixwidth, pixheight)
-tile_width = pixwidth // cols
-tile_height = pixheight // rows
+def get_color_scheme(board):
+    rows, cols = 4, 6
+    imgheight, imgwidth, dim = board.shape
+    #print("Image size:", imgwidth, imgheight)
+    tile_width = imgwidth // cols
+    tile_height = imgheight // rows
 
-# Loop through each tile
-rgb_matrix = []
-for c in range(cols):
+
+    rgb_list = []
     for r in range(rows):
-        # Calculate the middle pixel coordinates of the current tile, ensuring they are within bounds
-        mid_x = min(c * tile_width + tile_width // 2, pixwidth - 1)
-        mid_y = min(r * tile_height + tile_height // 2, pixheight - 1)
-        #print("r, c, mid_x, mid_y", r, c, mid_x, mid_y)
+        for c in range(cols):
 
-        # Get the RGB values at the middle of the tile
-        rgb_values = normboard[mid_x, mid_y]
-        #print(f"Tile ({r+1}, {c+1}) - RGB: {rgb_values}")
-        rgb_matrix.append(rgb_values)
-print(rgb_matrix)
-print(rgb_matrix[0])
+            tilemidx, tilemidy = int(c * imgwidth / cols + (imgwidth / cols) / 2), int(r * imgheight / rows + (imgheight / rows) / 2)
+            rgb_value = board[tilemidy, tilemidx]
+            #print(r,c, tilemidx, tilemidy, rgb_value)
+            rgb_list.append(rgb_value)
+    return rgb_list
 
- #plt.show()
+print(get_color_scheme(normboard)[19])
+print(get_color_scheme(fuckboard)[19])
