@@ -49,10 +49,10 @@ if CCtesting:
 
 def calculate_mcc(SRGB, IRGB):
     # Step 1: Compute SRGB * IRGB^T
-    s_rgb_i_rgb_t = np.dot(SRGB, IRGB.T)
+    s_rgb_i_rgb_t = np.dot(SRGB.T, IRGB)
     
     # Step 2: Compute IRGB * IRGB^T
-    i_rgb_i_rgb_t = np.dot(IRGB, IRGB.T)
+    i_rgb_i_rgb_t = np.dot(IRGB.T, IRGB)
     
     # Step 3: Take the inverse of IRGB * IRGB^T
     i_rgb_i_rgb_t_inv = np.linalg.inv(i_rgb_i_rgb_t)
