@@ -34,6 +34,6 @@ for c in range(cols):
         print(f"Tile ({r+1}, {c+1}) - RGB: {rgb_values}")
         print("---------")
 
- 
+ print("hello")
 
  #plt.show()
