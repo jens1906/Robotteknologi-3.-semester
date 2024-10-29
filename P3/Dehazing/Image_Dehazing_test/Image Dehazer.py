@@ -53,7 +53,7 @@ def dehaze(hazy_image):
     dark_r = dark_channel(r_channel)
     dark_g = dark_channel(g_channel)
     dark_b = dark_channel(b_channel)
-    
+
     A_r = atmospheric_light(r_channel, dark_r)
     A_g = atmospheric_light(g_channel, dark_g)
     A_b = atmospheric_light(b_channel, dark_b)
@@ -72,10 +72,10 @@ def dehaze(hazy_image):
     return dehazed_image
 
 script_dir = os.path.dirname(__file__)
-image_path = os.path.join(script_dir, 'Dehaze_Samples', 'underwater2.png')
+image_path = os.path.join(script_dir, 'Dehaze_Samples', 'underwater.jpg')
 hazy_image = cv.imread(image_path)
 if hazy_image is None:
-    print(f"Error: Unable to load image at {hazy_image_path}")
+    print(f"Error: Unable to load image at {image_path}")
 else:
     dehazed_image = dehaze(hazy_image)
     cv.imshow('Hazy Image', hazy_image)
