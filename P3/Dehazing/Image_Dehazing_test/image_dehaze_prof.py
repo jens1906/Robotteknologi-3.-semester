@@ -73,12 +73,17 @@ def Recover(im, t, A, tx=0.1):
 
     return res
 
+
+script_dir = os.path.dirname(__file__)
+image_path = os.path.join(script_dir, 'Dehaze_Samples', 'underwater2.png')
+
+
 if __name__ == '__main__':
     import sys
     try:
         fn = sys.argv[1]
     except:
-        fn = os.path.abspath('./Dehaze_Samples/forest.jpg')
+        fn = image_path
 
     def nothing(*argv):
         pass
@@ -99,5 +104,5 @@ if __name__ == '__main__':
     cv2.imshow("dark", dark)
     cv2.imshow("t", t)
     cv2.imshow('I', src)
-    cv2.imshow('J', J)
+    cv2.imshow('J, dehazed', J)
     cv2.waitKey()
