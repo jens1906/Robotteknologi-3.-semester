@@ -66,6 +66,13 @@ def dehaze(image_path):
     
     return dehazed_image
 
-hazy_image = cv.imread('hazy_image.jpg')
-dehazed_image = dehaze(hazy_image)
-cv.imwrite('dehazed_image.jpg', dehazed_image)
+hazy_image_path = "P3/Dehazing/Image_Dehazing_test/Dehaze_Samples/road.jpg"
+hazy_image = cv.imread(hazy_image_path)
+if hazy_image is None:
+    print(f"Error: Unable to load image at {hazy_image_path}")
+else:
+    dehazed_image = dehaze(hazy_image)
+    cv.imshow('Hazy Image', hazy_image)
+    cv.imshow('Dehazed Image', dehazed_image)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
