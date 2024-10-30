@@ -3,6 +3,22 @@ import math
 import numpy as np
 import os
 
+def Dehaze(img):
+    I = img.astype('float64') / 255
+    dark = DarkChannel(I, 15)
+    A = AtmLight(I, dark)
+    te = TransmissionEstimate(I, A, 15)
+    t = TransmissionRefine(img, te)
+    J = Recover(I, t, A, 0.1)
+
+    cv2.imshow("dark", dark)
+    cv2.imshow("t", t)
+    cv2.imshow('I', img)
+    cv2.imshow('J, dehazed', J)
+    cv2.waitKey()
+
+    return J
+
 def DarkChannel(im, sz):
     b, g, r = cv2.split(im)
     dc = cv2.min(cv2.min(r, g), b)
@@ -14,7 +30,7 @@ def AtmLight(im, dark):
     [h, w] = im.shape[:2]
     imsz = h * w
     numpx = int(max(math.floor(imsz / 1000), 1))
-    darkvec = dark.reshape(imsz)
+    darkvec = dark.reshape(imsz)    
     imvec = im.reshape(imsz, 3)
 
     indices = darkvec.argsort()
@@ -75,34 +91,7 @@ def Recover(im, t, A, tx=0.1):
 
 
 script_dir = os.path.dirname(__file__)
-image_path = os.path.join(script_dir, 'Dehaze_Samples', 'underwater2.png')
+image_path = os.path.join(script_dir, 'Dehaze_Samples', 'city.png')
+#image_path = "P3/Image_Dehazing/Dehaze_Samples/hyttetur.jpg"
 
-
-if __name__ == '__main__':
-    import sys
-    try:
-        fn = sys.argv[1]
-    except:
-        fn = image_path
-
-    def nothing(*argv):
-        pass
-
-    src = cv2.imread(fn)
-    if src is None:
-        print(f"Error: Unable to load image at {fn}")
-        sys.exit(1)
-
-    I = src.astype('float64') / 255
-
-    dark = DarkChannel(I, 15)
-    A = AtmLight(I, dark)
-    te = TransmissionEstimate(I, A, 15)
-    t = TransmissionRefine(src, te)
-    J = Recover(I, t, A, 0.1)
-
-    cv2.imshow("dark", dark)
-    cv2.imshow("t", t)
-    cv2.imshow('I', src)
-    cv2.imshow('J, dehazed', J)
-    cv2.waitKey()
+Dehaze(cv2.imread(image_path))
