@@ -26,7 +26,7 @@ template = cv2.imread("P3/Palette detection/checker_board.PNG", cv2.IMREAD_GRAYS
 #template = cv2.imread("P3/Palette detection/checker_board.PNG", cv2.IMREAD_GRAYSCALE)
 
 
-def LocateChecker(img, template):
+def LocateChecker(img, template, imgNumber):
     orb = cv2.ORB_create()
 
     # Finds features in the images in terms of keypoints and descriptors
@@ -68,24 +68,23 @@ def LocateChecker(img, template):
 
     # Chopped image
     chopped = img_with_box[int(corners_img[0][0][1]):int(corners_img[2][0][1]), int(corners_img[0][0][0]):int(corners_img[2][0][0])]
-    LocChopped = [int(corners_img[0][0][1]),
-                  int(corners_img[2][0][1]),
+    LocChopped = [[int(corners_img[0][0][1]),
+                  int(corners_img[2][0][1])]
+                  ,[
                   int(corners_img[0][0][0]),
-                  int(corners_img[2][0][0])]
+                  int(corners_img[2][0][0])]]
 
     print(f"{int(corners_img[0][0][1])},     {int(corners_img[2][0][1])},     {int(corners_img[0][0][0])},     {int(corners_img[2][0][0])}")
     # Display the images
-    cv2.imshow("Template Image", cv2.resize(template, (1080, 606), interpolation = cv2.INTER_LINEAR))
-    cv2.imshow("Target Image with Bounding Box", cv2.resize(img_with_box, (1080, 606), interpolation = cv2.INTER_LINEAR))
-    cv2.imshow("Matches", cv2.resize(img_matches, (1080, 606), interpolation = cv2.INTER_LINEAR))
-    cv2.waitKey(0)
-    cv2.imshow("Chopped", cv2.resize(chopped, (1080, 606), interpolation = cv2.INTER_LINEAR))
-    cv2.waitKey(0)
-    return chopped
+    #cv2.imshow("Template Image", cv2.resize(template, (1080, 606), interpolation = cv2.INTER_LINEAR))
+    #cv2.imshow("Target Image with Bounding Box", cv2.resize(img_with_box, (1080, 606), interpolation = cv2.INTER_LINEAR))
+    cv2.imshow(f"Matches on: {imgNumber}", cv2.resize(img_matches, (1080, 606), interpolation = cv2.INTER_LINEAR))
+    #cv2.imshow("Chopped", cv2.resize(chopped, (1080, 606), interpolation = cv2.INTER_LINEAR))
+    
+    return LocChopped
 
-template = LocateChecker(images[0], template)
-template = LocateChecker(images[1]-images[0], template)
-
+for i in range(len(images)):
+    print(LocateChecker(images[i], template, i))
 toc = time.perf_counter()
 print(f"Downloaded the tutorial in {toc - tic:0.4f} seconds")
 
