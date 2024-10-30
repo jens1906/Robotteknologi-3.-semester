@@ -15,23 +15,9 @@ template = cv2.imread("P3/Palette detection/checker_board.PNG", cv2.IMREAD_GRAYS
 
 tic = time.perf_counter()
 
-<<<<<<< Updated upstream
-# Use Agg backend for non-interactive plotting
-matplotlib.use('Agg')
-#img = cv2.imread("P3/Palette detection/test_img.jpg", cv2.IMREAD_GRAYSCALE)
-template = cv2.imread("P3/Palette detection/checker_board.PNG", cv2.IMREAD_GRAYSCALE)
-
-#img = cv2.imread("P3/Palette detection/test_img.jpg", cv2.IMREAD_GRAYSCALE)
-#template = cv2.imread("P3/Palette detection/checker_board.PNG", cv2.IMREAD_GRAYSCALE)
-
-
-def LocateChecker(img, template, imgNumber):
-    orb = cv2.ORB_create()
-=======
 def LocateChecker(img, template):
     # Initialize the ORB detector algorithm
     orb = cv2.ORB_create(1000)
->>>>>>> Stashed changes
 
     # Finds features in the images in terms of keypoints and descriptors
     kp_img, desc_img = orb.detectAndCompute(img, None)
@@ -65,36 +51,8 @@ def LocateChecker(img, template):
     x_max, y_max = int(corners_img[2][0][0]), int(corners_img[2][0][1])
     colour_checker = img[y_min:y_max, x_min:x_max]
 
-<<<<<<< Updated upstream
-    # Chopped image
-    chopped = img_with_box[int(corners_img[0][0][1]):int(corners_img[2][0][1]), int(corners_img[0][0][0]):int(corners_img[2][0][0])]
-    LocChopped = [[int(corners_img[0][0][1]),
-                  int(corners_img[2][0][1])]
-                  ,[
-                  int(corners_img[0][0][0]),
-                  int(corners_img[2][0][0])]]
-
-    print(f"{int(corners_img[0][0][1])},     {int(corners_img[2][0][1])},     {int(corners_img[0][0][0])},     {int(corners_img[2][0][0])}")
-    # Display the images
-    #cv2.imshow("Template Image", cv2.resize(template, (1080, 606), interpolation = cv2.INTER_LINEAR))
-    #cv2.imshow("Target Image with Bounding Box", cv2.resize(img_with_box, (1080, 606), interpolation = cv2.INTER_LINEAR))
-    cv2.imshow(f"Matches on: {imgNumber}", cv2.resize(img_matches, (1080, 606), interpolation = cv2.INTER_LINEAR))
-    #cv2.imshow("Chopped", cv2.resize(chopped, (1080, 606), interpolation = cv2.INTER_LINEAR))
-    
-    return LocChopped
-
-for i in range(len(images)):
-    print(LocateChecker(images[i], template, i))
-toc = time.perf_counter()
-print(f"Downloaded the tutorial in {toc - tic:0.4f} seconds")
-
-
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-=======
     toc = time.perf_counter()
     print(f"Downloaded the tutorial in {toc - tic:0.4f} seconds")
-
 
     def display_all():
         img_matches = cv2.drawMatches(template, kp_template, img, kp_img, matches[:5], None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
@@ -106,9 +64,7 @@ cv2.destroyAllWindows()
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    
     return colour_checker
 
 template = LocateChecker(images[0], template)
 template = LocateChecker(images[1]-images[0], template)
->>>>>>> Stashed changes
