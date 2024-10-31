@@ -5,51 +5,34 @@ import matplotlib
 import time
 import os
 
-folder_path = "C://Users//jens1//Documents//GitHub//Robotteknologi-3.-semester//P3//Palette detection//Testpics"
+folder_path = "P3/Palette detection/Testpics"
 dir_list = os.listdir(folder_path)
 print(dir_list)
 
-images = []
-for file in dir_list:
-    image_path = os.path.join(folder_path, file)
-    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    images.append(image)
+images = [cv2.imread(os.path.join(folder_path, file), cv2.IMREAD_GRAYSCALE) for file in dir_list]
+
+template = cv2.imread("P3/Palette detection/checker_board.PNG", cv2.IMREAD_GRAYSCALE)
 
 tic = time.perf_counter()
 
-# Use Agg backend for non-interactive plotting
-matplotlib.use('Agg')
-#img = cv2.imread("P3/Palette detection/test_img.jpg", cv2.IMREAD_GRAYSCALE)
-template = cv2.imread("P3/Palette detection/checker_board.PNG", cv2.IMREAD_GRAYSCALE)
-
-#img = cv2.imread("P3/Palette detection/test_img.jpg", cv2.IMREAD_GRAYSCALE)
-#template = cv2.imread("P3/Palette detection/checker_board.PNG", cv2.IMREAD_GRAYSCALE)
-
-
-def LocateChecker(img, template, imgNumber):
-    orb = cv2.ORB_create()
+def LocateChecker(img, template):
+    # Initialize the ORB detector algorithm
+    orb = cv2.ORB_create(1000)
 
     # Finds features in the images in terms of keypoints and descriptors
-    keypoints_img, descriptors_img = orb.detectAndCompute(img, None)
-    keypoints_template, descriptors_template = orb.detectAndCompute(template, None)
+    kp_img, desc_img = orb.detectAndCompute(img, None)
+    kp_template, desc_template = orb.detectAndCompute(template, None)
 
     # Matches the features of the two images
     matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-    matches = matcher.match(descriptors_template, descriptors_img)
+    matches = matcher.match(desc_template, desc_img)
 
     # Sort the matches based on distance (best matches first)
-    matches = sorted(matches, key=lambda x: x.distance)
-
-    # Draw the top matches
-    img_matches = cv2.drawMatches(template, keypoints_template, img, keypoints_img, matches[:5], None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+    matches = sorted(matches, key=lambda x: x.distance)[:50]
 
     # Extract the matched keypoints
-    points_template = np.zeros((len(matches), 2), dtype=np.float32)
-    points_img = np.zeros((len(matches), 2), dtype=np.float32)
-
-    for i, match in enumerate(matches):
-        points_template[i, :] = keypoints_template[match.queryIdx].pt
-        points_img[i, :] = keypoints_img[match.trainIdx].pt
+    points_template = np.float32([kp_template[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
+    points_img = np.float32([kp_img[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
 
     # Find the homography matrix
     homography, mask = cv2.findHomography(points_template, points_img, cv2.RANSAC)
@@ -58,36 +41,30 @@ def LocateChecker(img, template, imgNumber):
     h, w = template.shape[:2]
 
     # Define the corners of the template image
-    corners_template = np.array([[0, 0], [w, 0], [w, h], [0, h]], dtype=np.float32).reshape(-1, 1, 2)
+    corners_template = np.float32([[0, 0], [w, 0], [w, h], [0, h]])
 
     # Warp the corners of the template image to the target image
-    corners_img = cv2.perspectiveTransform(corners_template, homography)
+    corners_img = cv2.perspectiveTransform(corners_template.reshape(-1, 1, 2), homography)
 
-    # Draw the bounding box around the detected square
-    img_with_box = cv2.polylines(img, [np.int32(corners_img)], True, (0, 255, 0), 3, cv2.LINE_AA)
+    # Cropping img
+    x_min, y_min = int(corners_img[0][0][0]), int(corners_img[0][0][1])
+    x_max, y_max = int(corners_img[2][0][0]), int(corners_img[2][0][1])
+    colour_checker = img[y_min:y_max, x_min:x_max]
 
-    # Chopped image
-    chopped = img_with_box[int(corners_img[0][0][1]):int(corners_img[2][0][1]), int(corners_img[0][0][0]):int(corners_img[2][0][0])]
-    LocChopped = [[int(corners_img[0][0][1]),
-                  int(corners_img[2][0][1])]
-                  ,[
-                  int(corners_img[0][0][0]),
-                  int(corners_img[2][0][0])]]
+    toc = time.perf_counter()
+    print(f"Downloaded the tutorial in {toc - tic:0.4f} seconds")
 
-    print(f"{int(corners_img[0][0][1])},     {int(corners_img[2][0][1])},     {int(corners_img[0][0][0])},     {int(corners_img[2][0][0])}")
-    # Display the images
-    #cv2.imshow("Template Image", cv2.resize(template, (1080, 606), interpolation = cv2.INTER_LINEAR))
-    #cv2.imshow("Target Image with Bounding Box", cv2.resize(img_with_box, (1080, 606), interpolation = cv2.INTER_LINEAR))
-    cv2.imshow(f"Matches on: {imgNumber}", cv2.resize(img_matches, (1080, 606), interpolation = cv2.INTER_LINEAR))
-    #cv2.imshow("Chopped", cv2.resize(chopped, (1080, 606), interpolation = cv2.INTER_LINEAR))
-    
-    return LocChopped
+    def display_all():
+        img_matches = cv2.drawMatches(template, kp_template, img, kp_img, matches[:5], None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+        img_with_box = cv2.polylines(img, [np.int32(corners_img)], True, (0, 255, 0), 3, cv2.LINE_AA)
+        cv2.imshow("Matches", img_matches)
+        cv2.imshow("Best Matched Object", img_with_box)
+        cv2.imshow("Template Image", template)
+        cv2.imshow("Colour Checker", colour_checker)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
-for i in range(len(images)):
-    print(LocateChecker(images[i], template, i))
-toc = time.perf_counter()
-print(f"Downloaded the tutorial in {toc - tic:0.4f} seconds")
+    return colour_checker
 
-
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+template = LocateChecker(images[0], template)
+template = LocateChecker(images[1]-images[0], template)
