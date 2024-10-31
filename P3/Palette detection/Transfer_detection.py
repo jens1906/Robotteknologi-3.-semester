@@ -1,67 +1,109 @@
-import cv2 as cv
-import os
+import cv2
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib
+import time
+import os
 
-folder_path = "C://Users//jens1//Documents//GitHub//Robotteknologi-3.-semester//P3//Palette detection//Testpics"
+#folder_path = "C://Users//jens1//Documents//GitHub//Robotteknologi-3.-semester//P3//Palette detection//Testpics"
+folder_path = "P3//Palette detection//SmallMovement"
 dir_list = os.listdir(folder_path)
 print(dir_list)
 
 images = []
 for file in dir_list:
     image_path = os.path.join(folder_path, file)
-    image = cv.imread(image_path)
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     images.append(image)
 
-global template
-template = cv.imread("C://Users//jens1//Documents//GitHub//Robotteknologi-3.-semester//P3//Palette detection//Checker.png")
+tic = time.perf_counter()
 
-def Template(imgpre, imgfur, Template, loc = 0):
-    img = imgpre
-    if loc != 0:
-        print(loc)
-        img = imgpre-imgfur
-        Template=(imgfur-imgpre)[loc[1]:loc[1] + template.shape[0], 
-                                 loc[0]:loc[0] + template.shape[1]]
-        cv.imshow("templatein", cv.resize(Template, (1080, 606), interpolation = cv.INTER_LINEAR))
-        cv.imshow("imgin", cv.resize(img, (1080, 606), interpolation = cv.INTER_LINEAR))
-        cv.waitKey(0)    
-    cv.imshow("templateout", cv.resize(Template, (1080, 606), interpolation = cv.INTER_LINEAR))
-    cv.imshow("imgout", cv.resize(img, (1080, 606), interpolation = cv.INTER_LINEAR))
-    cv.waitKey(0)     
-    Temp_match_result = cv.matchTemplate(cv.cvtColor(img, cv.COLOR_BGR2GRAY), cv.cvtColor(Template, cv.COLOR_BGR2GRAY), cv.TM_CCOEFF_NORMED)
-    Location_list = np.where(Temp_match_result >= 0.4)
-    Position_list = list(zip(*Location_list[::-1]))
-    print(f"PosList: {Position_list}")
+# Use Agg backend for non-interactive plotting
+matplotlib.use('Agg')
+#img = cv2.imread("P3/Palette detection/test_img.jpg", cv2.IMREAD_GRAYSCALE)
+template = cv2.imread("P3/Palette detection/checker_board.PNG", cv2.IMREAD_GRAYSCALE)
 
-    if(len(Position_list)!=0):
-        Current_X, Current_Y = Position_list[0]
-        Dim=template.shape
-        cv.rectangle(img, Position_list[0], (Current_X + Dim[1], Current_Y + Dim[0]), [0,0,255], 25)
-        print("FOUND")  
-        cv.imshow("template", cv.resize(img, (1080, 606), interpolation = cv.INTER_LINEAR))
-        cv.waitKey(0) 
-        return Position_list[0]    
-    return 
+#img = cv2.imread("P3/Palette detection/test_img.jpg", cv2.IMREAD_GRAYSCALE)
+#template = cv2.imread("P3/Palette detection/checker_board.PNG", cv2.IMREAD_GRAYSCALE)
+Precision = 200
 
-Loc = Template(images[0], 0, template, 0)
-Loc = Template(images[0], images[1], template, Loc)
-#cv.imshow("Imagestuff1", cv.resize(images[1]-images[0], (1080, 606), interpolation = cv.INTER_LINEAR))
-#cv.imshow("Imagestuff2", cv.resize(images[0]-images[1], (1080, 606), interpolation = cv.INTER_LINEAR))
+def LocateChecker(img, template, imgNumber, cropLoc = 0):
+    if cropLoc != 0:
+        #print(img.shape)
+        #cv2.imshow(f"Picture: {imgNumber}", cv2.resize(img, (1080, 606), interpolation = cv2.INTER_LINEAR))
+        img = img[max(0, cropLoc[0][0] - Precision): min(img.shape[0], cropLoc[0][1] + Precision),  # y-axis (height)
+                  max(0, cropLoc[1][0] - Precision): min(img.shape[1], cropLoc[1][1] + Precision)   # x-axis (width)
+        ]
+        print(img.shape)        
+        #cv2.imshow(f"Section: {imgNumber}", cv2.resize(img, (1080, 606), interpolation = cv2.INTER_LINEAR))
+        #cv2.waitKey(0)
 
-cv.waitKey(0)
+    
+    orb = cv2.ORB_create()
+    # Finds features in the images in terms of keypoints and descriptors
+    keypoints_img, descriptors_img = orb.detectAndCompute(img, None)
+    keypoints_template, descriptors_template = orb.detectAndCompute(template, None)
+
+    # Matches the features of the two images
+    matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+    matches = matcher.match(descriptors_template, descriptors_img)
+
+    # Sort the matches based on distance (best matches first)
+    matches = sorted(matches, key=lambda x: x.distance)
+
+    # Draw the top matches
+    img_matches = cv2.drawMatches(template, keypoints_template, img, keypoints_img, matches[:5], None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+
+    # Extract the matched keypoints
+    points_template = np.zeros((len(matches), 2), dtype=np.float32)
+    points_img = np.zeros((len(matches), 2), dtype=np.float32)
+
+    for i, match in enumerate(matches):
+        points_template[i, :] = keypoints_template[match.queryIdx].pt
+        points_img[i, :] = keypoints_img[match.trainIdx].pt
+
+    # Find the homography matrix
+    homography, mask = cv2.findHomography(points_template, points_img, cv2.RANSAC)
+
+    # Get the dimensions of the template image
+    h, w = template.shape[:2]
+
+    # Define the corners of the template image
+    corners_template = np.array([[0, 0], [w, 0], [w, h], [0, h]], dtype=np.float32).reshape(-1, 1, 2)
+
+    # Warp the corners of the template image to the target image
+    corners_img = cv2.perspectiveTransform(corners_template, homography)
+
+    # Draw the bounding box around the detected square
+    img_with_box = cv2.polylines(img, [np.int32(corners_img)], True, (0, 255, 0), 3, cv2.LINE_AA)
+
+    # Chopped image
+    chopped = img_with_box[int(corners_img[0][0][1]):int(corners_img[2][0][1]), int(corners_img[0][0][0]):int(corners_img[2][0][0])]
+    LocChopped = [[int(corners_img[0][0][1]),
+                  int(corners_img[2][0][1])]
+                  ,[
+                  int(corners_img[0][0][0]),
+                  int(corners_img[2][0][0])]]
+
+    smartChopped = img[max(0, LocChopped[0][0] - Precision): min(img.shape[0], LocChopped[0][1] + Precision),  # y-axis (height)
+                       max(0, LocChopped[1][0] - Precision): min(img.shape[1], LocChopped[1][1] + Precision)   # x-axis (width)
+    ]
+    
+    print(f"{int(corners_img[0][0][1])},     {int(corners_img[2][0][1])},     {int(corners_img[0][0][0])},     {int(corners_img[2][0][0])}")
+    # Display the images
+    #cv2.imshow("Template Image", cv2.resize(template, (1080, 606), interpolation = cv2.INTER_LINEAR))
+    #cv2.imshow("Target Image with Bounding Box", cv2.resize(img_with_box, (1080, 606), interpolation = cv2.INTER_LINEAR))
+    #cv2.imshow(f"Matches on: {imgNumber}", cv2.resize(img_matches, (1080, 606), interpolation = cv2.INTER_LINEAR))
+    #cv2.imshow(f"SmartChopped: {imgNumber}", cv2.resize(smartChopped, (1080, 606), interpolation = cv2.INTER_LINEAR))
+    
+    return LocChopped
+location = 0
+for i in range(len(images)):
+    location = LocateChecker(images[i], template, i, location)
+    #print(location)
+toc = time.perf_counter()
+print(f"Downloaded the tutorial in {toc - tic:0.4f} seconds")
 
 
-
-#for i in range(len(images)):
-#    images[i] = cv.resize(images[i], (1080, 606), interpolation = cv.INTER_LINEAR)
-#cv.imshow("Image1", images[0])
-
-
-#cv.imshow("Image1", images[1]-images[0])
-#cv.imshow("Image2", images[2]-images[1])
-#cv.imshow("Image3", images[3]-images[2])
-#cv.imshow("Image4", images[4]-images[3])
-#cv.imshow("Image5", images[5]-images[4])
-#cv.imshow("Image6", images[6]-images[5])
-
-
+cv2.waitKey(0)
+cv2.destroyAllWindows()
