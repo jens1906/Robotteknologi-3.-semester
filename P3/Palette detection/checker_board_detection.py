@@ -1,23 +1,30 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib
 import time
 import os
 
 folder_path = "P3/Palette detection/Testpics"
+
 dir_list = os.listdir(folder_path)
+dir_list = sorted(dir_list, key=lambda x: int(x.split('.')[0]))
 print(dir_list)
 
 images = [cv2.imread(os.path.join(folder_path, file), cv2.IMREAD_GRAYSCALE) for file in dir_list]
 
 template = cv2.imread("P3/Palette detection/checker_board.PNG", cv2.IMREAD_GRAYSCALE)
 
+width = int(images[0].shape[1] * 0.5)
+height = int(images[0].shape[0] * 0.5)
+images[0] = cv2.resize(images[0], (width, height), interpolation=cv2.INTER_AREA)
+
+
+# Start two timers
 tic = time.perf_counter()
+
 
 def LocateChecker(img, template):
     # Initialize the ORB detector algorithm
-    orb = cv2.ORB_create(1000)
+    orb = cv2.ORB_create()
 
     # Finds features in the images in terms of keypoints and descriptors
     kp_img, desc_img = orb.detectAndCompute(img, None)
@@ -50,11 +57,8 @@ def LocateChecker(img, template):
     x_min, y_min = int(corners_img[0][0][0]), int(corners_img[0][0][1])
     x_max, y_max = int(corners_img[2][0][0]), int(corners_img[2][0][1])
     colour_checker = img[y_min:y_max, x_min:x_max]
-
-    toc = time.perf_counter()
-    print(f"Downloaded the tutorial in {toc - tic:0.4f} seconds")
-
-    def display_all():
+    
+    def display_results():
         img_matches = cv2.drawMatches(template, kp_template, img, kp_img, matches[:5], None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
         img_with_box = cv2.polylines(img, [np.int32(corners_img)], True, (0, 255, 0), 3, cv2.LINE_AA)
         cv2.imshow("Matches", img_matches)
@@ -66,5 +70,8 @@ def LocateChecker(img, template):
 
     return colour_checker
 
-template = LocateChecker(images[0], template)
-template = LocateChecker(images[1]-images[0], template)
+for image in images:
+    LocateChecker(image, template)
+
+toc = time.perf_counter()
+print(f"Downloaded the tutorial in {toc - tic:0.4f} seconds")
