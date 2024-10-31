@@ -28,6 +28,8 @@ def LocateChecker(img, template, imgNumber, PreviousLocation = 0):
         img = img[Y[0]: Y[1],  # y-axis (height)
                   X[0]: X[1]]   # x-axis (width)
 
+        cv2.imshow(f"Section:", img)
+
         if Testing:
             print(f"Previous location{imgNumber}: {PreviousLocation}")
             print(f"Max min stuff: {X[0]}, {Y[0]}, {X[1]}, {Y[1]}")
@@ -145,8 +147,8 @@ def TestVideoFile():
             location = LocateChecker(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), template, i, location)
             i += 1
             cv2.imshow(f"Result:", cv2.resize(img, (frameWidth, frameHeight)))
-            #if cv2.waitKey(1) and 0xFF == ord('q'):
-            #    break
+            if cv2.waitKey(1) and 0xFF == ord('q'):
+                break
 
 
 TestVideoFile()
