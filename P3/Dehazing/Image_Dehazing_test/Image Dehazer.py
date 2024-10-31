@@ -129,15 +129,21 @@ def dehaze(hazy_image):
     cv.imshow('Dark channel', cv.merge(dark_channels))
     cv.imshow('Transmission map', cv.merge(transmission_maps))
     cv.imshow('Refined transmission', cv.merge(refined_transmissions))
-    
+
     #Merge the dehazed channels back into a single image
     dehazed_image = cv.merge(dehazed_channels)
-    
+
+    output_dir = os.path.join(script_dir, 'Dehaze_Results')
+    cv.imwrite(os.path.join(output_dir, 'dark_channel.png'), cv.merge(dark_channels)*255)
+    cv.imwrite(os.path.join(output_dir, 'transmission_map.png'), cv.merge(transmission_maps)*255)
+    cv.imwrite(os.path.join(output_dir, 'refined_transmission.png'), cv.merge(refined_transmissions)*255)
+    cv.imwrite(os.path.join(output_dir, 'dehazed_image.png'), dehazed_image*255)
+       
     return dehazed_image
 
 #Example usage (delete when implemented in the main script!!)
 script_dir = os.path.dirname(__file__)
-image_path = os.path.join(script_dir, 'Dehaze_Samples', 'city.png')
+image_path = os.path.join(script_dir, 'Dehaze_Samples', 'underwater.jpg')
 hazy_image = cv.imread(image_path)
 if hazy_image is None:
     print(f"Error: Unable to load image at {image_path}")
