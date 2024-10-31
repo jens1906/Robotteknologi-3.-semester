@@ -14,91 +14,91 @@ def dark_channel(image, size=15):
 def atmospheric_light(image, dark_channel):
     """Estimate the atmospheric light in the image."""
     #Get the dimensions of the image
-    h, w = image.shape[:2]
-    num_pixels = h * w
+    height, width = image.shape[:2]
+    num_pixels = height * width
 
     #Number of brightest pixels to consider
-    num_brightest = int(max(num_pixels * 0.001, 1))
+    num_brightest_pixels = int(max(num_pixels * 0.001, 1))
     
     #Flatten the dark channel and image
-    dark_vec = dark_channel.ravel()
-    image_vec = image.reshape(num_pixels, -1)  #Reshape to (num_pixels, channels)
+    dark_vector = dark_channel.ravel()
+    image_vector = image.reshape(num_pixels, -1)  #Reshape to (num_pixels, channels)
     
     #Get the indices of the brightest pixels in the dark channel
-    indices = np.argsort(dark_vec)[-num_brightest:]
+    brightest_indices = np.argsort(dark_vector)[-num_brightest_pixels:]
 
     #Get the corresponding brightest pixels in the image
-    brightest_pixels = image_vec[indices]
+    brightest_pixels = image_vector[brightest_indices]
     
     #Compute the atmospheric light as the mean of the brightest pixels
-    A = np.mean(brightest_pixels, axis=0)
-    return A
+    atmospheric_light = np.mean(brightest_pixels, axis=0)
+    return atmospheric_light
 
-def transmission_map(image, A, omega=0.95, size=15):
+def transmission_map(image, atmospheric_light, omega=0.95, size=15):
     """Estimate the transmission map."""
     #Normalize the image by the atmospheric light
-    norm_image = image / A
+    normalized_image = image / atmospheric_light
     #Compute the dark channel of the normalized image
-    dark_channel_norm = dark_channel(norm_image, size)
+    dark_channel_normalized = dark_channel(normalized_image, size)
     #Estimate the transmission map
-    transmission = 1 - omega * dark_channel_norm
+    transmission = 1 - omega * dark_channel_normalized
     return transmission
 
-def Guidedfilter(im, p, r, eps):
+def guided_filter(guidance_image, input_image, radius, epsilon):
     """Apply the guided filter to the image."""
     #Compute the mean of the guidance image and the input image
-    mean_I = cv.boxFilter(im, cv.CV_64F, (r, r))
-    mean_p = cv.boxFilter(p, cv.CV_64F, (r, r))
+    mean_guidance = cv.boxFilter(guidance_image, cv.CV_64F, (radius, radius))
+    mean_input = cv.boxFilter(input_image, cv.CV_64F, (radius, radius))
     #Compute the mean of the product of the guidance image and the input image
-    mean_Ip = cv.boxFilter(im * p, cv.CV_64F, (r, r))
+    mean_guidance_input = cv.boxFilter(guidance_image * input_image, cv.CV_64F, (radius, radius))
     #Compute the covariance of the guidance image and the input image
-    cov_Ip = mean_Ip - mean_I * mean_p
+    covariance_guidance_input = mean_guidance_input - mean_guidance * mean_input
 
     #Compute the variance of the guidance image
-    mean_II = cv.boxFilter(im * im, cv.CV_64F, (r, r))
-    var_I = mean_II - mean_I * mean_I
+    mean_guidance_squared = cv.boxFilter(guidance_image * guidance_image, cv.CV_64F, (radius, radius))
+    variance_guidance = mean_guidance_squared - mean_guidance * mean_guidance
 
     #Compute the linear coefficients a and b
-    a = cov_Ip / (var_I + eps)
-    b = mean_p - a * mean_I
+    a = covariance_guidance_input / (variance_guidance + epsilon)
+    b = mean_input - a * mean_guidance
 
     #Compute the mean of the linear coefficients
-    mean_a = cv.boxFilter(a, cv.CV_64F, (r, r))
-    mean_b = cv.boxFilter(b, cv.CV_64F, (r, r))
+    mean_a = cv.boxFilter(a, cv.CV_64F, (radius, radius))
+    mean_b = cv.boxFilter(b, cv.CV_64F, (radius, radius))
 
     #Compute the output image
-    q = mean_a * im + mean_b
-    return q
+    output_image = mean_a * guidance_image + mean_b
+    return output_image
 
-def TransmissionRefine(im, et):
+def refine_transmission_map(image, estimated_transmission):
     """Refine the transmission map."""
     #Convert the image to grayscale
-    gray = cv.cvtColor(im, cv.COLOR_BGR2GRAY)
+    grayscale_image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
     #Normalize the grayscale image
-    gray = np.float64(gray) / 255.0  #Change to 4095 for 12-bit images
-    r = 60
-    eps = 0.0001
+    normalized_grayscale = np.float64(grayscale_image) / 255.0  # Change to 4095 for 12-bit images
+    radius = 60
+    epsilon = 0.0001
     #Apply the guided filter to refine the transmission map
-    t = Guidedfilter(gray, et, r, eps)
-    return t
+    refined_transmission = guided_filter(normalized_grayscale, estimated_transmission, radius, epsilon)
+    return refined_transmission
 
-def recover_image(image, transmission, A, t0=0.1):
+def recover_image(image, transmission, atmospheric_light, transmission_threshold=0.1):
     """Recover the dehazed image."""
     #Ensure the transmission map is above a threshold
-    transmission = np.maximum(transmission, t0)
+    transmission = np.maximum(transmission, transmission_threshold)
     #Recover the scene radiance
-    J = (image - A) / transmission + A
-    return J
+    recovered_image = (image - atmospheric_light) / transmission + atmospheric_light
+    return recovered_image
 
 def dehaze(hazy_image):
     """Main function to dehaze an image."""
     #Normalize the hazy image
-    image = hazy_image / 255.0  #Change to 4095 for 12-bit images
+    normalized_image = hazy_image / 255.0  #Change to 4095 for 12-bit images
     
-    #Split the image into R, G, B channels
-    channels = cv.split(image)
+    #Split the image into R,G,B channels
+    channels = cv.split(normalized_image)
     dark_channels = []
-    A_channels = []
+    atmospheric_lights = []
     transmission_maps = []
     refined_transmissions = []
     dehazed_channels = []
@@ -110,19 +110,19 @@ def dehaze(hazy_image):
         dark_channels.append(dark)
         
         #Estimate the atmospheric light
-        A = atmospheric_light(channel, dark)
-        A_channels.append(A)
+        atmospheric_light = atmospheric_light(channel, dark)
+        atmospheric_lights.append(atmospheric_light)
         
         #Estimate the transmission map
-        transmission = transmission_map(channel, A)
+        transmission = transmission_map(channel, atmospheric_light)
         transmission_maps.append(transmission)
         
         #Refine the transmission map
-        refined_transmission = TransmissionRefine(hazy_image, transmission)
+        refined_transmission = refine_transmission_map(hazy_image, transmission)
         refined_transmissions.append(refined_transmission)
         
         #Recover the dehazed image
-        dehazed = recover_image(channel, refined_transmission, A)
+        dehazed = recover_image(channel, refined_transmission, atmospheric_light)
         dehazed_channels.append(dehazed)
     
     #Merge the dehazed channels back into a single image
