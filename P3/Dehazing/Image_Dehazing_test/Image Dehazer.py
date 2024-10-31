@@ -2,15 +2,10 @@ import cv2 as cv
 import numpy as np
 import os
 
-def dark_channel(image, size=15): #size=15
+def dark_channel(image, size=15):
     """Compute the dark channel prior of the image."""
-    if len(image.shape) == 3:
-        min_channel = np.amin(image, axis=2)
-    else:
-        min_channel = image  # If the image is already single-channel - error recovery
-
     kernel = cv.getStructuringElement(cv.MORPH_RECT, (size, size))
-    dark_channel = cv.erode(min_channel, kernel)
+    dark_channel = cv.erode(image, kernel)
     return dark_channel
 
 def atmospheric_light(image, dark_channel):
@@ -20,7 +15,7 @@ def atmospheric_light(image, dark_channel):
     num_brightest = int(max(num_pixels * 0.001, 1))
     
     dark_vec = dark_channel.ravel()
-    image_vec = image.reshape(num_pixels, -1)  # Reshape to (num_pixels, channels)
+    image_vec = image.reshape(num_pixels, -1)
     
     indices = np.argsort(dark_vec)[-num_brightest:]
     brightest_pixels = image_vec[indices]
@@ -28,7 +23,7 @@ def atmospheric_light(image, dark_channel):
     A = np.mean(brightest_pixels, axis=0)
     return A
 
-def transmission_map(image, A, omega=0.95, size=15): #size=15
+def transmission_map(image, A, omega=0.95, size=15):
     """Estimate the transmission map."""
     norm_image = image / A
     dark_channel_norm = dark_channel(norm_image, size)
@@ -57,7 +52,7 @@ def Guidedfilter(im, p, r, eps):
 def TransmissionRefine(im, et):
     """Refine the transmission map."""
     gray = cv.cvtColor(im, cv.COLOR_BGR2GRAY)
-    gray = np.float64(gray) / 255
+    gray = np.float64(gray) / 255.0  # Change to 4095 for 12-bit images
     r = 60
     eps = 0.0001
     t = Guidedfilter(gray, et, r, eps)
@@ -69,10 +64,9 @@ def recover_image(image, transmission, A, t0=0.1):
     J = (image - A) / transmission + A
     return J
 
-
 def dehaze(hazy_image):
     """Main function to dehaze an image."""
-    image = hazy_image / 255.0
+    image = hazy_image / 255.0  # Change to 4095 for 12-bit images
     
     channels = cv.split(image)
     dark_channels = []
@@ -92,27 +86,31 @@ def dehaze(hazy_image):
         transmission_maps.append(transmission)
         
         refined_transmission = TransmissionRefine(hazy_image, transmission)
-
         refined_transmissions.append(refined_transmission)
         
         dehazed = recover_image(channel, refined_transmission, A)
         dehazed_channels.append(dehazed)
 
-    cv.imshow('Dark channel', cv.merge(dark_channels))
-    cv.imshow('Transmission map', cv.merge(transmission_maps))
-    cv.imshow('Refined transmission', cv.merge(refined_transmissions))
-    
     dehazed_image = cv.merge(dehazed_channels)
     
     return dehazed_image
 
+def calculate_psnr(image1, image2):
+    """Calculate the Peak Signal-to-Noise Ratio (PSNR) between two images."""
+    psnr_value = cv.PSNR(image1, image2)
+    return psnr_value
 
+# Example usage
 script_dir = os.path.dirname(__file__)
-image_path = os.path.join(script_dir, 'Dehaze_Samples', 'city.png')
+image_path = os.path.join(script_dir, 'Dehaze_Samples', 'underwater.jpg')
 hazy_image = cv.imread(image_path)
-dehazed_image = dehaze(hazy_image)
-
-cv.imshow('Dehazed image', dehazed_image)
-
-cv.waitKey(0)
-cv.destroyAllWindows()
+if hazy_image is None:
+    print(f"Error: Unable to load image at {image_path}")
+else:
+    dehazed_image = dehaze(hazy_image)
+    cv.imshow('Dehazed image', dehazed_image)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+    
+    psnr = calculate_psnr(hazy_image, (dehazed_image * 255).astype(np.uint8))
+    print(f"PSNR between hazy and dehazed image: {psnr:.2f} dB")

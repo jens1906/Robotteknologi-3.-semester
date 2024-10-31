@@ -1,25 +1,45 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib
 import time
 import os
 
+def display_checker(colour_checker):
+        cv2.imshow("Colour Checker", colour_checker)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        
+def display_box_checker(img,corners_img): # Draws a white box around the detected checkerboard
+    img_with_box = cv2.polylines(img.copy(), [np.int32(corners_img)], True, (255, 255, 255), 3, cv2.LINE_AA)
+    cv2.imshow("Detected Bounding Box", img_with_box)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+def scale_image(img, scale): # Scales the image by a factor of scale
+    width = int(img.shape[1] * scale)
+    height = int(img.shape[0] * scale)
+    return cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
+
+# Importing the images and template 
 folder_path = "P3/Palette detection/Testpics"
+
 dir_list = os.listdir(folder_path)
+dir_list = sorted(dir_list, key=lambda x: int(x.split('.')[0]))
 print(dir_list)
 
 images = [cv2.imread(os.path.join(folder_path, file), cv2.IMREAD_GRAYSCALE) for file in dir_list]
-
+#images = [cv2.imread(P3/Palette detection/RotatedChecker/3D_transformed_img.png", cv2.IMREAD_GRAYSCALE)]
 template = cv2.imread("P3/Palette detection/checker_board.PNG", cv2.IMREAD_GRAYSCALE)
 
+# Start timer
 tic = time.perf_counter()
 
-def LocateChecker(img, template):
-    # Initialize the ORB detector algorithm
-    orb = cv2.ORB_create(1000)
+# Initialize the ORB detector algorithm
+orb = cv2.ORB_create()
 
-    # Finds features in the images in terms of keypoints and descriptors
+def LocateChecker(img, template):
+    img = scale_image(img, 0.5)
+    
+    # Detects features in the images in terms of keypoints and descriptors
     kp_img, desc_img = orb.detectAndCompute(img, None)
     kp_template, desc_template = orb.detectAndCompute(template, None)
 
@@ -40,31 +60,19 @@ def LocateChecker(img, template):
     # Get the dimensions of the template image
     h, w = template.shape[:2]
 
-    # Define the corners of the template image
-    corners_template = np.float32([[0, 0], [w, 0], [w, h], [0, h]])
+    # Define the corners of the template image and its corresponding corners in the target image
+    corners_template = np.float32([[0, 0], [w, 0], [w, h], [0, h]]).reshape(-1, 1, 2)
+    corners_checker = cv2.perspectiveTransform(corners_template, homography)
 
-    # Warp the corners of the template image to the target image
-    corners_img = cv2.perspectiveTransform(corners_template.reshape(-1, 1, 2), homography)
-
-    # Cropping img
-    x_min, y_min = int(corners_img[0][0][0]), int(corners_img[0][0][1])
-    x_max, y_max = int(corners_img[2][0][0]), int(corners_img[2][0][1])
+    # Crop the detected colour checker from the img
+    x_min, y_min = np.min(corners_checker[:, 0, :], axis=0).astype(int)
+    x_max, y_max = np.max(corners_checker[:, 0, :], axis=0).astype(int)
     colour_checker = img[y_min:y_max, x_min:x_max]
 
-    toc = time.perf_counter()
-    print(f"Downloaded the tutorial in {toc - tic:0.4f} seconds")
+    return colour_checker, corners_checker
 
-    def display_all():
-        img_matches = cv2.drawMatches(template, kp_template, img, kp_img, matches[:5], None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
-        img_with_box = cv2.polylines(img, [np.int32(corners_img)], True, (0, 255, 0), 3, cv2.LINE_AA)
-        cv2.imshow("Matches", img_matches)
-        cv2.imshow("Best Matched Object", img_with_box)
-        cv2.imshow("Template Image", template)
-        cv2.imshow("Colour Checker", colour_checker)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+for image in images:
+    LocateChecker(image, template)
 
-    return colour_checker
-
-template = LocateChecker(images[0], template)
-template = LocateChecker(images[1]-images[0], template)
+toc = time.perf_counter()
+print(f"Downloaded the tutorial in {toc - tic:0.4f} seconds")
