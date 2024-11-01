@@ -12,3 +12,5 @@ if CCtesting == True:
     plt.imshow(normboard) 
     plt.show()
 
+#print hello world
+print("he")
