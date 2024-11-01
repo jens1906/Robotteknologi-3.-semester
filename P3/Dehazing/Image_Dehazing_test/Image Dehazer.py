@@ -8,8 +8,8 @@ def dark_channel(image, size=15):
     dark_channel = cv.erode(image, kernel)
     return dark_channel
 
-def atmospheric_light(image, dark_channel):
-    """Estimate the atmospheric light in the image."""
+def underwater_light(image, dark_channel):
+    """Estimate the underwater light in the image."""
     h, w = image.shape[:2]
     num_pixels = h * w
     num_brightest = int(max(num_pixels * 0.001, 1))
@@ -79,7 +79,7 @@ def dehaze(hazy_image):
         dark = dark_channel(channel)
         dark_channels.append(dark)
         
-        A = atmospheric_light(channel, dark)
+        A = underwater_light(channel, dark)
         A_channels.append(A)
         
         transmission = transmission_map(channel, A)
@@ -94,8 +94,8 @@ def dehaze(hazy_image):
     dehazed_image = cv.merge(dehazed_channels)
 
     cv.imshow('Dark channel', cv.merge(dark_channels))
-    cv.imshow('Atmospheric light', cv.merge(transmission_maps))
-    cv.imshow('Transmission map', cv.merge(refined_transmissions))
+    cv.imshow('Transmission map', cv.merge(transmission_maps))
+    cv.imshow('Refined transmission map', cv.merge(refined_transmissions))
     
     return dehazed_image
 
