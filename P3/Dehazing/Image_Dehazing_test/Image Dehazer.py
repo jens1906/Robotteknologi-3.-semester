@@ -112,6 +112,7 @@ if hazy_image is None:
     print(f"Error: Unable to load image at {image_path}")
 else:
     dehazed_image = dehaze(hazy_image)
+    cv.imshow('Hazy image', hazy_image)
     cv.imshow('Dehazed image', dehazed_image)
     cv.waitKey(0)
     cv.destroyAllWindows()
