@@ -92,6 +92,10 @@ def dehaze(hazy_image):
         dehazed_channels.append(dehazed)
 
     dehazed_image = cv.merge(dehazed_channels)
+
+    cv.imshow('Dark channel', cv.merge(dark_channels))
+    cv.imshow('Atmospheric light', cv.merge(transmission_maps))
+    cv.imshow('Transmission map', cv.merge(refined_transmissions))
     
     return dehazed_image
 
