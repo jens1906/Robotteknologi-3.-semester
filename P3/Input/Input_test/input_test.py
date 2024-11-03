@@ -27,8 +27,8 @@ def show_image(image):
     cv.destroyAllWindows()
 
 # Im stupido pls dont hate my file path
-script_dir = os.path.dirname(__file__)
-image_path = os.path.join(script_dir, 'hazy15.dng') 
+#script_dir = os.path.dirname(__file__)
+#image_path = os.path.join(script_dir, 'hazy15.dng') 
 
-converted_image = convert_raw_to_bgr(image_path)
-show_image(converted_image)
+#converted_image = convert_raw_to_bgr(image_path)
+#show_image(converted_image)

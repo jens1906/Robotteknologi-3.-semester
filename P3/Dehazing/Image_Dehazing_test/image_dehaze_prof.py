@@ -91,7 +91,7 @@ def Recover(im, t, A, tx=0.1):
 
 
 script_dir = os.path.dirname(__file__)
-image_path = os.path.join(script_dir, 'Dehaze_Samples', 'city.png')
+image_path = os.path.join(script_dir, 'Dehaze_Samples', 'underwater.jpg')
 #image_path = "P3/Image_Dehazing/Dehaze_Samples/hyttetur.jpg"
 
 Dehaze(cv2.imread(image_path))
