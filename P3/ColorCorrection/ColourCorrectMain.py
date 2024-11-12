@@ -1,15 +1,9 @@
 import cv2 as cv
 import numpy as np
-import matplotlib.pyplot as plt
-import os
 
-def clear_console():
-    os.system('cls' if os.name == 'nt' else 'clear')
-
-def load_and_convert_image(image_path):
-    image = cv.imread(image_path)
+def load_and_convert_image(image):
     if image is None:
-        raise FileNotFoundError(f"Image not found at {image_path}")
+        raise FileNotFoundError(f"Image not found")
     image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
     return image
 
@@ -67,55 +61,16 @@ def apply_color_correction(image, color_correction_matrix):
     
     return corrected_image
 
-
-def main():
-    clear_console()
-    print("Color Correction Testing: True")
-    print("---------------Import Test Boards--------------")
-    
+def colour_correct(image):
     reference_image_path = 'P3/ColorCorrection/Color-Checker.jpg'
-    target_image_path = 'P3/ColorCorrection/U_Water_Sim_ColourUltimate.png'
-    
     reference_image = load_and_convert_image(reference_image_path)
-    target_image = load_and_convert_image(target_image_path)
+      
+    target_image = load_and_convert_image(image)
 
-    print("---------------Extract Color Patches--------------")
     reference_patches = get_color_patches(reference_image)
     target_patches = get_color_patches(target_image)
     
-    print("Reference Patches:")
-    print(reference_patches)
-    print("Target Patches:")
-    print(target_patches)
-    
-    print("---------------Calculate Color Correction Matrix--------------")
     color_correction_matrix = calculate_color_correction_matrix(reference_patches, target_patches)
-    
-    print("Color Correction Matrix (Mcc):")
-    print(color_correction_matrix)
-    
-    print("---------------Apply Color Correction--------------")
+        
     corrected_image = apply_color_correction(target_image, color_correction_matrix)
-    
-    # Display the reference, original, and corrected images
-    plt.figure(figsize=(15, 5))
-    plt.subplot(1, 3, 1)
-    plt.title('Reference Image')
-    plt.imshow(reference_image)
-    plt.axis('off')
-    
-    plt.subplot(1, 3, 2)
-    plt.title('Original Image')
-    plt.imshow(target_image)
-    plt.axis('off')
-    
-    plt.subplot(1, 3, 3)
-    plt.title('Corrected Image')
-    plt.imshow(corrected_image)
-    plt.axis('off')
-    
-    plt.tight_layout()
-    plt.show()
-
-if __name__ == "__main__":
-    main()
+    return corrected_image
