@@ -1,7 +1,13 @@
-from ColorCorrection import ColourCorrectMain
-from Dehazing import DehazingMain
-from Input import InputMain
-from Palette_detection import PaletteDetectionMain
+from ColorCorrection import ColourCorrectMain as cc
+from Dehazing import Dehaze as dh
+from Input import InputMain as im
+from Palette_detection import PaletteDetectionMain as pd
+
+def correct_image(image):
+    return
 
 
-ColourCorrectMain.colour_correct()
+
+def main():
+    image = im.get_image()
+    return
