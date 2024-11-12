@@ -1,0 +1,91 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" version="24.7.17">
+  <diagram name="Page-1" id="lJG2Rq1U1Uyy4U4gTyN2">
+    <mxGraphModel dx="1147" dy="597" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="bvQyoMIgR2W1LX171B6L-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="bvQyoMIgR2W1LX171B6L-1" target="bvQyoMIgR2W1LX171B6L-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-1" value="Start" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="175" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="bvQyoMIgR2W1LX171B6L-2" target="bvQyoMIgR2W1LX171B6L-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="bvQyoMIgR2W1LX171B6L-2" target="bvQyoMIgR2W1LX171B6L-14">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-2" value="Run ORB on first image frame using template. Output &lt;br&gt;Colour checker and its location" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="160" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="bvQyoMIgR2W1LX171B6L-5" target="bvQyoMIgR2W1LX171B6L-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-5" value="Template" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="115" y="280" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-9" value="Colour checker" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="290" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-13" value="Location" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="280" y="170" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-16" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="bvQyoMIgR2W1LX171B6L-14" target="bvQyoMIgR2W1LX171B6L-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-14" value="(x1 and y1) - x pixels&lt;div&gt;(x2 and y2) + x pixels&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="172.5" width="130" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-18" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="bvQyoMIgR2W1LX171B6L-15" target="bvQyoMIgR2W1LX171B6L-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-15" value="Crop next frame from video using cordinates" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="490" y="170" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="bvQyoMIgR2W1LX171B6L-17" target="bvQyoMIgR2W1LX171B6L-9">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="700" y="260" />
+              <mxPoint x="330" y="260" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="bvQyoMIgR2W1LX171B6L-17" target="bvQyoMIgR2W1LX171B6L-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-17" value="Use ORB with template on cropped image and output Colour checker and location" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="640" y="170" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-22" value="Location" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="620" y="120" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-23" value="Colour checker" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="200" y="240" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-24" value="Colour checker" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="450" y="230" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-25" value="Video" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="120" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="bvQyoMIgR2W1LX171B6L-25" target="bvQyoMIgR2W1LX171B6L-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="180" y="140" as="targetPoint" />
+            <mxPoint x="315" y="120" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bvQyoMIgR2W1LX171B6L-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="bvQyoMIgR2W1LX171B6L-25" target="bvQyoMIgR2W1LX171B6L-15">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="365" y="120" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="550" y="135" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
