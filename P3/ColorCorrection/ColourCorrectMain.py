@@ -73,4 +73,4 @@ def colour_correct(image):
     color_correction_matrix = calculate_color_correction_matrix(reference_patches, target_patches)
         
     corrected_image = apply_color_correction(target_image, color_correction_matrix)
-    return corrected_image
+    return corrected_image, color_correction_matrix
