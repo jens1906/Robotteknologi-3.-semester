@@ -20,15 +20,19 @@ def main():
     ## Get Image
 
     image = im.get_image()
-    plt.imshow(image)
-    plt.show()
 
     ## Dehazing
 
     dehazed_image = None
-    #dehazed_image = dh.dehaze(image)
-    #plt.imshow(dehazed_image)
-    #plt.show()
+    dehazed_image = dh.dehaze(image)
+
+    ## show both image and dehazed image on one plot
+    fig, axs = plt.subplots(1, 2)
+    axs[0].imshow(image)
+    axs[0].set_title('Original Image')
+    axs[1].imshow(dehazed_image)
+    axs[1].set_title('Dehazed Image')
+    plt.show()
 
     ## Locate Color Checker
     if dehazed_image is None:
