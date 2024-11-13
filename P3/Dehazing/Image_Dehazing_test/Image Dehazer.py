@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
 import os
+import matplotlib.pyplot as plt
 
 def dark_channel(image, size=15):
     """Compute the dark channel prior of the image."""
@@ -49,13 +50,12 @@ def Guidedfilter(im, p, r, eps):
     q = mean_a * im + mean_b
     return q
 
-def TransmissionRefine(im, et):
-    """Refine the transmission map."""
-    gray = cv.cvtColor(im, cv.COLOR_BGR2GRAY)
-    gray = np.float64(gray) / 255.0  # Change to 4095 for 12-bit images
+def TransmissionRefine(image, estimated_transition_map):
+    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    gray = np.float64(gray) / 255
     r = 60
     eps = 0.0001
-    t = Guidedfilter(gray, et, r, eps)
+    t = Guidedfilter(gray, estimated_transition_map, r, eps)
     return t
 
 def recover_image(image, transmission, A, t0=0.1):
