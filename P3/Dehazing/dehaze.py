@@ -129,3 +129,8 @@ def dehaze(hazy_image):
     dehazed_image = cv.merge(dehazed_channels)
     
     return dehazed_image
+
+#hazy = cv.imread('P3/Dehazing/Image_Dehazing_test/Dehaze_Samples/underwater.jpg')
+
+#cv.imshow('Hazy Image', dehaze(hazy))
+#cv.waitKey(0)
