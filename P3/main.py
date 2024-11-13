@@ -27,6 +27,7 @@ def main():
     dehazed_image = dh.dehaze(image)
 
     ## show both image and dehazed image on one plot
+    dehazed_image = (dehazed_image * 255).astype(np.uint8)
     fig, axs = plt.subplots(1, 2)
     axs[0].imshow(image)
     axs[0].set_title('Original Image')
@@ -37,8 +38,18 @@ def main():
     ## Locate Color Checker
     if dehazed_image is None:
         dehazed_image = image
-
-    checker = lc.LocateChecker(dehazed_image, 'P3/Palette_detection/ColorChecker.jpg')
+    print("non dehazed image: ")
+    print(image[0])
+    print("dehazed image: ")
+    print(dehazed_image[0])
+    checker, corner, pos = lc.LocateChecker(dehazed_image, cv.imread('P3\Palette_detection\Colour_checker_from_Vikki.png', cv.IMREAD_GRAYSCALE))
+    fig, axs = plt.subplots(1, 2)
+    axs[0].imshow(image)
+    axs[0].set_title('Original Image')
+    axs[1].imshow(dehazed_image)
+    axs[1].set_title('Dehazed Image')
+    plt.show()
+    
 
     ## Color Correction
 

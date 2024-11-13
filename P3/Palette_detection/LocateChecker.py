@@ -4,7 +4,7 @@ import time
 import os
 
 Adjustment = 100
-template = cv2.imread("P3/Palette detection/checker_board.PNG", cv2.IMREAD_GRAYSCALE)
+#template = cv2.imread("P3/Palette detection/checker_board.PNG", cv2.IMREAD_GRAYSCALE)
 
 
 def display_checker(colour_checker):
@@ -24,7 +24,7 @@ def scale_image(img, scale): # Scales the image by a factor of scale
     return cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
 
 # Start timer
-tic = time.perf_counter()
+#tic = time.perf_counter()
 
 # Initialize the ORB detector algorithm
 orb = cv2.ORB_create()
@@ -154,5 +154,5 @@ def TestImageSmall():
 #TestImageSmall()
 #TestVideoFile()
 
-toc = time.perf_counter()
-print(f"Downloaded the tutorial in {toc - tic:0.4f} seconds")
+#toc = time.perf_counter()
+#print(f"Downloaded the tutorial in {toc - tic:0.4f} seconds")
