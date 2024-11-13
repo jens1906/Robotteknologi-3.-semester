@@ -3,33 +3,30 @@ import numpy as np
 import time
 import os
 
+test = False
+
 Adjustment = 100
-#template = cv2.imread("P3/Palette detection/checker_board.PNG", cv2.IMREAD_GRAYSCALE)
 
+if test == True:
+    template = cv2.imread("P3/Palette_detection/Colour_checker_from_Vikki.png", cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread("P3/Results/OrgImages/image_20241311_142611.png")
 
-def display_checker(colour_checker):
-        cv2.imshow("Colour Checker", colour_checker)
+    def display(colour_checker):
+            cv2.imshow("Colour Checker", colour_checker)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+
+    def display_box_checker(img,corners_img): # Draws a white box around the detected checkerboard
+        img_with_box = cv2.polylines(img.copy(), [np.int32(corners_img)], True, (0, 0, 0), 3, cv2.LINE_AA)
+        cv2.imshow("Detected Bounding Box", img_with_box)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-        
-def display_box_checker(img,corners_img): # Draws a white box around the detected checkerboard
-    img_with_box = cv2.polylines(img.copy(), [np.int32(corners_img)], True, (255, 255, 255), 3, cv2.LINE_AA)
-    cv2.imshow("Detected Bounding Box", img_with_box)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-def scale_image(img, scale): # Scales the image by a factor of scale
-    width = int(img.shape[1] * scale)
-    height = int(img.shape[0] * scale)
-    return cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
-
-# Start timer
-#tic = time.perf_counter()
 
 # Initialize the ORB detector algorithm
 orb = cv2.ORB_create()
 
 def LocateChecker(img, template, PreviousLocation = 0):
+
     if PreviousLocation != 0:
         # Adjust crop location by -250 for the top-left and +250 for the bottom-right
         X = [max(0, PreviousLocation[1][0] - Adjustment),
@@ -40,11 +37,6 @@ def LocateChecker(img, template, PreviousLocation = 0):
         img = img[Y[0]: Y[1],  # y-axis (height)
                   X[0]: X[1]]   # x-axis (width)
 
-        cv2.imshow(f"Section:", img)
-
-
-    #img = scale_image(img, 0.5)
-    
     # Detects features in the images in terms of keypoints and descriptors
     kp_img, desc_img = orb.detectAndCompute(img, None)
     kp_template, desc_template = orb.detectAndCompute(template, None)
@@ -55,6 +47,8 @@ def LocateChecker(img, template, PreviousLocation = 0):
 
     # Sort the matches based on distance (best matches first)
     matches = sorted(matches, key=lambda x: x.distance)[:100]
+
+    display(cv2.drawMatches(template, kp_template, img, kp_img, matches, None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)) if test == True else None
 
     # Extract the matched keypoints
     points_template = np.float32([kp_template[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
@@ -70,10 +64,12 @@ def LocateChecker(img, template, PreviousLocation = 0):
     corners_template = np.float32([[0, 0], [w, 0], [w, h], [0, h]]).reshape(-1, 1, 2)
     corners_checker = cv2.perspectiveTransform(corners_template, homography)
 
-    # Crop the detected colour checker from the img
-    x_min, y_min = np.min(corners_checker[:, 0, :], axis=0).astype(int)
-    x_max, y_max = np.max(corners_checker[:, 0, :], axis=0).astype(int)
-    colour_checker = img[y_min:y_max, x_min:x_max]
+    # Display the bounding box around the detected checkerboard
+    display_box_checker(img, corners_checker) if test == True else None
+
+    # Change the perspective of the detected colour checker to align it with the template
+    warp_matrix = cv2.getPerspectiveTransform(corners_checker, corners_template)
+    colour_checker = cv2.warpPerspective(img, warp_matrix, (w, h))
 
     # Chopped image
     CurrentLocation = [[int(corners_checker[0][0][1]),
@@ -87,18 +83,15 @@ def LocateChecker(img, template, PreviousLocation = 0):
              PreviousLocation[0][1]+(CurrentLocation[0][0]-Adjustment)]#Y2
         X = [PreviousLocation[1][0]+(CurrentLocation[1][0]-Adjustment),#X1
              PreviousLocation[1][1]+(CurrentLocation[1][0]-Adjustment)]#X2
-        FinalLocation = [[Y[0],
-                          Y[1]],
-                         [X[0],
-                          X[1]]]
+        FinalLocation = [[Y[0], Y[1]],
+                         [X[0], X[1]]]
 
-    #cv2.waitKey(0)
+    # Display the cropped colour checker
+    display(colour_checker) if test == True else None
+
     return colour_checker, corners_checker, FinalLocation
 
-
-
-
-
+LocateChecker(img, template) if test == True else None
 
 def TestImageFolder():
     folder_path = "P3//Palette detection//SmallMovement"
@@ -132,7 +125,6 @@ def TestVideoFile():
             if cv2.waitKey(1) and 0xFF == ord('q'):
                 break
 
-
 def TestImageSmall():
     # Importing the images and template 
     folder_path = "P3/Palette detection/Testpics"
@@ -153,6 +145,3 @@ def TestImageSmall():
 #TestImageFolder()
 #TestImageSmall()
 #TestVideoFile()
-
-#toc = time.perf_counter()
-#print(f"Downloaded the tutorial in {toc - tic:0.4f} seconds")
