@@ -22,6 +22,9 @@ def main():
     print("------Getting Image------")
 
     image = im.get_image()
+    #save image
+    timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
+    cv.imwrite(f'P3/Results/OrgImages/image_{timestamp}.png', cv.cvtColor(image, cv.COLOR_BGR2RGB))
 
     ## Dehazing
     print("------Dehazing Image------")
@@ -29,15 +32,6 @@ def main():
     dehazed_image = None
     dehazed_image = dh.dehaze(image)
 
-    ## show both image and dehazed image on one plot
-    """
-    fig, axs = plt.subplots(1, 2)
-    axs[0].imshow(image)
-    axs[0].set_title('Original Image')
-    axs[1].imshow(dehazed_image)
-    axs[1].set_title('Dehazed Image')
-    plt.show()
-    """
     if dehazed_image is None:
         dehazed_image = image
 
@@ -45,11 +39,7 @@ def main():
     print("------Locating Color Checker------")
 
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki.png', cv.IMREAD_GRAYSCALE)
-    checker, corner, pos = lc.LocateChecker(image, template)
-
-    #save image in P3/Results/OrgImages as png witht the name image[date-time].png
-    timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
-    cv.imwrite(f'P3/Results/OrgImages/image_{timestamp}.png', cv.cvtColor(image, cv.COLOR_BGR2RGB))
+    checker, corner, pos = lc.LocateChecker(image, template)    
     
     ## Color Correction
     print("------Color Correcting Image------")
@@ -57,27 +47,31 @@ def main():
     ref_pal = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki.png')
     ref_pal = cv.cvtColor(ref_pal, cv.COLOR_BGR2RGB)
 
-    corrected, cc_matrix = cc.colour_correct(image, ref_pal, checker)
-    corrected = cv.cvtColor(corrected, cv.COLOR_BGR2RGB)
+    try:
+        corrected_image, cc_matrix, corrected_palette = cc.colour_correct(image, ref_pal, checker)
+        corrected_image = cv.cvtColor(corrected_image, cv.COLOR_BGR2RGB)
+    except:
+        raise Exception("CC Failed")
+
+    ## Plot Results
 
     fig, axs = plt.subplots(2, 3)
     axs[0, 0].imshow(image)
     axs[0, 0].set_title('Original Image')
     axs[0, 1].imshow(dehazed_image)
     axs[0, 1].set_title('Dehazed Image')
-    axs[0, 2].imshow(cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
+    axs[0, 2].imshow(cv.cvtColor(corrected_image, cv.COLOR_BGR2RGB))
     axs[0, 2].set_title('CC Image')
     axs[1, 0].imshow(ref_pal)
     axs[1, 0].set_title('Reference Palette')
     axs[1, 1].imshow(checker)
-    axs[1, 1].set_title('Checker Image')
-    axs[1, 2].imshow(corner)
+    axs[1, 1].set_title('Found Palette')
+    axs[1, 2].imshow(corrected_palette)
+    axs[1, 2].set_title('CC Palette')
+    plt.savefig(f'P3/Results/FullPlots/FullPlot_{timestamp}.png')
     plt.show()
 
-    print(cc_matrix)
-
-
-
+    print("------Finished------")
     return
 
 if __name__ == '__main__':

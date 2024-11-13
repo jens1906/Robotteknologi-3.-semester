@@ -78,9 +78,10 @@ def colour_correct(image, reference_pal=None, taken_pal=None):
     target_patches = get_color_patches(taken_pal)
     
     color_correction_matrix = calculate_color_correction_matrix(reference_patches, target_patches)
-        
+    
+    corrected_palette = apply_color_correction(taken_pal, color_correction_matrix)
     corrected_image = apply_color_correction(image, color_correction_matrix)
-    return corrected_image, color_correction_matrix
+    return corrected_image, color_correction_matrix, corrected_palette
 
 if CCTesting:
     os.system('cls')
