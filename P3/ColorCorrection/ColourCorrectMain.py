@@ -12,7 +12,7 @@ def load_and_convert_image(image_path):
     image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
     return image
 
-def get_color_patches(image, rows=4, cols=6, patch_size=10):
+def get_color_patches(image, rows=7, cols=10, patch_size=10):
     img_height, img_width, _ = image.shape
     tile_width = img_width // cols
     tile_height = img_height // rows

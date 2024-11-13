@@ -54,7 +54,7 @@ def LocateChecker(img, template, PreviousLocation = 0):
     matches = matcher.match(desc_template, desc_img)
 
     # Sort the matches based on distance (best matches first)
-    matches = sorted(matches, key=lambda x: x.distance)[:50]
+    matches = sorted(matches, key=lambda x: x.distance)[:100]
 
     # Extract the matched keypoints
     points_template = np.float32([kp_template[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
