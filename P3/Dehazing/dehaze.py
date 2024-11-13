@@ -75,7 +75,7 @@ def refine_transmission_map(image, estimated_transmission):
     #Convert the image to grayscale
     grayscale_image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
     #Normalize the grayscale image
-    normalized_grayscale = np.float64(grayscale_image) / 255.0  # Change to 4095 for 12-bit images
+    normalized_grayscale = np.float64(grayscale_image) / 4095.0  # Change to 4095 for 12-bit images
     radius = 60
     epsilon = 0.0001
     #Apply the guided filter to refine the transmission map
@@ -93,7 +93,7 @@ def recover_image(image, transmission, atmospheric_light, transmission_threshold
 def dehaze(hazy_image):
     """Main function to dehaze an image."""
     #Normalize the hazy image
-    normalized_image = hazy_image / 255.0  #Change to 4095 for 12-bit images
+    normalized_image = hazy_image / 4095.0  #Change to 4095 for 12-bit images
     
     #Split the image into R,G,B channels
     channels = cv.split(normalized_image)
