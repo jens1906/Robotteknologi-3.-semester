@@ -11,7 +11,7 @@ def dark_channel(image, size=15):
     dark_channel = cv.erode(image, kernel)
     return dark_channel
 
-def atmospheric_light(image, dark_channel):
+def atmospheric_light_estimation(image, dark_channel):
     """Estimate the atmospheric light in the image."""
     #Get the dimensions of the image
     height, width = image.shape[:2]
@@ -110,7 +110,7 @@ def dehaze(hazy_image):
         dark_channels.append(dark)
         
         #Estimate the atmospheric light
-        atmospheric_light = atmospheric_light(channel, dark)
+        atmospheric_light = atmospheric_light_estimation(channel, dark)
         atmospheric_lights.append(atmospheric_light)
         
         #Estimate the transmission map
@@ -128,4 +128,5 @@ def dehaze(hazy_image):
     #Merge the dehazed channels back into a single image
     dehazed_image = cv.merge(dehazed_channels)
     
-    return dehazed_image
+    return (dehazed_image * 255).astype(np.uint8)
+
