@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 import math
+import torch
+import piq
+
 
 # Load the image
 imageBefore = cv2.imread('Objective_testing\Objective_testing_before.jpg')
@@ -61,6 +64,7 @@ def SSIM(imgX, imgY):
     else:
         raise ValueError('Wrong input image dimensions.')
 
+
 def MeanBrightnessError(imgX, imgY):
     #In the start the before and after picture get converted into grey scale picture
     #This is done because of greyscale also can be seen at as brightness levels
@@ -68,8 +72,15 @@ def MeanBrightnessError(imgX, imgY):
     imgYGrey = cv2.cvtColor(imgY, cv2.COLOR_BGR2GRAY)
 
     #After the convertion the formula can be calculated for the 2 pictures by doing as seen down under.
-    result = abs(np.mean(imgXGrey)-np.mean(imgYGrey))
-    return result
+    result = round(np.mean(imgXGrey)-np.mean(imgYGrey), 2)
+    if result>0:
+        output = f"{result} which means the picture has a lower brightness"
+    elif result<0:
+        output = f"{result} which means the picture has a higher brightness"
+    else:
+        output = f"There has been no change"
+    return output 
+
 
 def AverageGradient(imgX, imgY):
     #Firstly the images har converted into greyscale so that there is less information to work with.
@@ -91,7 +102,18 @@ def AverageGradient(imgX, imgY):
     #Then the average gradient can be found
     avgGradientResult = [np.sum(gradientMagnitutes[0])/((imgX.shape[1]-1)*(imgX.shape[0]-1)),
                np.sum(gradientMagnitutes[1])/((imgY.shape[1]-1)*(imgY.shape[0]-1))]
-    return avgGradientResult
+    
+    avgGradientResult = np.round(avgGradientResult, decimals=2)
+    avgGradientResultCompare = round(avgGradientResult[0]-avgGradientResult[1],2)
+
+    if avgGradientResultCompare>0:
+        output = f"{avgGradientResult} which worse by a difference of {abs(avgGradientResultCompare)}"
+    elif avgGradientResultCompare<0:
+        output = f"{avgGradientResult} which better by a difference of {abs(avgGradientResultCompare)}"
+    else:
+        output = f"There has been no change"
+    return output
+
 
 
 def ContrastQualityIndex(imgB, imgA, PatchSize):
@@ -120,6 +142,32 @@ def ContrastQualityIndex(imgB, imgA, PatchSize):
     #Then the average patch contrast/luminence can be found
     avgPacthContrastResult = Total_PCQI / Patches 
     return avgPacthContrastResult
+
+
+def PatchBasedContrastQualityIndex(imgB, imgA, PatchSize, C=1e-5):
+    Total_PCQI = 0
+    num_patches = 0
+
+    for y in range(0, imgB.shape[0], PatchSize):
+        for x in range(0, imgB.shape[1], PatchSize):
+            # Extract patches
+            patchB = imgB[y:y+PatchSize, x:x+PatchSize]
+            patchA = imgA[y:y+PatchSize, x:x+PatchSize]
+            
+            # Compute standard deviation (contrast) within each patch
+            contrastB = np.std(patchB)
+            contrastA = np.std(patchA)
+            
+            # PCQI calculation for the patch
+            pcqi_patch = (2 * contrastB * contrastA + C) / (contrastB**2 + contrastA**2 + C)
+            
+            # Accumulate PCQI score for all patches
+            Total_PCQI += pcqi_patch
+            num_patches += 1
+
+    # Average the PCQI over all patches
+    avg_PCQI = Total_PCQI / num_patches
+    return avg_PCQI
 
 
 def UnderwaterQualityEvaluation(imgX, imgY):
@@ -156,6 +204,30 @@ def UnderwaterQualityEvaluation(imgX, imgY):
     resultUCIQE = [c[0] * Chroma[0] + c[1] * Contrast[0] + c[2] * AverageSaturation[0],
                    c[0] * Chroma[1] + c[1] * Contrast[1] + c[2] * AverageSaturation[1]]
     return resultUCIQE
+
+def pSSIM(reference,Improved):
+    reference_tensor = torch.from_numpy(reference).float() / 255.0
+    Improved_tensor = torch.from_numpy(Improved).float() / 255.0
+
+    # Rearrange dimensions to (N, C, H, W)
+    reference_tensor = reference_tensor.permute(2, 0, 1).unsqueeze(0)  # (1, C, H, W)
+    Improved_tensor = Improved_tensor.permute(2, 0, 1).unsqueeze(0)    # (1, C, H, W)
+
+    ssim_value = piq.ssim(reference_tensor, Improved_tensor).item() * 100    
+    output = f"{round(ssim_value,2)}%"
+
+    return output
+
+def pPSNR(reference,Improved):
+    reference_tensor = torch.from_numpy(reference).float() / 255.0
+    Improved_tensor = torch.from_numpy(Improved).float() / 255.0
+
+    # Rearrange dimensions to (N, C, H, W)
+    reference_tensor = reference_tensor.permute(2, 0, 1).unsqueeze(0)  # (1, C, H, W)
+    Improved_tensor = Improved_tensor.permute(2, 0, 1).unsqueeze(0)    # (1, C, H, W)
+    
+    return piq.psnr(reference_tensor, Improved_tensor)
+
 """
 print(f'Mean Square Error: {MSE(imageBefore, imageAfter)}')
 print(f'Peak Signal to Noise Ratio: {PSNR(imageBefore, imageAfter)}')
@@ -164,12 +236,29 @@ print(f'Mean Brightness Error: {MeanBrightnessError(imageBefore, imageAfter)}')
 print(f'Average Gradient: {AverageGradient(imageBefore, imageAfter)}')
 print(f'Patch-based Contrast Quality Index (PCQI): {ContrastQualityIndex(imageBefore, imageAfter, 32)}')
 print(f'Underwater colour image quality evaluation metric (UCIQE): {UnderwaterQualityEvaluation(imageBefore, imageAfter)}')
+print(f'Patch-based Contrast Quality Index (PCQI): {CompareContrastQualityIndex(reference, Improved, 32)} with the value {round(ContrastQualityIndex(reference, Improved, 32),2)}')
 """
 
-
 def ObjectiveTesting(Improved, reference):
-    print(f'Average Gradient: {np.round(AverageGradient(reference, Improved), decimals=2)}')
-    print(f'Mean Brightness Error: {round(MeanBrightnessError(reference, Improved),2)}')
-    print(f'Patch-based Contrast Quality Index (PCQI): {round(ContrastQualityIndex(reference, Improved, 32),2)}')
+    print(f'Average Gradient: {AverageGradient(reference, Improved)}')
+    print(f'Mean Brightness Error: {MeanBrightnessError(reference, Improved)}')
+    print(f'Structure Similarity Index Method: {pSSIM(reference, Improved)}')
 
-#ObjectiveTesting(imageAfter, imageBefore)
+    #print(f'Structure Similarity Index Method: {SSIM(reference, Improved)}')
+
+def AllObjectiveTesting(Improved, reference):
+    print(f'Mean Square Error: {MSE(reference, Improved)}')
+    print(f'Peak Signal to Noise Ratio: {cv2.PSNR(reference, Improved)}')
+    print(f'Structure Similarity Index Method: {pSSIM(reference, Improved)}')
+    print(f'Mean Brightness Error: {MeanBrightnessError(reference, Improved)}')
+    print(f'Average Gradient: {AverageGradient(reference, Improved)}')
+    print(f'Patch-based Contrast Quality Index (PCQI): {ContrastQualityIndex(reference, Improved, 32)}')
+    print(f'Underwater colour image quality evaluation metric (UCIQE): {UnderwaterQualityEvaluation(reference, Improved)}')
+
+"""
+ObjectiveTesting(imageAfter, imageBefore)
+print("Switch")
+ObjectiveTesting(imageBefore, imageBefore)
+print("All methods")
+AllObjectiveTesting(imageAfter, imageBefore)
+"""
