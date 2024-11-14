@@ -3,8 +3,8 @@ import numpy as np
 import math
 
 # Load the image
-imageBefore = cv2.imread('Objective testing\Objective_testing_before.jpg')
-imageAfter = cv2.imread('Objective testing\Objective_testing_after.jpg')
+imageBefore = cv2.imread('Objective_testing\Objective_testing_before.jpg')
+imageAfter = cv2.imread('Objective_testing\Objective_testing_after.jpg')
 
 def MSE(imgX, imgY):
     return np.mean((imgX - imgY)**2)   
@@ -172,4 +172,4 @@ def ObjectiveTesting(Improved, reference):
     print(f'Mean Brightness Error: {MeanBrightnessError(reference, Improved)}')
     print(f'Patch-based Contrast Quality Index (PCQI): {ContrastQualityIndex(reference, Improved, 32)}')
 
-ObjectiveTesting(imageAfter, imageBefore)
+#ObjectiveTesting(imageAfter, imageBefore)
