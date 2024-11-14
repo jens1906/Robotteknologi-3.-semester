@@ -1,10 +1,16 @@
 import os
 os.system('cls')
+import sys
+
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(project_root)
 
 from Input import input as im
 from Dehazing import dehaze as dh
 from Palette_detection import LocateChecker as lc
 from ColorCorrection import ColourCorrectMain as cc
+from Objective_testing import APalTest as apt
+
 
 
 import cv2 as cv
@@ -21,15 +27,19 @@ def main():
     ## Get Image
     print("------Getting Image------")
 
-    image = im.get_image()
+    if False:
+        image = im.get_image()
+    else:
+        image = cv.imread('P3/Results/OrgImages/image_20241411_085252.png')
+        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+
     #save image
     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
-    cv.imwrite(f'P3/Results/OrgImages/image_{timestamp}.png', cv.cvtColor(image, cv.COLOR_BGR2RGB))
+    #cv.imwrite(f'P3/Results/OrgImages/image_{timestamp}.png', cv.cvtColor(image, cv.COLOR_BGR2RGB))
 
     ## Dehazing
     print("------Dehazing Image------")
 
-    dehazed_image = None
     dehazed_image = dh.dehaze(image)
 
     if dehazed_image is None:
@@ -52,9 +62,11 @@ def main():
         corrected_image = cv.cvtColor(corrected_image, cv.COLOR_BGR2RGB)
     except:
         raise Exception("CC Failed")
+    
+    ## Get Palette Difference
+    apt.get_pal_diff(ref_pal, checker, corrected_palette)
 
-    ## Plot Results
-
+    # Plot images
     fig, axs = plt.subplots(2, 3)
     axs[0, 0].imshow(image)
     axs[0, 0].set_title('Original Image')
@@ -70,6 +82,7 @@ def main():
     axs[1, 2].set_title('CC Palette')
     plt.savefig(f'P3/Results/FullPlots/FullPlot_{timestamp}.png')
     plt.show()
+    
 
     print("------Finished------")
     return
