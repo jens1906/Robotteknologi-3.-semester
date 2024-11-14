@@ -71,7 +71,7 @@ def main():
     ## Get Image
     print("------Getting Image------")
     
-    if True:
+    if False:
         image = im.get_image()
     else:
         image = cv.imread('P3/Results/OrgImages/image_20241411_085252.png')
@@ -127,7 +127,7 @@ def main():
  
     ## Plot Images
     print("------Plotting Images------")
-    #plot_images(image, dehazed_image, corrected_image, ref_pal, checker, corrected_palette)
+    plot_images(image, dehazed_image, corrected_image, ref_pal, checker, corrected_palette)
 
 
     ## Objective Testing
