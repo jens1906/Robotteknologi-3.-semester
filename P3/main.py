@@ -80,7 +80,7 @@ def main():
     if False:
         image = im.get_image()
     else:
-        image = cv.imread('P3\Results\OrgImages\image_20241311_142217.png')
+        image = cv.imread('P3\Results\OrgImages\image_20241311_144042.png')
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
 
     #save image
@@ -99,11 +99,13 @@ def main():
         dehazed_image = image
 
     dehaze_time = time.perf_counter()
+    
     ## Locate Color Checker
     print("------Locating Color Checker------")
 
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki.png', cv.IMREAD_GRAYSCALE)
-    checker, corner, pos = lc.LocateChecker(image, template)    
+
+    checker, corner, pos = lc.LocateChecker(dehazed_image, template)    
     
     locate_time = time.perf_counter()
 
