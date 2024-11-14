@@ -1,6 +1,7 @@
 import os
-os.system('cls')
 import sys
+os.system('cls')
+
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
@@ -11,16 +12,56 @@ from Palette_detection import LocateChecker as lc
 from ColorCorrection import ColourCorrectMain as cc
 from Objective_testing import APalTest as apt
 
-
-
+import math
+import inspect
 import cv2 as cv
 import numpy as np
 from vmbpy import *
 from datetime import datetime
 import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
-def correct_image(image):
-    return
+def plot_images(*images):
+    """
+    Plots a given number of images in a fullscreen grid layout using matplotlib.
+    The image variable names from the caller's scope are used as titles.
+    
+    Parameters:
+    - *images: a variable number of images (as arrays) to display.
+    """
+    # Get the names of the variables from the caller's scope
+    caller_locals = inspect.currentframe().f_back.f_locals
+    image_names = []
+    
+    for name, val in caller_locals.items():
+        # Check if val is an array and is in images
+        if isinstance(val, np.ndarray) and any(np.array_equal(val, img) for img in images):
+            image_names.append(name)
+    
+    # Number of images
+    n = len(images)
+    
+    # Calculate grid size (rows and columns)
+    cols = math.ceil(math.sqrt(n))
+    rows = math.ceil(n / cols)
+    
+    # Create the plot
+    fig, axs = plt.subplots(rows, cols, figsize=(15, 15))
+    
+    axs = axs.ravel()  # Flatten the array of axes for easy indexing
+    
+    for i, img in enumerate(images):
+        axs[i].imshow(img)
+        # Use variable names as titles if they exist
+        if i < len(image_names):
+            axs[i].set_title(image_names[i])
+
+    # Hide any empty subplots
+    for j in range(i + 1, rows * cols):
+        axs[j].axis('off')
+    
+    plt.tight_layout()
+    plt.show()
 
 def main():
     
@@ -64,26 +105,11 @@ def main():
         raise Exception("CC Failed")
     
     ## Get Palette Difference
-    apt.get_pal_diff(ref_pal, checker, corrected_palette)
+    #apt.get_pal_diff(ref_pal, checker, corrected_palette)
 
-    # Plot images
-    fig, axs = plt.subplots(2, 3)
-    axs[0, 0].imshow(image)
-    axs[0, 0].set_title('Original Image')
-    axs[0, 1].imshow(dehazed_image)
-    axs[0, 1].set_title('Dehazed Image')
-    axs[0, 2].imshow(cv.cvtColor(corrected_image, cv.COLOR_BGR2RGB))
-    axs[0, 2].set_title('CC Image')
-    axs[1, 0].imshow(ref_pal)
-    axs[1, 0].set_title('Reference Palette')
-    axs[1, 1].imshow(checker)
-    axs[1, 1].set_title('Found Palette')
-    axs[1, 2].imshow(corrected_palette)
-    axs[1, 2].set_title('CC Palette')
-    plt.savefig(f'P3/Results/FullPlots/FullPlot_{timestamp}.png')
-    plt.show()
+    ## Plot Images
+    plot_images(image, dehazed_image, corrected_image, ref_pal, checker, corrected_palette)
     
-
     print("------Finished------")
     return
 

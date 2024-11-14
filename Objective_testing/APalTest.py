@@ -24,7 +24,7 @@ def get_pal_diff(ref_pal, checker, corrected_palette):
     cc_pal_diff = np.mean(cc_pal_diff, axis=0).astype(int)
     print("Found pal avr diff", found_pal_diff)
     print("cc pal avr diff", cc_pal_diff)
-    print("------")
+
     #make a 3d plot of all points for found diff and cc diff
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
