@@ -1,124 +1,134 @@
 import cv2 as cv
 import numpy as np
 import os
-import matplotlib.pyplot as plt
-import time
 
-def dark_channel(image, size=15):
+def dark_channel(image, size=15): # Default kernal size 15
     """Compute the dark channel prior of the image."""
+    #Create a morphological kernel
     kernel = cv.getStructuringElement(cv.MORPH_RECT, (size, size))
+
+    #Apply erosion to the minimum channel to get the dark channel
     dark_channel = cv.erode(image, kernel)
     return dark_channel
 
-def underwater_light(image, dark_channel):
-    """Estimate the underwater light in the image."""
-    h, w = image.shape[:2]
-    num_pixels = h * w
-    num_brightest = int(max(num_pixels * 0.001, 1))
-    
-    dark_vec = dark_channel.ravel()
-    image_vec = image.reshape(num_pixels, -1)
-    
-    indices = np.argsort(dark_vec)[-num_brightest:]
-    brightest_pixels = image_vec[indices]
-    
-    A = np.mean(brightest_pixels, axis=0)
-    return A
+def atmospheric_light_estimation(image, dark_channel):
+    """Estimate the atmospheric light in the image."""
+    #Get the dimensions of the image
+    height, width = image.shape[:2]
+    num_pixels = height * width
 
-def transmission_map(image, A, omega=0.95, size=15):
+    #Number of brightest pixels to consider
+    num_brightest_pixels = int(max(num_pixels * 0.001, 1))
+    
+    #Flatten the dark channel and image
+    dark_vector = dark_channel.ravel()
+    image_vector = image.reshape(num_pixels, -1)  #Reshape to (num_pixels, channels)
+    
+    #Get the indices of the brightest pixels in the dark channel
+    brightest_indices = np.argpartition(dark_vector, -num_brightest_pixels)[-num_brightest_pixels:]
+
+    #Get the corresponding brightest pixels in the image
+    brightest_pixels = image_vector[brightest_indices]
+    
+    #Compute the atmospheric light as the mean of the brightest pixels
+    atmospheric_light = np.mean(brightest_pixels, axis=0)
+    return atmospheric_light
+
+def transmission_map(image, atmospheric_light, omega=0.95, size=15): #Default kernal size 15
     """Estimate the transmission map."""
-    norm_image = image / A
-    dark_channel_norm = dark_channel(norm_image, size)
-    transmission = 1 - omega * dark_channel_norm
-    return transmission
+    #Normalize the image by the atmospheric light
+    normalized_image = image / atmospheric_light
+    #Compute the dark channel of the normalized image
+    dark_channel_normalized = dark_channel(normalized_image, size)
+    #Estimate and return the transmission map
+    return 1 - omega * dark_channel_normalized
 
-def Guidedfilter(im, p, r, eps):
+def guided_filter(guidance_image, input_image, radius, epsilon):
     """Apply the guided filter to the image."""
-    mean_I = cv.boxFilter(im, cv.CV_64F, (r, r))
-    mean_p = cv.boxFilter(p, cv.CV_64F, (r, r))
-    mean_Ip = cv.boxFilter(im * p, cv.CV_64F, (r, r))
-    cov_Ip = mean_Ip - mean_I * mean_p
+    #Compute the mean of the guidance image and the input image
+    mean_guidance = cv.boxFilter(guidance_image, cv.CV_64F, (radius, radius))
+    mean_input = cv.boxFilter(input_image, cv.CV_64F, (radius, radius))
+    #Compute the mean of the product of the guidance image and the input image
+    mean_guidance_input = cv.boxFilter(guidance_image * input_image, cv.CV_64F, (radius, radius))
+    #Compute the covariance of the guidance image and the input image
+    covariance_guidance_input = mean_guidance_input - mean_guidance * mean_input
 
-    mean_II = cv.boxFilter(im * im, cv.CV_64F, (r, r))
-    var_I = mean_II - mean_I * mean_I
+    #Compute the variance of the guidance image
+    mean_guidance_squared = cv.boxFilter(guidance_image * guidance_image, cv.CV_64F, (radius, radius))
+    variance_guidance = mean_guidance_squared - mean_guidance * mean_guidance
 
-    a = cov_Ip / (var_I + eps)
-    b = mean_p - a * mean_I
+    #Compute the linear coefficients a and b
+    a = covariance_guidance_input / (variance_guidance + epsilon)
+    b = mean_input - a * mean_guidance
 
-    mean_a = cv.boxFilter(a, cv.CV_64F, (r, r))
-    mean_b = cv.boxFilter(b, cv.CV_64F, (r, r))
+    #Compute the mean of the linear coefficients
+    mean_a = cv.boxFilter(a, cv.CV_64F, (radius, radius))
+    mean_b = cv.boxFilter(b, cv.CV_64F, (radius, radius))
 
-    q = mean_a * im + mean_b
-    return q
+    #Compute the output image and return
+    output_image = mean_a * guidance_image + mean_b
+    return output_image
 
-def TransmissionRefine(image, estimated_transition_map):
-    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-    gray = np.float64(gray) / 255
-    r = 60
-    eps = 0.0001
-    t = Guidedfilter(gray, estimated_transition_map, r, eps)
-    return t
+def refine_transmission_map(image, estimated_transmission):
+    """Refine the transmission map."""
+    #Convert the image to grayscale
+    grayscale_image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    #Normalize the grayscale image
+    normalized_grayscale = np.float64(grayscale_image) / 255.0  # Change to 4095 for 12-bit images
+    radius = 60
+    epsilon = 0.0001
+    #Apply the guided filter to refine the transmission map
+    refined_transmission = guided_filter(normalized_grayscale, estimated_transmission, radius, epsilon)
+    return refined_transmission
 
-def recover_image(image, transmission, A, t0=0.1):
+def recover_image(image, transmission, atmospheric_light, transmission_threshold=0.1):
     """Recover the dehazed image."""
-    transmission = np.maximum(transmission, t0)
-    J = (image - A) / transmission + A
-    return J
+    #Ensure the transmission map is above a threshold
+    transmission = np.maximum(transmission, transmission_threshold)
+    #Recover the scene radiance
+    recovered_image = (image - atmospheric_light) / transmission + atmospheric_light
+    return recovered_image
 
 def dehaze(hazy_image):
     """Main function to dehaze an image."""
-    start_time = time.time()
+    #Normalize the hazy image
+    normalized_image = hazy_image / 255.0  #Change to 4095 for 12-bit images
     
-    image = hazy_image / 255.0
-    channels = cv.split(image)
+    #Split the image into R,G,B channels
+    channels = cv.split(normalized_image)
     dark_channels = []
-    A_channels = []
+    atmospheric_lights = []
     transmission_maps = []
     refined_transmissions = []
     dehazed_channels = []
 
-    # Timing for each step
-    step_times = {}
-    
+    #Process each channel
     for channel in channels:
-        t0 = time.time()
+        #Compute the dark channel
         dark = dark_channel(channel)
         dark_channels.append(dark)
-        step_times['dark_channel'] = time.time() - t0
         
-        t0 = time.time()
-        A = underwater_light(channel, dark)
-        A_channels.append(A)
-        step_times['underwater_light'] = time.time() - t0
+        #Estimate the atmospheric light
+        atmospheric_light = atmospheric_light_estimation(channel, dark)
+        atmospheric_lights.append(atmospheric_light)
         
-        t0 = time.time()
-        transmission = transmission_map(channel, A)
+        #Estimate the transmission map
+        transmission = transmission_map(channel, atmospheric_light)
         transmission_maps.append(transmission)
-        step_times['transmission_map'] = time.time() - t0
         
-        t0 = time.time()
-        refined_transmission = TransmissionRefine(hazy_image, transmission)
+        #Refine the transmission map
+        refined_transmission = refine_transmission_map(hazy_image, transmission)
         refined_transmissions.append(refined_transmission)
-        step_times['transmission_refine'] = time.time() - t0
         
-        t0 = time.time()
-        dehazed = recover_image(channel, refined_transmission, A)
+        #Recover the dehazed image
+        dehazed = recover_image(channel, refined_transmission, atmospheric_light)
         dehazed_channels.append(dehazed)
-        step_times['recover_image'] = time.time() - t0
-
-    dehazed_image = cv.merge(dehazed_channels)
-
-    total_time = time.time() - start_time
     
-    # Print timing information
-    print("\nDehazing Performance Metrics:")
-    print("-" * 30)
-    print(f"Total time: {total_time:.3f} seconds")
-    print("\nTime per step (averaged across channels):")
-    for step, t in step_times.items():
-        print(f"{step}: {t/3:.3f} seconds")  # Divide by 3 for RGB channels
-
+    #Merge the dehazed channels back into a single image
+    dehazed_image = cv.merge(dehazed_channels)
+    
     return np.clip(dehazed_image * 255, 0, 255).astype(np.uint8)
+
 
 script_dir = os.path.dirname(__file__)
 image_path = os.path.join(script_dir, 'Dehaze_Samples', 'city.png')
