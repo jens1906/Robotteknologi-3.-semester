@@ -30,14 +30,20 @@ def plot_images(*images):
     Parameters:
     - *images: a variable number of images (as arrays) to display.
     """
+
+    #image, dehazed_image, corrected_image, ref_pal, checker, corrected_palette
+
+    # Get the names of the variables from the caller's scope
     # Get the names of the variables from the caller's scope
     caller_locals = inspect.currentframe().f_back.f_locals
     image_names = []
     
-    for name, val in caller_locals.items():
-        # Check if val is an array and is in images
-        if isinstance(val, np.ndarray) and any(np.array_equal(val, img) for img in images):
-            image_names.append(name)
+    # Create a list of (name, image) pairs for each image passed into the function
+    for image in images:
+        for name, val in caller_locals.items():
+            if isinstance(val, np.ndarray) and np.array_equal(val, image):
+                image_names.append(name)
+                break  # Once we find the name, stop searching
     
     # Number of images
     n = len(images)
@@ -74,7 +80,7 @@ def main():
     if False:
         image = im.get_image()
     else:
-        image = cv.imread('P3/Results/OrgImages/image_20241411_085252.png')
+        image = cv.imread('P3\Results\OrgImages\image_20241311_142217.png')
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
 
     #save image
@@ -109,7 +115,7 @@ def main():
 
     try:
         corrected_image, cc_matrix, corrected_palette = cc.colour_correct(image, ref_pal, checker)
-        corrected_image = cv.cvtColor(corrected_image, cv.COLOR_BGR2RGB)
+        #corrected_image = cv.cvtColor(corrected_image, cv.COLOR_BGR2RGB)
     except:
         raise Exception("CC Failed")
     cc_time = time.perf_counter()
@@ -118,12 +124,13 @@ def main():
     
     ## End time
     end_time = time.perf_counter()
-    print(f"Image process took {end_time - start_time:.2f} seconds")
-    print(f'Image loading took {image_time - start_time:.2f} seconds')
-    print(f'Dehazing took {dehaze_time - image_time:.2f} seconds')
-    print(f'Locating checker took {locate_time - dehaze_time:.2f} seconds')
-    print(f'Color correction took {cc_time - locate_time:.2f} seconds')
-    
+    if False:
+        print(f"Image process took {end_time - start_time:.2f} seconds")
+        print(f'Image loading took {image_time - start_time:.2f} seconds')
+        print(f'Dehazing took {dehaze_time - image_time:.2f} seconds')
+        print(f'Locating checker took {locate_time - dehaze_time:.2f} seconds')
+        print(f'Color correction took {cc_time - locate_time:.2f} seconds')
+
  
     ## Plot Images
     print("------Plotting Images------")
