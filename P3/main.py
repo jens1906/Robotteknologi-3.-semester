@@ -104,16 +104,15 @@ def main():
         corrected_image = cv.cvtColor(corrected_image, cv.COLOR_BGR2RGB)
     except:
         raise Exception("CC Failed")
-    
-    ## Get Palette Difference
-    #apt.get_pal_diff(ref_pal, checker, corrected_palette)
-
+ 
     ## Plot Images
     plot_images(image, dehazed_image, corrected_image, ref_pal, checker, corrected_palette)
 
-    ot.ObjectiveTesting(corrected_image, image)
 
-    
+    ## Objective Testing
+    ot.ObjectiveTesting(corrected_image, image) #AG, MBE, PCQI
+    apt.get_pal_diff(ref_pal, checker, corrected_palette) #Pal diff
+
     print("------Finished------")
     return
 
