@@ -168,8 +168,8 @@ print(f'Underwater colour image quality evaluation metric (UCIQE): {UnderwaterQu
 
 
 def ObjectiveTesting(Improved, reference):
-    print(f'Average Gradient: {AverageGradient(reference, Improved)}')
-    print(f'Mean Brightness Error: {MeanBrightnessError(reference, Improved)}')
-    print(f'Patch-based Contrast Quality Index (PCQI): {ContrastQualityIndex(reference, Improved, 32)}')
+    print(f'Average Gradient: {np.round(AverageGradient(reference, Improved), decimals=2)}')
+    print(f'Mean Brightness Error: {round(MeanBrightnessError(reference, Improved),2)}')
+    print(f'Patch-based Contrast Quality Index (PCQI): {round(ContrastQualityIndex(reference, Improved, 32),2)}')
 
 #ObjectiveTesting(imageAfter, imageBefore)
