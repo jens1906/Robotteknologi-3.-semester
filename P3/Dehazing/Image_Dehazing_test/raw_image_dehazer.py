@@ -1,44 +1,38 @@
 import cv2 as cv
 import numpy as np
 import os
-import rawpy
 import matplotlib.pyplot as plt
-import sys
-
-# Add the input_test directory to the Python path
-script_dir = os.path.dirname(__file__)
-input_test_dir = os.path.join(script_dir, '..', '..', 'Input', 'Input_test')
-sys.path.append(input_test_dir)
-
-# Import the input_test module
-import input_test
+import time
 
 def dark_channel(image, size=15):
+    """Compute the dark channel prior of the image."""
     kernel = cv.getStructuringElement(cv.MORPH_RECT, (size, size))
     dark_channel = cv.erode(image, kernel)
     return dark_channel
 
-def atmospheric_light(image, dark_channel):
-    h, w = image.shape[:2]
-    num_pixels = h * w
+
+def underwater_light(image, dark_channel):
+    """Estimate the underwater light in the image."""
+    num_pixels = image.shape[0] * image.shape[1]
     num_brightest = int(max(num_pixels * 0.001, 1))
     
     dark_vec = dark_channel.ravel()
     image_vec = image.reshape(num_pixels, -1)
     
-    indices = np.argsort(dark_vec)[-num_brightest:]
+    indices = np.argpartition(dark_vec, -num_brightest)[-num_brightest:]
     brightest_pixels = image_vec[indices]
     
-    A = np.mean(brightest_pixels, axis=0)
-    return A
+    return np.mean(brightest_pixels, axis=0)
 
 def transmission_map(image, A, omega=0.95, size=15):
+    """Estimate the transmission map."""
     norm_image = image / A
     dark_channel_norm = dark_channel(norm_image, size)
     transmission = 1 - omega * dark_channel_norm
     return transmission
 
 def Guidedfilter(im, p, r, eps):
+    """Apply the guided filter to the image."""
     mean_I = cv.boxFilter(im, cv.CV_64F, (r, r))
     mean_p = cv.boxFilter(p, cv.CV_64F, (r, r))
     mean_Ip = cv.boxFilter(im * p, cv.CV_64F, (r, r))
@@ -56,22 +50,24 @@ def Guidedfilter(im, p, r, eps):
     q = mean_a * im + mean_b
     return q
 
-def TransmissionRefine(im, et):
-    gray = cv.cvtColor(im, cv.COLOR_BGR2GRAY)
-    gray = np.float64(gray) / 1023.0  # Normalize for 10-bit images
+def TransmissionRefine(image, estimated_transition_map):
+    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    gray = np.float64(gray) / 255
     r = 60
     eps = 0.0001
-    t = Guidedfilter(gray, et, r, eps)
+    t = Guidedfilter(gray, estimated_transition_map, r, eps)
     return t
 
 def recover_image(image, transmission, A, t0=0.1):
+    """Recover the dehazed image."""
     transmission = np.maximum(transmission, t0)
-    J = (image - A) / transmission + A
-    return J
+    return (image - A) / transmission + A
 
 def dehaze(hazy_image):
-    image = hazy_image / 1023.0  # Normalize for 10-bit images
+    """Main function to dehaze an image."""
+    start_time = time.time()
     
+    image = hazy_image / 255.0
     channels = cv.split(image)
     dark_channels = []
     A_channels = []
@@ -79,73 +75,64 @@ def dehaze(hazy_image):
     refined_transmissions = []
     dehazed_channels = []
 
+    # Timing for each step
+    step_times = {}
+    
     for channel in channels:
+        t0 = time.time()
         dark = dark_channel(channel)
         dark_channels.append(dark)
+        step_times['dark_channel'] = time.time() - t0
         
-        A = atmospheric_light(channel, dark)
+        t0 = time.time()
+        A = underwater_light(channel, dark)
         A_channels.append(A)
+        step_times['underwater_light'] = time.time() - t0
         
+        t0 = time.time()
         transmission = transmission_map(channel, A)
         transmission_maps.append(transmission)
+        step_times['transmission_map'] = time.time() - t0
         
+        t0 = time.time()
         refined_transmission = TransmissionRefine(hazy_image, transmission)
         refined_transmissions.append(refined_transmission)
+        step_times['transmission_refine'] = time.time() - t0
         
+        t0 = time.time()
         dehazed = recover_image(channel, refined_transmission, A)
         dehazed_channels.append(dehazed)
+        step_times['recover_image'] = time.time() - t0
 
     dehazed_image = cv.merge(dehazed_channels)
-    
-    return dehazed_image, dark_channels, transmission_maps, refined_transmissions
 
-def display_images(hazy_image, dehazed_image, dark_channels, transmission_maps, refined_transmissions):
-    fig, axes = plt.subplots(2, 3, figsize=(15, 10))
+    total_time = time.time() - start_time
     
-    def resize_image(image, width=800):
-        height = int(image.shape[0] * (width / image.shape[1]))
-        return cv.resize(image, (width, height))
-    
-    hazy_image_resized = resize_image(hazy_image)
-    dehazed_image_resized = resize_image(dehazed_image)
-    
-    hazy_image_8bit = cv.convertScaleAbs(hazy_image_resized, alpha=(255.0/1023.0))
-    dehazed_image_8bit = cv.convertScaleAbs(dehazed_image_resized, alpha=(255.0/1023.0))
-    
-    dark_channel_images_8bit = [cv.cvtColor(cv.convertScaleAbs(resize_image(dark), alpha=(255.0/1023.0)), cv.COLOR_GRAY2BGR) for dark in dark_channels]
-    transmission_map_images_8bit = [cv.cvtColor(cv.convertScaleAbs(resize_image(transmission), alpha=(255.0/1023.0)), cv.COLOR_GRAY2BGR) for transmission in transmission_maps]
-    refined_transmission_images_8bit = [cv.cvtColor(cv.convertScaleAbs(resize_image(transmission), alpha=(255.0/1023.0)), cv.COLOR_GRAY2BGR) for transmission in refined_transmissions]
-    
-    axes[0, 0].imshow(cv.cvtColor(hazy_image_8bit, cv.COLOR_BGR2RGB))
-    axes[0, 0].set_title('Hazy Image')
-    axes[0, 0].axis('off')
-    
-    axes[0, 1].imshow(cv.cvtColor(dehazed_image_8bit, cv.COLOR_BGR2RGB))
-    axes[0, 1].set_title('Dehazed Image')
-    axes[0, 1].axis('off')
-    
-    axes[0, 2].imshow(dark_channel_images_8bit[0])
-    axes[0, 2].set_title('Dark Channel')
-    axes[0, 2].axis('off')
-    
-    axes[1, 0].imshow(transmission_map_images_8bit[0])
-    axes[1, 0].set_title('Transmission Map')
-    axes[1, 0].axis('off')
-    
-    axes[1, 1].imshow(refined_transmission_images_8bit[0])
-    axes[1, 1].set_title('Refined Transmission')
-    axes[1, 1].axis('off')
-    
-    plt.tight_layout()
-    plt.show()
+    # Print timing information
+    print("\nDehazing Performance Metrics:")
+    print("-" * 30)
+    print(f"Total time: {total_time:.3f} seconds")
+    print("\nTime per step (averaged across channels):")
+    for step, t in step_times.items():
+        print(f"{step}: {t/3:.3f} seconds")  # Divide by 3 for RGB channels
 
-image_path = os.path.join(script_dir, 'Dehaze_Samples', 'DE haze', 'hazy15.DNG')
+    return dehazed_image
 
-# Read the raw image using input_test
-hazy_image = input_test.convert_raw_to_bgr(image_path)
 
+def calculate_psnr(image1, image2):
+    """Calculate the Peak Signal-to-Noise Ratio (PSNR) between two images."""
+    psnr_value = cv.PSNR(image1, image2)
+    return psnr_value
+
+# Example usage
+script_dir = os.path.dirname(__file__)
+image_path = os.path.join(script_dir, 'Dehaze_Samples', 'city.png')
+hazy_image = cv.imread(image_path)
 if hazy_image is None:
     print(f"Error: Unable to load image at {image_path}")
 else:
-    dehazed_image, dark_channels, transmission_maps, refined_transmissions = dehaze(hazy_image)
-    display_images(hazy_image, dehazed_image, dark_channels, transmission_maps, refined_transmissions)
+    dehazed_image = dehaze(hazy_image)
+    cv.imshow('Hazy image', hazy_image)
+    cv.imshow('Dehazed image', dehazed_image)
+    cv.waitKey(0)
+    cv.destroyAllWindows()

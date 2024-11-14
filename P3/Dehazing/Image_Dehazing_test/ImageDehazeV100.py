@@ -128,3 +128,14 @@ def dehaze(hazy_image):
     dehazed_image = cv.merge(dehazed_channels)
     
     return np.clip(dehazed_image * 255, 0, 255).astype(np.uint8)
+
+
+script_dir = os.path.dirname(__file__)
+image_path = os.path.join(script_dir, 'Dehaze_Samples', 'city.png')
+hazy_image = cv.imread(image_path)
+
+dehazed_image = dehaze(hazy_image)
+cv.imshow('Hazy image', hazy_image)
+cv.imshow('Dehazed image', dehazed_image)
+cv.waitKey(0)
+cv.destroyAllWindows()
