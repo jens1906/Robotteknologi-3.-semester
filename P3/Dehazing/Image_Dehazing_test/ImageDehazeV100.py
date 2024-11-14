@@ -10,19 +10,20 @@ def dark_channel(image, size=15):
     dark_channel = cv.erode(image, kernel)
     return dark_channel
 
-
 def underwater_light(image, dark_channel):
     """Estimate the underwater light in the image."""
-    num_pixels = image.shape[0] * image.shape[1]
+    h, w = image.shape[:2]
+    num_pixels = h * w
     num_brightest = int(max(num_pixels * 0.001, 1))
     
     dark_vec = dark_channel.ravel()
     image_vec = image.reshape(num_pixels, -1)
     
-    indices = np.argpartition(dark_vec, -num_brightest)[-num_brightest:]
+    indices = np.argsort(dark_vec)[-num_brightest:]
     brightest_pixels = image_vec[indices]
     
-    return np.mean(brightest_pixels, axis=0)
+    A = np.mean(brightest_pixels, axis=0)
+    return A
 
 def transmission_map(image, A, omega=0.95, size=15):
     """Estimate the transmission map."""
@@ -61,7 +62,8 @@ def TransmissionRefine(image, estimated_transition_map):
 def recover_image(image, transmission, A, t0=0.1):
     """Recover the dehazed image."""
     transmission = np.maximum(transmission, t0)
-    return (image - A) / transmission + A
+    J = (image - A) / transmission + A
+    return J
 
 def dehaze(hazy_image):
     """Main function to dehaze an image."""
@@ -116,23 +118,14 @@ def dehaze(hazy_image):
     for step, t in step_times.items():
         print(f"{step}: {t/3:.3f} seconds")  # Divide by 3 for RGB channels
 
-    return dehazed_image
+    return np.clip(dehazed_image * 255, 0, 255).astype(np.uint8)
 
-
-def calculate_psnr(image1, image2):
-    """Calculate the Peak Signal-to-Noise Ratio (PSNR) between two images."""
-    psnr_value = cv.PSNR(image1, image2)
-    return psnr_value
-
-# Example usage
 script_dir = os.path.dirname(__file__)
 image_path = os.path.join(script_dir, 'Dehaze_Samples', 'city.png')
 hazy_image = cv.imread(image_path)
-if hazy_image is None:
-    print(f"Error: Unable to load image at {image_path}")
-else:
-    dehazed_image = dehaze(hazy_image)
-    cv.imshow('Hazy image', hazy_image)
-    cv.imshow('Dehazed image', dehazed_image)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
+
+dehazed_image = dehaze(hazy_image)
+cv.imshow('Hazy image', hazy_image)
+cv.imshow('Dehazed image', dehazed_image)
+cv.waitKey(0)
+cv.destroyAllWindows()
