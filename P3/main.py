@@ -20,7 +20,7 @@ import numpy as np
 from vmbpy import *
 from datetime import datetime
 import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
+
 
 def plot_images(*images):
     """
@@ -71,7 +71,7 @@ def main():
     ## Get Image
     print("------Getting Image------")
     
-    if False:
+    if True:
         image = im.get_image()
     else:
         image = cv.imread('P3/Results/OrgImages/image_20241411_085252.png')
@@ -132,8 +132,9 @@ def main():
 
     ## Objective Testing
     print("------Objective Testing------")
-
+    #print("Image diff")
     #ot.ObjectiveTesting(corrected_image, image) #AG, MBE, PCQI
+    #print("Checker diff")
     #apt.get_pal_diff(ref_pal, checker, corrected_palette) #Pal diff
     #print(cv.PSNR(ref_pal, checker))
     #print(cv.PSNR(ref_pal, corrected_palette))
