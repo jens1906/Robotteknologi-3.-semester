@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 
 def plot_images(*images):
     """
-    Plots a given number of images in a fullscreen grid layout using matplotlib.
+    Plots a given number of images in a grid layout using matplotlib.
     The image variable names from the caller's scope are used as titles.
     
     Parameters:
@@ -47,7 +47,7 @@ def plot_images(*images):
     rows = math.ceil(n / cols)
     
     # Create the plot
-    fig, axs = plt.subplots(rows, cols, figsize=(15, 15))
+    fig, axs = plt.subplots(rows, cols)
     
     axs = axs.ravel()  # Flatten the array of axes for easy indexing
     
@@ -106,12 +106,15 @@ def main():
         raise Exception("CC Failed")
  
     ## Plot Images
+    print("------Plotting Images------")
     plot_images(image, dehazed_image, corrected_image, ref_pal, checker, corrected_palette)
 
 
     ## Objective Testing
-    ot.ObjectiveTesting(corrected_image, image) #AG, MBE, PCQI
-    apt.get_pal_diff(ref_pal, checker, corrected_palette) #Pal diff
+    print("------Objective Testing------")
+    #ot.ObjectiveTesting(corrected_image, image) #AG, MBE, PCQI
+
+    #apt.get_pal_diff(ref_pal, checker, corrected_palette) #Pal diff
 
     print("------Finished------")
     return
