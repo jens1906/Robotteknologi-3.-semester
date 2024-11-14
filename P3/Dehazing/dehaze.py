@@ -128,5 +128,5 @@ def dehaze(hazy_image):
     #Merge the dehazed channels back into a single image
     dehazed_image = cv.merge(dehazed_channels)
     
-    return (dehazed_image * 255).astype(np.uint8)
+    return np.clip(dehazed_image * 255, 0, 255).astype(np.uint8)
 

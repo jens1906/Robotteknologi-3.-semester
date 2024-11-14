@@ -2,6 +2,7 @@ import cv2 as cv
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+import time
 
 def dark_channel(image, size=15):
     """Compute the dark channel prior of the image."""
@@ -66,8 +67,9 @@ def recover_image(image, transmission, A, t0=0.1):
 
 def dehaze(hazy_image):
     """Main function to dehaze an image."""
-    image = hazy_image / 255.0  # Change to 4095 for 12-bit images
+    start_time = time.time()
     
+    image = hazy_image / 255.0
     channels = cv.split(image)
     dark_channels = []
     A_channels = []
@@ -75,29 +77,49 @@ def dehaze(hazy_image):
     refined_transmissions = []
     dehazed_channels = []
 
+    # Timing for each step
+    step_times = {}
+    
     for channel in channels:
+        t0 = time.time()
         dark = dark_channel(channel)
         dark_channels.append(dark)
+        step_times['dark_channel'] = time.time() - t0
         
+        t0 = time.time()
         A = underwater_light(channel, dark)
         A_channels.append(A)
+        step_times['underwater_light'] = time.time() - t0
         
+        t0 = time.time()
         transmission = transmission_map(channel, A)
         transmission_maps.append(transmission)
+        step_times['transmission_map'] = time.time() - t0
         
+        t0 = time.time()
         refined_transmission = TransmissionRefine(hazy_image, transmission)
         refined_transmissions.append(refined_transmission)
+        step_times['transmission_refine'] = time.time() - t0
         
+        t0 = time.time()
         dehazed = recover_image(channel, refined_transmission, A)
         dehazed_channels.append(dehazed)
+        step_times['recover_image'] = time.time() - t0
 
     dehazed_image = cv.merge(dehazed_channels)
 
-    cv.imshow('Dark channel', cv.merge(dark_channels))
-    cv.imshow('Transmission map', cv.merge(transmission_maps))
-    cv.imshow('Refined transmission map', cv.merge(refined_transmissions))
+    total_time = time.time() - start_time
     
+    # Print timing information
+    print("\nDehazing Performance Metrics:")
+    print("-" * 30)
+    print(f"Total time: {total_time:.3f} seconds")
+    print("\nTime per step (averaged across channels):")
+    for step, t in step_times.items():
+        print(f"{step}: {t/3:.3f} seconds")  # Divide by 3 for RGB channels
+
     return dehazed_image
+
 
 def calculate_psnr(image1, image2):
     """Calculate the Peak Signal-to-Noise Ratio (PSNR) between two images."""
@@ -106,7 +128,7 @@ def calculate_psnr(image1, image2):
 
 # Example usage
 script_dir = os.path.dirname(__file__)
-image_path = os.path.join(script_dir, 'Dehaze_Samples', 'underwater.jpg')
+image_path = os.path.join(script_dir, 'Dehaze_Samples', 'city.png')
 hazy_image = cv.imread(image_path)
 if hazy_image is None:
     print(f"Error: Unable to load image at {image_path}")
@@ -116,6 +138,3 @@ else:
     cv.imshow('Dehazed image', dehazed_image)
     cv.waitKey(0)
     cv.destroyAllWindows()
-    
-    psnr = calculate_psnr(hazy_image, (dehazed_image * 255).astype(np.uint8))
-    print(f"PSNR between hazy and dehazed image: {psnr:.2f} dB")
