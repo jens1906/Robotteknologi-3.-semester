@@ -9,14 +9,11 @@ from P3.ColorCorrection import ColourCorrectMain as cc
 
 def get_pal_diff(ref_pal, checker, corrected_palette):
     ## get palette difference
-    print("------Getting Palette Difference--")
+    print("Getting Checker Difference")
     org_pal = cc.get_color_patches(ref_pal)
     found_pal = cc.get_color_patches(checker)
     cc_pal = cc.get_color_patches(corrected_palette)
-    print(org_pal[0])
-    print(found_pal[0])
-    print(cc_pal[0])
-    print("------")
+
     found_pal_diff = (org_pal - found_pal)
     cc_pal_diff = (org_pal - cc_pal)
     #get the sum of each color channel
