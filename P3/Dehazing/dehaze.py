@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 import os
 
-def dark_channel(image, size=55): # Default size 15
+def dark_channel(image, size=5): # Default size 15
     """Compute the dark channel prior of the image."""
     #Create a morphological kernel
     kernel = cv.getStructuringElement(cv.MORPH_RECT, (size, size))
@@ -34,7 +34,7 @@ def atmospheric_light_estimation(image, dark_channel):
     atmospheric_light = np.mean(brightest_pixels, axis=0)
     return atmospheric_light
 
-def transmission_map(image, atmospheric_light, omega=0.95, size=55): #Default size 15
+def transmission_map(image, atmospheric_light, omega=0.95, size=5): #Default size 15
     """Estimate the transmission map."""
     #Normalize the image by the atmospheric light
     normalized_image = image / atmospheric_light
