@@ -3,8 +3,8 @@ import numpy as np
 import math
 
 # Load the image
-imageBefore = cv2.imread('Objective testing before.jpg')
-imageAfter = cv2.imread('Objective testing after.jpg')
+imageBefore = cv2.imread('Objective testing\Objective_testing_before.jpg')
+imageAfter = cv2.imread('Objective testing\Objective_testing_after.jpg')
 
 def MSE(imgX, imgY):
     return np.mean((imgX - imgY)**2)   
@@ -156,7 +156,7 @@ def UnderwaterQualityEvaluation(imgX, imgY):
     resultUCIQE = [c[0] * Chroma[0] + c[1] * Contrast[0] + c[2] * AverageSaturation[0],
                    c[0] * Chroma[1] + c[1] * Contrast[1] + c[2] * AverageSaturation[1]]
     return resultUCIQE
-
+"""
 print(f'Mean Square Error: {MSE(imageBefore, imageAfter)}')
 print(f'Peak Signal to Noise Ratio: {PSNR(imageBefore, imageAfter)}')
 print(f'Structure Similarity Index Method:0 {SSIM(imageBefore, imageAfter)}')
@@ -164,3 +164,12 @@ print(f'Mean Brightness Error: {MeanBrightnessError(imageBefore, imageAfter)}')
 print(f'Average Gradient: {AverageGradient(imageBefore, imageAfter)}')
 print(f'Patch-based Contrast Quality Index (PCQI): {ContrastQualityIndex(imageBefore, imageAfter, 32)}')
 print(f'Underwater colour image quality evaluation metric (UCIQE): {UnderwaterQualityEvaluation(imageBefore, imageAfter)}')
+"""
+
+
+def ObjectiveTesting(Improved, reference):
+    print(f'Average Gradient: {AverageGradient(reference, Improved)}')
+    print(f'Mean Brightness Error: {MeanBrightnessError(reference, Improved)}')
+    print(f'Patch-based Contrast Quality Index (PCQI): {ContrastQualityIndex(reference, Improved, 32)}')
+
+ObjectiveTesting(imageAfter, imageBefore)
