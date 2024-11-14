@@ -11,6 +11,7 @@ from Dehazing import dehaze as dh
 from Palette_detection import LocateChecker as lc
 from ColorCorrection import ColourCorrectMain as cc
 from Objective_testing import APalTest as apt
+from Objective_testing import Objective_testing as ot
 
 import math
 import inspect
@@ -109,6 +110,9 @@ def main():
 
     ## Plot Images
     plot_images(image, dehazed_image, corrected_image, ref_pal, checker, corrected_palette)
+
+    ot.ObjectiveTesting(corrected_image, image)
+
     
     print("------Finished------")
     return
