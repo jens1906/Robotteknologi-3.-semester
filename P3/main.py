@@ -2,7 +2,6 @@ import os
 import sys
 os.system('cls')
 
-
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
 
@@ -14,6 +13,7 @@ from Objective_testing import APalTest as apt
 from Objective_testing import Objective_testing as ot
 
 import math
+import time
 import inspect
 import cv2 as cv
 import numpy as np
@@ -65,10 +65,12 @@ def plot_images(*images):
     plt.show()
 
 def main():
-    
+    # Start time
+    start_time = time.perf_counter()
+
     ## Get Image
     print("------Getting Image------")
-
+    
     if False:
         image = im.get_image()
     else:
@@ -78,6 +80,9 @@ def main():
     #save image
     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
     #cv.imwrite(f'P3/Results/OrgImages/image_{timestamp}.png', cv.cvtColor(image, cv.COLOR_BGR2RGB))
+    #get image time
+    image_time = time.perf_counter()
+
 
     ## Dehazing
     print("------Dehazing Image------")
@@ -87,12 +92,15 @@ def main():
     if dehazed_image is None:
         dehazed_image = image
 
+    dehaze_time = time.perf_counter()
     ## Locate Color Checker
     print("------Locating Color Checker------")
 
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki.png', cv.IMREAD_GRAYSCALE)
     checker, corner, pos = lc.LocateChecker(image, template)    
     
+    locate_time = time.perf_counter()
+
     ## Color Correction
     print("------Color Correcting Image------")
 
@@ -104,17 +112,32 @@ def main():
         corrected_image = cv.cvtColor(corrected_image, cv.COLOR_BGR2RGB)
     except:
         raise Exception("CC Failed")
+    cc_time = time.perf_counter()
+
+    print("------Image Processing Done------")
+    
+    ## End time
+    end_time = time.perf_counter()
+    print(f"Image process took {end_time - start_time:.2f} seconds")
+    print(f'Image loading took {image_time - start_time:.2f} seconds')
+    print(f'Dehazing took {dehaze_time - image_time:.2f} seconds')
+    print(f'Locating checker took {locate_time - dehaze_time:.2f} seconds')
+    print(f'Color correction took {cc_time - locate_time:.2f} seconds')
+    
  
     ## Plot Images
     print("------Plotting Images------")
-    plot_images(image, dehazed_image, corrected_image, ref_pal, checker, corrected_palette)
+    #plot_images(image, dehazed_image, corrected_image, ref_pal, checker, corrected_palette)
 
 
     ## Objective Testing
     print("------Objective Testing------")
-    #ot.ObjectiveTesting(corrected_image, image) #AG, MBE, PCQI
 
+    #ot.ObjectiveTesting(corrected_image, image) #AG, MBE, PCQI
     #apt.get_pal_diff(ref_pal, checker, corrected_palette) #Pal diff
+    #print(cv.PSNR(ref_pal, checker))
+    #print(cv.PSNR(ref_pal, corrected_palette))
+
 
     print("------Finished------")
     return
