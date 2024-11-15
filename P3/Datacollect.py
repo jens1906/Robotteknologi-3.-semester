@@ -2,13 +2,15 @@ from Input import input as im
 
 import os
 import cv2 as cv
+import vmbpy as vmb
 from datetime import datetime
 
 #image = im.get_image()
 image = cv.imread('P3\Results\OrgImages\image_20241311_144042.png')
 #make folder in P3/Results/Data
-test_folder = 'maelk/halv'
+test_folder = 'maelk'
 test_name = 'forfra'
+
 
 #make folder in P3/Results/Data
 try:
