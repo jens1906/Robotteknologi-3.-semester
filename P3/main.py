@@ -10,7 +10,7 @@ from Dehazing import dehaze as dh
 from Palette_detection import LocateChecker as lc
 from ColorCorrection import ColourCorrectMain as cc
 from Objective_testing import APalTest as apt
-from Objective_testing import Objective_testing as ot
+#from Objective_testing import Objective_testing as ot
 
 import math
 import time
@@ -80,12 +80,13 @@ def main():
     if False:
         image = im.get_image()
     else:
-        image = cv.imread('P3\Results\OrgImages\image_20241311_144042.png')
+        image = cv.imread('P3\Results\OrgImages\image_20241311_143038.png')
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
 
     #save image
     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
     #cv.imwrite(f'P3/Results/OrgImages/image_{timestamp}.png', cv.cvtColor(image, cv.COLOR_BGR2RGB))
+    
     #get image time
     image_time = time.perf_counter()
 
