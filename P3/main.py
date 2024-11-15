@@ -70,19 +70,24 @@ def plot_images(*images):
     plt.tight_layout()
     plt.show()
 
-def main():
+def main(cam):
+
     # Start time
     start_time = time.perf_counter()
 
     ## Get Image
     print("------Getting Image------")
-    
-    if False:
-        image = im.get_image()
-    else:
+    if cam is not None:
+        frame = cam.get_frame() 
+        bayer_image = frame.as_numpy_ndarray()
+        image = cv.cvtColor(bayer_image, cv.COLOR_BAYER_BG2RGB)   
+        #image = im.get_image(cam)
+    elif cam is None:
         image = cv.imread('P3\Results\OrgImages\image_20241311_144042.png')
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-
+    else:
+        raise Exception("Camera not initialized")
+    
     #save image
     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
     #cv.imwrite(f'P3/Results/OrgImages/image_{timestamp}.png', cv.cvtColor(image, cv.COLOR_BGR2RGB))
@@ -105,7 +110,7 @@ def main():
 
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki.png', cv.IMREAD_GRAYSCALE)
 
-    checker, corner, pos = lc.LocateChecker(dehazed_image, template)    
+    checker, corner, pos = lc.LocateChecker(image, template)    
     
     locate_time = time.perf_counter()
 
@@ -141,8 +146,8 @@ def main():
 
     ## Objective Testing
     print("------Objective Testing------")
-    #print("Image diff")
-    #ot.ObjectiveTesting(corrected_image, image) #AG, MBE, PCQI
+    print("Image diff")
+    ot.ObjectiveTesting(corrected_image, image) #AG, MBE, PCQI
     #print("Checker diff")
     #apt.get_pal_diff(ref_pal, checker, corrected_palette) #Pal diff
     #print(cv.PSNR(ref_pal, checker))
@@ -153,4 +158,5 @@ def main():
     return
 
 if __name__ == '__main__':
-    main()
+    cam = im.initialize_camera()
+    main(cam)
