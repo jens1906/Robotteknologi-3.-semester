@@ -10,7 +10,7 @@ image = im.get_image()
 
 #   Setup settings
 #Exposure 25k, Gain 0
-#Light = MAX
+#Light = MAX    Overvej at tage billeder med forskellige lysmængder
 
 #Light positions: 
 # Pink = Behind_Camera
