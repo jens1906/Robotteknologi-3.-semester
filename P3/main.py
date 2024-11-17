@@ -83,7 +83,7 @@ def main(cam):
         image = cv.cvtColor(bayer_image, cv.COLOR_BAYER_BG2RGB)   
         #image = im.get_image(cam)
     elif cam is None:
-        image = cv.imread('P3\Results\OrgImages\image_20241311_144042.png')
+        image = cv.imread('P3/Results/Data/32th_Milk/Behind_Camera_20241611_121741.png')
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
     else:
         raise Exception("Camera not initialized")
@@ -111,7 +111,7 @@ def main(cam):
 
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki.png', cv.IMREAD_GRAYSCALE)
 
-    checker, corner, pos = lc.LocateChecker(image, template)    
+    checker, corner, pos = lc.LocateChecker(dehazed_image, template)    
     
     locate_time = time.perf_counter()
 
@@ -148,9 +148,9 @@ def main(cam):
     ## Objective Testing
     print("------Objective Testing------")
     print("Image diff")
-    ot.ObjectiveTesting(corrected_image, image) #AG, MBE, PCQI
+    #ot.ObjectiveTesting(corrected_image, image) #AG, MBE, PCQI
     #print("Checker diff")
-    #apt.get_pal_diff(ref_pal, checker, corrected_palette) #Pal diff
+    apt.get_pal_diff(ref_pal, checker, corrected_palette) #Pal diff
     #print(cv.PSNR(ref_pal, checker))
     #print(cv.PSNR(ref_pal, corrected_palette))
 
@@ -159,5 +159,6 @@ def main(cam):
     return
 
 if __name__ == '__main__':
-    cam = im.initialize_camera()
+    #cam = im.initialize_camera()
+    cam = None
     main(cam)
