@@ -120,7 +120,6 @@ def dehaze(hazy_image):
 
     return dehazed_image
 
-
 def calculate_psnr(image1, image2):
     """Calculate the Peak Signal-to-Noise Ratio (PSNR) between two images."""
     psnr_value = cv.PSNR(image1, image2)
@@ -129,12 +128,26 @@ def calculate_psnr(image1, image2):
 # Example usage
 script_dir = os.path.dirname(__file__)
 image_path = os.path.join(script_dir, 'Dehaze_Samples', 'city.png')
-hazy_image = cv.imread(image_path)
+hazy_image = cv.imread("P3/Results/Data/32th_Milk/Beside_Camera_20241611_121705.png")
 if hazy_image is None:
     print(f"Error: Unable to load image at {image_path}")
 else:
     dehazed_image = dehaze(hazy_image)
-    cv.imshow('Hazy image', hazy_image)
-    cv.imshow('Dehazed image', dehazed_image)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
+
+    # Convert dehazed image to 8-bit format
+    dehazed_image_8bit = np.clip(dehazed_image * 255, 0, 255).astype(np.uint8)
+
+    plt.figure(figsize=(10, 5))
+        
+    plt.subplot(1, 2, 1)
+    plt.title('Hazy Image')
+    plt.imshow(cv.cvtColor(hazy_image, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+        
+    plt.subplot(1, 2, 2)
+    plt.title('Dehazed Image')
+    plt.imshow(cv.cvtColor(dehazed_image_8bit, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+        
+    plt.tight_layout()
+    plt.show()
