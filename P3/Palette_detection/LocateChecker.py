@@ -230,7 +230,7 @@ def DehazeTest():
     cv2.imshow(f"Not cropped:", cv2.resize(PIC, (640, 480)))
     cv2.waitKey(0)
 
-DehazeTest()
+#DehazeTest()
 #TestImageFolder()
 #TestImageSmall()
 #TestVideoFile()
