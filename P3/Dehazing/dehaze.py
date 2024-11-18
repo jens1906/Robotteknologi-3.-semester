@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 import os
 
-def dark_channel(image, size=15):
+def dark_channel(image, size=15): # Default kernal size 15
     """Compute the dark channel prior of the image."""
     #Create a morphological kernel
     kernel = cv.getStructuringElement(cv.MORPH_RECT, (size, size))
@@ -11,7 +11,7 @@ def dark_channel(image, size=15):
     dark_channel = cv.erode(image, kernel)
     return dark_channel
 
-def atmospheric_light(image, dark_channel):
+def atmospheric_light_estimation(image, dark_channel):
     """Estimate the atmospheric light in the image."""
     #Get the dimensions of the image
     height, width = image.shape[:2]
@@ -25,7 +25,7 @@ def atmospheric_light(image, dark_channel):
     image_vector = image.reshape(num_pixels, -1)  #Reshape to (num_pixels, channels)
     
     #Get the indices of the brightest pixels in the dark channel
-    brightest_indices = np.argsort(dark_vector)[-num_brightest_pixels:]
+    brightest_indices = np.argpartition(dark_vector, -num_brightest_pixels)[-num_brightest_pixels:]
 
     #Get the corresponding brightest pixels in the image
     brightest_pixels = image_vector[brightest_indices]
@@ -34,15 +34,14 @@ def atmospheric_light(image, dark_channel):
     atmospheric_light = np.mean(brightest_pixels, axis=0)
     return atmospheric_light
 
-def transmission_map(image, atmospheric_light, omega=0.95, size=15):
+def transmission_map(image, atmospheric_light, omega=0.95, size=15): #Default kernal size 15
     """Estimate the transmission map."""
     #Normalize the image by the atmospheric light
     normalized_image = image / atmospheric_light
     #Compute the dark channel of the normalized image
     dark_channel_normalized = dark_channel(normalized_image, size)
-    #Estimate the transmission map
-    transmission = 1 - omega * dark_channel_normalized
-    return transmission
+    #Estimate and return the transmission map
+    return 1 - omega * dark_channel_normalized
 
 def guided_filter(guidance_image, input_image, radius, epsilon):
     """Apply the guided filter to the image."""
@@ -66,7 +65,7 @@ def guided_filter(guidance_image, input_image, radius, epsilon):
     mean_a = cv.boxFilter(a, cv.CV_64F, (radius, radius))
     mean_b = cv.boxFilter(b, cv.CV_64F, (radius, radius))
 
-    #Compute the output image
+    #Compute the output image and return
     output_image = mean_a * guidance_image + mean_b
     return output_image
 
@@ -110,7 +109,7 @@ def dehaze(hazy_image):
         dark_channels.append(dark)
         
         #Estimate the atmospheric light
-        atmospheric_light = atmospheric_light(channel, dark)
+        atmospheric_light = atmospheric_light_estimation(channel, dark)
         atmospheric_lights.append(atmospheric_light)
         
         #Estimate the transmission map
@@ -128,4 +127,4 @@ def dehaze(hazy_image):
     #Merge the dehazed channels back into a single image
     dehazed_image = cv.merge(dehazed_channels)
     
-    return dehazed_image
+    return np.clip(dehazed_image * 255, 0, 255).astype(np.uint8)
