@@ -154,7 +154,7 @@ def main(cam):
     #print(cv.PSNR(ref_pal, checker))
     #print(cv.PSNR(ref_pal, corrected_palette))
 
-
+    
     print("------Finished------")
     return
 
