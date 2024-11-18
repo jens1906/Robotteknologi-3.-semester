@@ -115,10 +115,6 @@ def main(cam=None, image_path=None, detailed=False):
     
     locate_time = time.perf_counter()
 
-    plot_images(dehazed_image, checker)
-    #save dehaed image
-    cv.imwrite(f'P3/Results/Data/32th_Milk/dehazed_top_down_2nd_{timestamp}.png', cv.cvtColor(dehazed_image, cv.COLOR_BGR2RGB))
-
     ## Color Correction
     print("------Color Correcting Image------")
 
@@ -168,7 +164,7 @@ if __name__ == '__main__':
     image_path = None
 
     #cam = im.initialize_camera()
-    test_method = 'single'
+    test_method = 'folder'
 
 
     if test_method == 'single':
@@ -176,7 +172,7 @@ if __name__ == '__main__':
         main(cam, image_path, True)
     #get all images in P3\Results\Data\32th_Milk
     elif test_method == 'folder':
-        folder = 'P3/Results/Data/16th_Milk'
+        folder = 'P3/Results/Data/32th_Milk'
         corrected_list = []
         for file in os.listdir(folder):
             if file.endswith('.png'):
