@@ -162,6 +162,7 @@ def main(cam=None, image_path=None, detailed=False):
 if __name__ == '__main__':
     cam = None
     image_path = None
+    
 
     #cam = im.initialize_camera()
     test_method = 'folder'
