@@ -171,7 +171,6 @@ if __name__ == '__main__':
     if test_method == 'single':
         image_path = 'P3/Results/Data/32th_Milk/Top_Down_20241611_121554.png'
         main(cam, image_path, True)
-    #get all images in P3\Results\Data\32th_Milk
     
     elif test_method == 'folder':
         folder = 'P3/Results/Data/32th_Milk'
