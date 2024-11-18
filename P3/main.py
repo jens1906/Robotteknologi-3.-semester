@@ -132,7 +132,7 @@ def main(cam=None, image_path=None, detailed=False):
     
     ## End time
     end_time = time.perf_counter()
-    if False:
+    if detailed:
         print(f"Image process took {end_time - start_time:.2f} seconds")
         print(f'Image loading took {image_time - start_time:.2f} seconds')
         print(f'Dehazing took {dehaze_time - image_time:.2f} seconds')
@@ -165,12 +165,21 @@ if __name__ == '__main__':
 
 
     #cam = im.initialize_camera()
-    test_method = 'folder'
+    test_method = 'single'
 
 
     if test_method == 'single':
-        image_path = 'P3/Results/Data/32th_Milk/Top_Down_20241611_121554.png'
+        image_path = 'P3/Results/Data/32th_Milk/Beside_Camera_20241611_121710.png'
         main(cam, image_path, True)
+
+    elif test_method == 'live':
+        while True:
+            corrected = main(cam, None, True)
+            cv.imshow('Corrected Image', corrected)
+            if cv.waitKey(1) & 0xFF == ord('q'):
+                break
+        cam.close()
+        cv.destroyAllWindows()
     
     elif test_method == 'folder':
         folder = 'P3/Results/Data/32th_Milk'
