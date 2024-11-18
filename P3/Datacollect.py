@@ -28,9 +28,13 @@ image = im.get_image()
 #1/2 Milk, mixed
 #Full Milk, mixed
 
+import matplotlib.pyplot as plt
+plt.imshow(image)
+plt.show()
+
 #make folder in P3/Results/Data
-test_folder = '32th_Milk'
-test_name = 'Behind_Camera'
+test_folder = 'cum'
+test_name = 'Andrefunny'
 
 #make folder in P3/Results/Data
 try:

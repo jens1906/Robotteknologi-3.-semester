@@ -71,22 +71,23 @@ def plot_images(*images):
 
 
 def main(cam=None, image_path=None, detailed=False):
-
     # Start time
     start_time = time.perf_counter()
 
     ## Get Image
     print("------Getting Image------")
     if cam is not None:
-        frame = cam.get_frame() 
-        bayer_image = frame.as_numpy_ndarray()
-        image = cv.cvtColor(bayer_image, cv.COLOR_BAYER_BG2RGB)   
-        #image = im.get_image(cam)
+        try:
+            frame = cam.get_frame() 
+            bayer_image = frame.as_numpy_ndarray()
+            image = cv.cvtColor(bayer_image, cv.COLOR_BAYER_BG2RGB)
+        except Exception as e:
+            raise Exception(f"Error capturing frame from camera: {e}")
     elif image_path is not None:
         image = cv.imread(image_path)
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
     else:
-        raise Exception("Camera not initialized")
+        raise Exception("Camera or image path not initialized")
     
     #save image
     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
@@ -164,22 +165,28 @@ if __name__ == '__main__':
     image_path = None
 
 
-    #cam = im.initialize_camera()
-    test_method = 'single'
+    test_method = 'live'
 
 
     if test_method == 'single':
         image_path = 'P3/Results/Data/32th_Milk/Beside_Camera_20241611_121710.png'
         main(cam, image_path, True)
 
-    elif test_method == 'live':
-        while True:
-            corrected = main(cam, None, True)
-            cv.imshow('Corrected Image', corrected)
-            if cv.waitKey(1) & 0xFF == ord('q'):
-                break
-        cam.close()
-        cv.destroyAllWindows()
+    if test_method == 'live':
+        from vmbpy import Vimba  # Import the Vimba API context manager
+    
+        with Vimba() as vimba:  # Start the Vimba API
+            with im.initialize_camera(vimba) as cam:  # Ensure the camera is initialized correctly
+                while True:
+                    try:
+                        corrected = main(cam, image_path, True)
+                        cv.imshow('Corrected Image', corrected)
+                        if cv.waitKey(1) & 0xFF == ord('q'):  # Exit loop on 'q' press
+                            break
+                    except Exception as e:
+                        print("Error during live processing:", e)
+                        break
+                cv.destroyAllWindows()
     
     elif test_method == 'folder':
         folder = 'P3/Results/Data/32th_Milk'
