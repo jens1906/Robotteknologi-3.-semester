@@ -21,19 +21,15 @@ from vmbpy import *
 from datetime import datetime
 import matplotlib.pyplot as plt
 
-
 def plot_images(*images):
     """
     Plots a given number of images in a grid layout using matplotlib.
-    The image variable names from the caller's scope are used as titles.
-    
-    Parameters:
-    - *images: a variable number of images (as arrays) to display.
+    Handles both individual images and lists of images.
     """
-
-    #image, dehazed_image, corrected_image, ref_pal, checker, corrected_palette
-
-    # Get the names of the variables from the caller's scope
+    # If a single list is passed, unpack it
+    if len(images) == 1 and isinstance(images[0], list):
+        images = images[0]
+    
     # Get the names of the variables from the caller's scope
     caller_locals = inspect.currentframe().f_back.f_locals
     image_names = []
@@ -53,24 +49,28 @@ def plot_images(*images):
     rows = math.ceil(n / cols)
     
     # Create the plot
-    fig, axs = plt.subplots(rows, cols)
-    
+    fig, axs = plt.subplots(rows, cols, figsize=(15, 10))
     axs = axs.ravel()  # Flatten the array of axes for easy indexing
     
     for i, img in enumerate(images):
-        axs[i].imshow(img)
+        if img.ndim == 2:  # Grayscale image
+            axs[i].imshow(img, cmap='gray')
+        else:  # Color image
+            axs[i].imshow(img)
+        axs[i].axis('off')  # Hide axes
         # Use variable names as titles if they exist
         if i < len(image_names):
-            axs[i].set_title(image_names[i])
-
+            axs[i].set_title(image_names[i], fontsize=8)
+    
     # Hide any empty subplots
-    for j in range(i + 1, rows * cols):
+    for j in range(i + 1, len(axs)):
         axs[j].axis('off')
     
     plt.tight_layout()
     plt.show()
 
-def main(cam):
+
+def main(cam=None, image_path=None, detailed=False):
 
     # Start time
     start_time = time.perf_counter()
@@ -82,8 +82,8 @@ def main(cam):
         bayer_image = frame.as_numpy_ndarray()
         image = cv.cvtColor(bayer_image, cv.COLOR_BAYER_BG2RGB)   
         #image = im.get_image(cam)
-    elif cam is None:
-        image = cv.imread('P3/Results/Data/32th_Milk/Behind_Camera_20241611_121741.png')
+    elif image_path is not None:
+        image = cv.imread(image_path)
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
     else:
         raise Exception("Camera not initialized")
@@ -115,6 +115,10 @@ def main(cam):
     
     locate_time = time.perf_counter()
 
+    plot_images(dehazed_image, checker)
+    #save dehaed image
+    cv.imwrite(f'P3/Results/Data/32th_Milk/dehazed_top_down_2nd_{timestamp}.png', cv.cvtColor(dehazed_image, cv.COLOR_BGR2RGB))
+
     ## Color Correction
     print("------Color Correcting Image------")
 
@@ -122,7 +126,7 @@ def main(cam):
     ref_pal = cv.cvtColor(ref_pal, cv.COLOR_BGR2RGB)
 
     try:
-        corrected_image, cc_matrix, corrected_palette = cc.colour_correct(image, ref_pal, checker)
+        corrected_image, cc_matrix, corrected_palette = cc.colour_correct(dehazed_image, ref_pal, checker)
         #corrected_image = cv.cvtColor(corrected_image, cv.COLOR_BGR2RGB)
     except:
         raise Exception("CC Failed")
@@ -142,23 +146,50 @@ def main(cam):
  
     ## Plot Images
     print("------Plotting Images------")
-    plot_images(image, dehazed_image, corrected_image, ref_pal, checker, corrected_palette)
+    if detailed:
+        plot_images(image, dehazed_image, corrected_image, ref_pal, checker, corrected_palette)
 
 
     ## Objective Testing
     print("------Objective Testing------")
-    print("Image diff")
+    #print("Image diff")
     #ot.ObjectiveTesting(corrected_image, image) #AG, MBE, PCQI
     #print("Checker diff")
-    apt.get_pal_diff(ref_pal, checker, corrected_palette) #Pal diff
+    #apt.get_pal_diff(ref_pal, checker, corrected_palette) #Pal diff
     #print(cv.PSNR(ref_pal, checker))
     #print(cv.PSNR(ref_pal, corrected_palette))
 
-    
+
     print("------Finished------")
-    return
+    return corrected_image
 
 if __name__ == '__main__':
-    #cam = im.initialize_camera()
     cam = None
-    main(cam)
+    image_path = None
+
+    #cam = im.initialize_camera()
+    test_method = 'single'
+
+
+    if test_method == 'single':
+        image_path = 'P3/Results/Data/32th_Milk/Top_Down_20241611_121554.png'
+        main(cam, image_path, True)
+    #get all images in P3\Results\Data\32th_Milk
+    elif test_method == 'folder':
+        folder = 'P3/Results/Data/16th_Milk'
+        corrected_list = []
+        for file in os.listdir(folder):
+            if file.endswith('.png'):
+                image_path = f'{folder}/{file}'
+                print("!!!!!!!!!!!Processing: ", file)
+                try:
+                    corrected = main(cam, image_path)
+                    corrected_list.append(corrected)
+                except Exception as e:
+                    print("Failed", file, "Error:", e)
+                    continue
+
+        # Plot all corrected images
+        plot_images(corrected_list)
+    else:
+        exit(1)

@@ -67,6 +67,7 @@ def apply_color_correction(image, color_correction_matrix):
     return corrected_image
 
 def colour_correct(image, reference_pal=None, taken_pal=None):
+
     if reference_pal is None:
         reference_pal_path = 'P3/ColorCorrection/Color-Checker.jpg'
         reference_pal = load_and_convert_image(reference_pal_path)
