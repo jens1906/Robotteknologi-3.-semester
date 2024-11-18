@@ -5,8 +5,6 @@ import os
 
 test = False
 
-Adjustment = 100
-
 if test == True:
     template = cv2.imread("P3/Palette_detection/Colour_checker_from_Vikki.png", cv2.IMREAD_GRAYSCALE)
     img = cv2.imread("P3/Results/OrgImages/image_20241311_142611.png")
@@ -23,10 +21,8 @@ if test == True:
         cv2.destroyAllWindows()
 
 # Initialize the ORB detector algorithm
-orb = cv2.ORB_create()
-
-def LocateChecker(img, template, PreviousLocation = 0):
-
+def ORBLocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=False):
+    orb = cv2.ORB_create()
     if PreviousLocation != 0:
         # Adjust crop location by -250 for the top-left and +250 for the bottom-right
         X = [max(0, PreviousLocation[1][0] - Adjustment),
@@ -34,7 +30,7 @@ def LocateChecker(img, template, PreviousLocation = 0):
         Y = [max(0, PreviousLocation[0][0] - Adjustment),
              min(img.shape[0], PreviousLocation[0][1] + Adjustment)]
         
-        img = img[Y[0]: Y[1],  # y-axis (height)
+        img = img[Y[0]: Y[1],   #y-axis (height)
                   X[0]: X[1]]   # x-axis (width)
 
     # Detects features in the images in terms of keypoints and descriptors
@@ -44,6 +40,12 @@ def LocateChecker(img, template, PreviousLocation = 0):
     # Matches the features of the two images
     matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
     matches = matcher.match(desc_template, desc_img)
+    img_matches = cv2.drawMatches(template, kp_template, img, kp_img, matches, None, 
+                               flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+
+    # Display the resulting image with matches
+    cv2.imshow("Printed Matches pre", cv2.resize(img_matches, (640, 480)))
+    cv2.waitKey(0)
 
     # Sort the matches based on distance (best matches first)
     matches = sorted(matches, key=lambda x: x.distance)[:100]
@@ -91,7 +93,88 @@ def LocateChecker(img, template, PreviousLocation = 0):
 
     return colour_checker, corners_checker, FinalLocation
 
-LocateChecker(img, template) if test == True else None
+def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=False):
+    orb = cv2.AKAZE_create()  # Use SIFT for better results
+
+    if PreviousLocation != 0:
+        # Adjust crop location
+        X = [max(0, PreviousLocation[1][0] - Adjustment),
+             min(img.shape[1], PreviousLocation[1][1] + Adjustment)]
+        Y = [max(0, PreviousLocation[0][0] - Adjustment),
+             min(img.shape[0], PreviousLocation[0][1] + Adjustment)]
+        img = img[Y[0]: Y[1],   #y-axis (height)
+                  X[0]: X[1]]   #x-axis (width)
+
+    # Detect features
+    kp_img, desc_img = orb.detectAndCompute(img, None)
+    kp_template, desc_template = orb.detectAndCompute(template, None)
+
+    # Match features using KNN
+    matcher = cv2.BFMatcher(cv2.NORM_L2)  # Use NORM_L2 for SIFT
+    knn_matches = matcher.knnMatch(desc_template, desc_img, k=2)
+
+    # Lowe's ratio test
+    good_matches = []
+    for m, n in knn_matches:
+        if m.distance < 0.75 * n.distance:
+            good_matches.append(m)
+
+    if len(good_matches) < 4:
+        print("Not enough good matches!")
+        return None, None, None
+
+    # Extract matched keypoints
+    points_template = np.float32([kp_template[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+    points_img = np.float32([kp_img[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+
+    # Find homography
+    homography, mask = cv2.findHomography(points_template, points_img, cv2.RANSAC)
+
+    if homography is None or np.linalg.det(homography) < 1e-6:
+        print("Invalid homography matrix!")
+        return None, None, None
+
+    # Transform corners
+    h, w = template.shape[:2]
+    corners_template = np.float32([[0, 0], [w, 0], [w, h], [0, h]]).reshape(-1, 1, 2)
+    corners_checker = cv2.perspectiveTransform(corners_template, homography)
+
+    if corners_checker is None or len(corners_checker) != 4:
+        print("Invalid corners detected!")
+        return None, None, None
+
+    # Warp perspective
+    warp_matrix = cv2.getPerspectiveTransform(corners_checker, corners_template)
+    colour_checker = cv2.warpPerspective(img, warp_matrix, (w, h))
+    print(colour_checker.shape)
+    colour_checker = colour_checker[170: 997,  # y-axis (height)
+                                    520: 1705]   # x-axis (width)
+
+    # Debugging
+    if test:
+        img_matches = cv2.drawMatches(template, kp_template, img, kp_img, good_matches, None,
+                                      flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+        cv2.imshow("Good Matches",  cv2.resize(img_matches, (640, 480)))
+        cv2.imshow("Warped Colour Checker", cv2.resize(colour_checker, (640, 480)))
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+    return colour_checker, corners_checker, [[int(corners_checker[0][0][1]), int(corners_checker[2][0][1])],
+                                             [int(corners_checker[0][0][0]), int(corners_checker[2][0][0])]]
+
+def LocateChecker(img, template, PreviousLocation=0, Adjustment=100, test=False):
+    #return ORBLocateChecker(img, template, PreviousLocation, Adjustment, test)
+    return AKAZELocateChecker(img, template, PreviousLocation, Adjustment, test)
+
+
+
+
+
+
+
+###
+### THIS IS TEST FUNCTIONS
+###
 
 def TestImageFolder():
     folder_path = "P3//Palette detection//SmallMovement"
@@ -140,8 +223,14 @@ def TestImageSmall():
         x,y,Location = LocateChecker(image, template, Location)
 
 
+def DehazeTest():
+    temp = cv2.imread("P3/Palette_detection/Colour_checker_from_Vikki_full.png", cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread("P3/Palette_detection/Dehazed_image.png")
+    PIC,y,Location = LocateChecker(img, temp, 0, 250, True)
+    cv2.imshow(f"Not cropped:", cv2.resize(PIC, (640, 480)))
+    cv2.waitKey(0)
 
-
+DehazeTest()
 #TestImageFolder()
 #TestImageSmall()
 #TestVideoFile()
