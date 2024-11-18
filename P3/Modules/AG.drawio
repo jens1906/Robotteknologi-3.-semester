@@ -1,0 +1,59 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36" version="24.8.6">
+  <diagram name="Page-1" id="YnH_Gp7cI8mRs6oksH3H">
+    <mxGraphModel dx="974" dy="483" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="X6Loj6Yh5KK2jkIvwgXB-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="X6Loj6Yh5KK2jkIvwgXB-1" target="X6Loj6Yh5KK2jkIvwgXB-5">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="170" y="180" />
+              <mxPoint x="170" y="255" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="X6Loj6Yh5KK2jkIvwgXB-1" value="Original image&lt;br&gt;(reference image)" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="160" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="X6Loj6Yh5KK2jkIvwgXB-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="X6Loj6Yh5KK2jkIvwgXB-2" target="X6Loj6Yh5KK2jkIvwgXB-5">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="180" y="130" />
+              <mxPoint x="180" y="225" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="X6Loj6Yh5KK2jkIvwgXB-2" value="Enhanced image" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="110" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="X6Loj6Yh5KK2jkIvwgXB-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="X6Loj6Yh5KK2jkIvwgXB-3" target="X6Loj6Yh5KK2jkIvwgXB-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="X6Loj6Yh5KK2jkIvwgXB-3" value="&lt;b&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;Start&lt;/font&gt;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="90" y="220" width="60" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="X6Loj6Yh5KK2jkIvwgXB-4" value="Print outputs" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="221" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="X6Loj6Yh5KK2jkIvwgXB-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="X6Loj6Yh5KK2jkIvwgXB-5" target="X6Loj6Yh5KK2jkIvwgXB-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="X6Loj6Yh5KK2jkIvwgXB-5" value="Images pixelvalues is converted into gradients using OpenCV&#39;s Sobel function" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="210" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="X6Loj6Yh5KK2jkIvwgXB-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="X6Loj6Yh5KK2jkIvwgXB-6" target="X6Loj6Yh5KK2jkIvwgXB-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="X6Loj6Yh5KK2jkIvwgXB-6" value="Magnitudes/lengths of gradients are calculated" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="370" y="210" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="X6Loj6Yh5KK2jkIvwgXB-7" value="Average gradients &lt;br&gt;are then calculated" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="550" y="210" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="X6Loj6Yh5KK2jkIvwgXB-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.126;entryY=0.467;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="X6Loj6Yh5KK2jkIvwgXB-7" target="X6Loj6Yh5KK2jkIvwgXB-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

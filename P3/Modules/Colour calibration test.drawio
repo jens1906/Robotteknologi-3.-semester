@@ -1,0 +1,69 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36" version="24.8.6">
+  <diagram name="Page-1" id="OEZhDE_sIScnifORKLpe">
+    <mxGraphModel dx="1894" dy="518" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="e-vnFvZ5ydK1tD2NiWsa-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="e-vnFvZ5ydK1tD2NiWsa-1" target="e-vnFvZ5ydK1tD2NiWsa-5">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="120" y="205" />
+              <mxPoint x="120" y="270" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-vnFvZ5ydK1tD2NiWsa-1" value="Original image &lt;br&gt;colour palette&lt;br&gt;(reference image colour palette)" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="-20" y="170" width="120" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vnFvZ5ydK1tD2NiWsa-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="e-vnFvZ5ydK1tD2NiWsa-2" target="e-vnFvZ5ydK1tD2NiWsa-5">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="110" y="135" />
+              <mxPoint x="110" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-vnFvZ5ydK1tD2NiWsa-2" value="Enhanced image&lt;br&gt;Colour palette" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="-20" y="110" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vnFvZ5ydK1tD2NiWsa-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="e-vnFvZ5ydK1tD2NiWsa-3" target="e-vnFvZ5ydK1tD2NiWsa-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vnFvZ5ydK1tD2NiWsa-3" value="&lt;b&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;Start&lt;/font&gt;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="270" width="60" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vnFvZ5ydK1tD2NiWsa-4" value="Print outputs" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="640" y="270" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vnFvZ5ydK1tD2NiWsa-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="e-vnFvZ5ydK1tD2NiWsa-5" target="e-vnFvZ5ydK1tD2NiWsa-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vnFvZ5ydK1tD2NiWsa-5" value="Colour patches of the colour palettes are found for enhances, reference and colour palette reference" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="140" y="250" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vnFvZ5ydK1tD2NiWsa-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="e-vnFvZ5ydK1tD2NiWsa-6" target="e-vnFvZ5ydK1tD2NiWsa-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vnFvZ5ydK1tD2NiWsa-6" value="Colour patches of the enhances and reference images are then substracted from the reference colour palette." style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="310" y="250" width="150" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vnFvZ5ydK1tD2NiWsa-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="e-vnFvZ5ydK1tD2NiWsa-7" target="e-vnFvZ5ydK1tD2NiWsa-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vnFvZ5ydK1tD2NiWsa-7" value="Mean of the found differences for the&amp;nbsp; enhanced picture and reference(original) picture is found" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="490" y="250" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e-vnFvZ5ydK1tD2NiWsa-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="e-vnFvZ5ydK1tD2NiWsa-8" target="e-vnFvZ5ydK1tD2NiWsa-5">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="210" y="360" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-vnFvZ5ydK1tD2NiWsa-8" value="Reference &lt;br&gt;colour palette" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry y="340" width="120" height="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
