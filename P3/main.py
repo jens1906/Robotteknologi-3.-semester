@@ -110,7 +110,7 @@ def main(cam=None, image_path=None, detailed=False):
     ## Locate Color Checker
     print("------Locating Color Checker------")
 
-    template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki.png', cv.IMREAD_GRAYSCALE)
+    template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png', cv.IMREAD_GRAYSCALE)
 
     checker, corner, pos = lc.LocateChecker(dehazed_image, template)    
     
