@@ -106,23 +106,23 @@ def main(cam=None, image_path=None, detailed=False):
 
     dehaze_time = time.perf_counter()
     
-    ## Locate Color Checker
-    print("------Locating Color Checker------")
+    ## Locate Color dehazed_checker
+    print("------Locating Color dehazed_checker------")
 
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png', cv.IMREAD_GRAYSCALE)
 
-    checker, corner, pos = lc.LocateChecker(dehazed_image, template)    
+    dehazed_checker, corner, pos = lc.LocateChecker(dehazed_image, template)    
     
     locate_time = time.perf_counter()
 
     ## Color Correction
     print("------Color Correcting Image------")
 
-    ref_pal = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki.png')
-    ref_pal = cv.cvtColor(ref_pal, cv.COLOR_BGR2RGB)
+    original_checker = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki.png')
+    original_checker = cv.cvtColor(original_checker, cv.COLOR_BGR2RGB)
 
     try:
-        corrected_image, cc_matrix, corrected_palette = cc.colour_correct(dehazed_image, ref_pal, checker)
+        corrected_image, cc_matrix, corrected_checker = cc.colour_correct(dehazed_image, original_checker, dehazed_checker)
         #corrected_image = cv.cvtColor(corrected_image, cv.COLOR_BGR2RGB)
     except:
         raise Exception("CC Failed")
@@ -136,24 +136,24 @@ def main(cam=None, image_path=None, detailed=False):
         print(f"Image process took {end_time - start_time:.2f} seconds")
         print(f'Image loading took {image_time - start_time:.2f} seconds')
         print(f'Dehazing took {dehaze_time - image_time:.2f} seconds')
-        print(f'Locating checker took {locate_time - dehaze_time:.2f} seconds')
+        print(f'Locating dehazed_checker took {locate_time - dehaze_time:.2f} seconds')
         print(f'Color correction took {cc_time - locate_time:.2f} seconds')
 
  
     ## Plot Images
     print("------Plotting Images------")
     if detailed:
-        plot_images(image, dehazed_image, corrected_image, ref_pal, checker, corrected_palette)
+        plot_images(image, dehazed_image, corrected_image, original_checker, dehazed_checker, corrected_checker)
 
 
     ## Objective Testing
     print("------Objective Testing------")
     #print("Image diff")
     #ot.ObjectiveTesting(corrected_image, image) #AG, MBE, PCQI
-    #print("Checker diff")
-    #apt.get_pal_diff(ref_pal, checker, corrected_palette) #Pal diff
-    #print(cv.PSNR(ref_pal, checker))
-    #print(cv.PSNR(ref_pal, corrected_palette))
+    #print("dehazed_checker diff")
+    #apt.get_pal_diff(original_checker, dehazed_checker, corrected_checker) #Pal diff
+    #print(cv.PSNR(original_checker, dehazed_checker))
+    #print(cv.PSNR(original_checker, corrected_checker))
 
 
     print("------Finished------")
@@ -166,17 +166,19 @@ if __name__ == '__main__':
     test_method = 'single' # 'single', 'live', 'folder'
 
     if test_method == 'single':
-        image_path = 'P3\Results\Data\cum\Andrefunny_20241811_112431.png'
+        image_path = 'P3\Results\OrgImages\image_20241311_142217.png'
         main(cam, image_path, True)
 
     elif test_method == 'live':
-        from vmbpy import Vimba  # Import the Vimba API context manager
-    
-        with Vimba() as vimba:  # Start the Vimba API
-            with im.initialize_camera(vimba) as cam:  # Ensure the camera is initialized correctly
-                while True:
+        with VmbSystem.get_instance() as vmb:
+            while True:
+                cams = vmb.get_all_cameras()
+                if len(cams) == 0:
+                    print('No cameras found')
+                    exit(1)
+                with cams[0] as cam:
                     try:
-                        corrected = main(cam, image_path, True)
+                        corrected = main(cam, None, True)
                         cv.imshow('Corrected Image', corrected)
                         if cv.waitKey(1) & 0xFF == ord('q'):  # Exit loop on 'q' press
                             break
