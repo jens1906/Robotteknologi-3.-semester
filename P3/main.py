@@ -172,7 +172,7 @@ if __name__ == '__main__':
         image_path = 'P3\Results\Data\cum\Andrefunny_20241811_112431.png'
         main(cam, image_path, True)
 
-    if test_method == 'live':
+    elif test_method == 'live':
         from vmbpy import Vimba  # Import the Vimba API context manager
     
         with Vimba() as vimba:  # Start the Vimba API
