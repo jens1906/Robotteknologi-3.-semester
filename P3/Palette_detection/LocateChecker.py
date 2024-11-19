@@ -20,79 +20,6 @@ if test == True:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-# Initialize the ORB detector algorithm
-def ORBLocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=False):
-    orb = cv2.ORB_create()
-    if PreviousLocation != 0:
-        # Adjust crop location by -250 for the top-left and +250 for the bottom-right
-        X = [max(0, PreviousLocation[1][0] - Adjustment),
-             min(img.shape[0], PreviousLocation[1][1] + Adjustment)]
-        Y = [max(0, PreviousLocation[0][0] - Adjustment),
-             min(img.shape[0], PreviousLocation[0][1] + Adjustment)]
-        
-        img = img[Y[0]: Y[1],   #y-axis (height)
-                  X[0]: X[1]]   # x-axis (width)
-
-    # Detects features in the images in terms of keypoints and descriptors
-    kp_img, desc_img = orb.detectAndCompute(img, None)
-    kp_template, desc_template = orb.detectAndCompute(template, None)
-
-    # Matches the features of the two images
-    matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-    matches = matcher.match(desc_template, desc_img)
-    img_matches = cv2.drawMatches(template, kp_template, img, kp_img, matches, None, 
-                               flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
-
-    # Display the resulting image with matches
-    cv2.imshow("Printed Matches pre", cv2.resize(img_matches, (640, 480)))
-    cv2.waitKey(0)
-
-    # Sort the matches based on distance (best matches first)
-    matches = sorted(matches, key=lambda x: x.distance)[:100]
-
-    display(cv2.drawMatches(template, kp_template, img, kp_img, matches, None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)) if test == True else None
-
-    # Extract the matched keypoints
-    points_template = np.float32([kp_template[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
-    points_img = np.float32([kp_img[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
-
-    # Find the homography matrix
-    homography, mask = cv2.findHomography(points_template, points_img, cv2.RANSAC)
-
-    # Get the dimensions of the template image
-    h, w = template.shape[:2]
-
-    # Define the corners of the template image and its corresponding corners in the target image
-    corners_template = np.float32([[0, 0], [w, 0], [w, h], [0, h]]).reshape(-1, 1, 2)
-    corners_checker = cv2.perspectiveTransform(corners_template, homography)
-
-    # Display the bounding box around the detected checkerboard
-    display_box_checker(img, corners_checker) if test == True else None
-
-    # Change the perspective of the detected colour checker to align it with the template
-    warp_matrix = cv2.getPerspectiveTransform(corners_checker, corners_template)
-    colour_checker = cv2.warpPerspective(img, warp_matrix, (w, h))
-
-    # Chopped image
-    CurrentLocation = [[int(corners_checker[0][0][1]),
-                          int(corners_checker[2][0][1])]
-                        ,[int(corners_checker[0][0][0]),
-                          int(corners_checker[2][0][0])]]
-    FinalLocation = CurrentLocation
-
-    if PreviousLocation != 0:
-        Y = [PreviousLocation[0][0]+(CurrentLocation[0][0]-Adjustment),#Y1
-             PreviousLocation[0][1]+(CurrentLocation[0][0]-Adjustment)]#Y2
-        X = [PreviousLocation[1][0]+(CurrentLocation[1][0]-Adjustment),#X1
-             PreviousLocation[1][1]+(CurrentLocation[1][0]-Adjustment)]#X2
-        FinalLocation = [[Y[0], Y[1]],
-                         [X[0], X[1]]]
-
-    # Display the cropped colour checker
-    display(colour_checker) if test == True else None
-
-    return colour_checker, corners_checker, FinalLocation
-
 def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=False):
     Akaze = cv2.AKAZE_create()  # Use SIFT for better results
 
@@ -168,10 +95,6 @@ def LocateChecker(img, template, PreviousLocation=0, Adjustment=100, test=False)
 
 
 
-
-
-
-
 ###
 ### THIS IS TEST FUNCTIONS
 ###
@@ -234,3 +157,80 @@ def DehazeTest():
 #TestImageFolder()
 #TestImageSmall()
 #TestVideoFile()
+
+
+# Previous code - ORB algorithm
+"""
+# Initialize the ORB detector algorithm
+def ORBLocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=False):
+    orb = cv2.ORB_create()
+    if PreviousLocation != 0:
+        # Adjust crop location by -250 for the top-left and +250 for the bottom-right
+        X = [max(0, PreviousLocation[1][0] - Adjustment),
+             min(img.shape[0], PreviousLocation[1][1] + Adjustment)]
+        Y = [max(0, PreviousLocation[0][0] - Adjustment),
+             min(img.shape[0], PreviousLocation[0][1] + Adjustment)]
+        
+        img = img[Y[0]: Y[1],   #y-axis (height)
+                  X[0]: X[1]]   # x-axis (width)
+
+    # Detects features in the images in terms of keypoints and descriptors
+    kp_img, desc_img = orb.detectAndCompute(img, None)
+    kp_template, desc_template = orb.detectAndCompute(template, None)
+
+    # Matches the features of the two images
+    matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+    matches = matcher.match(desc_template, desc_img)
+    img_matches = cv2.drawMatches(template, kp_template, img, kp_img, matches, None, 
+                               flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+
+    # Display the resulting image with matches
+    cv2.imshow("Printed Matches pre", cv2.resize(img_matches, (640, 480)))
+    cv2.waitKey(0)
+
+    # Sort the matches based on distance (best matches first)
+    matches = sorted(matches, key=lambda x: x.distance)[:100]
+
+    display(cv2.drawMatches(template, kp_template, img, kp_img, matches, None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)) if test == True else None
+
+    # Extract the matched keypoints
+    points_template = np.float32([kp_template[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
+    points_img = np.float32([kp_img[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
+
+    # Find the homography matrix
+    homography, mask = cv2.findHomography(points_template, points_img, cv2.RANSAC)
+
+    # Get the dimensions of the template image
+    h, w = template.shape[:2]
+
+    # Define the corners of the template image and its corresponding corners in the target image
+    corners_template = np.float32([[0, 0], [w, 0], [w, h], [0, h]]).reshape(-1, 1, 2)
+    corners_checker = cv2.perspectiveTransform(corners_template, homography)
+
+    # Display the bounding box around the detected checkerboard
+    display_box_checker(img, corners_checker) if test == True else None
+
+    # Change the perspective of the detected colour checker to align it with the template
+    warp_matrix = cv2.getPerspectiveTransform(corners_checker, corners_template)
+    colour_checker = cv2.warpPerspective(img, warp_matrix, (w, h))
+
+    # Chopped image
+    CurrentLocation = [[int(corners_checker[0][0][1]),
+                          int(corners_checker[2][0][1])]
+                        ,[int(corners_checker[0][0][0]),
+                          int(corners_checker[2][0][0])]]
+    FinalLocation = CurrentLocation
+
+    if PreviousLocation != 0:
+        Y = [PreviousLocation[0][0]+(CurrentLocation[0][0]-Adjustment),#Y1
+             PreviousLocation[0][1]+(CurrentLocation[0][0]-Adjustment)]#Y2
+        X = [PreviousLocation[1][0]+(CurrentLocation[1][0]-Adjustment),#X1
+             PreviousLocation[1][1]+(CurrentLocation[1][0]-Adjustment)]#X2
+        FinalLocation = [[Y[0], Y[1]],
+                         [X[0], X[1]]]
+
+    # Display the cropped colour checker
+    display(colour_checker) if test == True else None
+
+    return colour_checker, corners_checker, FinalLocation
+"""
