@@ -169,11 +169,7 @@ if __name__ == '__main__':
 
 
     if test_method == 'single':
-<<<<<<< Updated upstream
         image_path = 'P3/Results/Data/16th_Milk/Right_Side_20241611_120159.png'
-=======
-        image_path = 'P3\Results\Data\cum\Andrefunny_20241811_112431.png'
->>>>>>> Stashed changes
         main(cam, image_path, True)
 
     if test_method == 'live':
