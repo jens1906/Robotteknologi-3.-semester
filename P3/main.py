@@ -143,8 +143,10 @@ def main(cam=None, image_path=None, detailed=False):
  
     ## Plot Images
     print("------Plotting Images------")
-    if detailed:
+    try:
         plot_images(image, dehazed_image, corrected_image, ref_pal, checker, corrected_palette)
+    except Exception as e:
+        print("Error plotting images:", e)
 
 
     ## Objective Testing
