@@ -164,22 +164,23 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-
     test_method = 'single'
 
 
     if test_method == 'single':
-        image_path = 'P3\Results\Data\cum\Andrefunny_20241811_112431.png'
+        image_path = 'P3\Results\OrgImages\image_20241311_142217.png'
         main(cam, image_path, True)
 
     elif test_method == 'live':
-        from vmbpy import Vimba  # Import the Vimba API context manager
-    
-        with Vimba() as vimba:  # Start the Vimba API
-            with im.initialize_camera(vimba) as cam:  # Ensure the camera is initialized correctly
-                while True:
+        with VmbSystem.get_instance() as vmb:
+            while True:
+                cams = vmb.get_all_cameras()
+                if len(cams) == 0:
+                    print('No cameras found')
+                    exit(1)
+                with cams[0] as cam:
                     try:
-                        corrected = main(cam, image_path, True)
+                        corrected = main(cam, None, True)
                         cv.imshow('Corrected Image', corrected)
                         if cv.waitKey(1) & 0xFF == ord('q'):  # Exit loop on 'q' press
                             break
