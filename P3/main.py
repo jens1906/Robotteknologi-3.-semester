@@ -57,7 +57,7 @@ def plot_images(*images):
             axs[i].imshow(img, cmap='gray')
         else:  # Color image
             axs[i].imshow(img)
-        axs[i].axis('off')  # Hide axes
+        #axs[i].axis('off')  # Hide axes
         # Use variable names as titles if they exist
         if i < len(image_names):
             axs[i].set_title(image_names[i], fontsize=8)
