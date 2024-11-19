@@ -94,7 +94,7 @@ def ORBLocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=Fal
     return colour_checker, corners_checker, FinalLocation
 
 def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=False):
-    orb = cv2.AKAZE_create()  # Use SIFT for better results
+    Akaze = cv2.AKAZE_create()  # Use SIFT for better results
 
     if PreviousLocation != 0:
         # Adjust crop location
@@ -106,8 +106,8 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
                   X[0]: X[1]]   #x-axis (width)
 
     # Detect features
-    kp_img, desc_img = orb.detectAndCompute(img, None)
-    kp_template, desc_template = orb.detectAndCompute(template, None)
+    kp_img, desc_img = Akaze.detectAndCompute(img, None)
+    kp_template, desc_template = Akaze.detectAndCompute(template, None)
 
     # Match features using KNN
     matcher = cv2.BFMatcher(cv2.NORM_L2)  # Use NORM_L2 for SIFT
@@ -121,7 +121,7 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
 
     if len(good_matches) < 4:
         print("Not enough good matches!")
-                
+
         return None, None, None
 
     # Extract matched keypoints
