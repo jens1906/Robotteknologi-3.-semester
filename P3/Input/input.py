@@ -6,6 +6,7 @@ import time
 
 def initialize_camera():
     try:
+        
         with VmbSystem.get_instance() as vmb: #This line takes approx 0.7s
             cams = vmb.get_all_cameras()
             if len(cams) == 0:

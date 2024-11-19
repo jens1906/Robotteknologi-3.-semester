@@ -169,24 +169,37 @@ if __name__ == '__main__':
 
 
     if test_method == 'single':
+<<<<<<< Updated upstream
         image_path = 'P3/Results/Data/16th_Milk/Right_Side_20241611_120159.png'
+=======
+        image_path = 'P3\Results\Data\cum\Andrefunny_20241811_112431.png'
+>>>>>>> Stashed changes
         main(cam, image_path, True)
 
     if test_method == 'live':
-        from vmbpy import Vimba  # Import the Vimba API context manager
-    
-        with Vimba() as vimba:  # Start the Vimba API
-            with im.initialize_camera(vimba) as cam:  # Ensure the camera is initialized correctly
-                while True:
-                    try:
-                        corrected = main(cam, image_path, True)
-                        cv.imshow('Corrected Image', corrected)
-                        if cv.waitKey(1) & 0xFF == ord('q'):  # Exit loop on 'q' press
-                            break
-                    except Exception as e:
-                        print("Error during live processing:", e)
+        print("im", im.initialize_camera())
+        cam = im.initialize_camera()
+        #get image
+        with cam as cam:
+            frame = cam.get_frame() 
+            bayer_image = frame.as_numpy_ndarray()
+            image = cv.cvtColor(bayer_image, cv.COLOR_BAYER_BG2RGB)
+            cv.imshow('Original Image', image)
+            cv.waitKey(0)
+            cv.destroyAllWindows()
+
+        with im.initialize_camera() as cam:  # Ensure the camera is initialized correctly
+            print("cam", cam)
+            while True:
+                try:
+                    corrected = main(cam, image_path, True)
+                    cv.imshow('Corrected Image', corrected)
+                    if cv.waitKey(1) & 0xFF == ord('q'):  # Exit loop on 'q' press
                         break
-                cv.destroyAllWindows()
+                except Exception as e:
+                    print("Error during live processing:", e)
+                    break
+            cv.destroyAllWindows()
     
     elif test_method == 'folder':
         folder = 'P3/Results/Data/32th_Milk'
