@@ -110,7 +110,7 @@ def main(cam=None, image_path=None, detailed=False):
     ## Locate Color Checker
     print("------Locating Color Checker------")
 
-    template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png', cv.IMREAD_GRAYSCALE)
+    template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki.png', cv.IMREAD_GRAYSCALE)
 
     checker, corner, pos = lc.LocateChecker(dehazed_image, template)    
     
@@ -143,8 +143,10 @@ def main(cam=None, image_path=None, detailed=False):
  
     ## Plot Images
     print("------Plotting Images------")
-    if detailed:
+    try:
         plot_images(image, dehazed_image, corrected_image, ref_pal, checker, corrected_palette)
+    except Exception as e:
+        print("Error plotting images:", e)
 
 
     ## Objective Testing
@@ -169,24 +171,33 @@ if __name__ == '__main__':
 
 
     if test_method == 'single':
-        image_path = 'P3/Results/Data/16th_Milk/Beside_Camera_20241611_120010.png'
+        image_path = 'P3\Results\Data\Half_Milk\Beside_Camera_20241611_113210.png'
         main(cam, image_path, True)
 
     if test_method == 'live':
-        from vmbpy import Vimba  # Import the Vimba API context manager
-    
-        with Vimba() as vimba:  # Start the Vimba API
-            with im.initialize_camera(vimba) as cam:  # Ensure the camera is initialized correctly
-                while True:
-                    try:
-                        corrected = main(cam, image_path, True)
-                        cv.imshow('Corrected Image', corrected)
-                        if cv.waitKey(1) & 0xFF == ord('q'):  # Exit loop on 'q' press
-                            break
-                    except Exception as e:
-                        print("Error during live processing:", e)
+        print("im", im.initialize_camera())
+        cam = im.initialize_camera()
+        #get image
+        with cam as cam:
+            frame = cam.get_frame() 
+            bayer_image = frame.as_numpy_ndarray()
+            image = cv.cvtColor(bayer_image, cv.COLOR_BAYER_BG2RGB)
+            cv.imshow('Original Image', image)
+            cv.waitKey(0)
+            cv.destroyAllWindows()
+
+        with im.initialize_camera() as cam:  # Ensure the camera is initialized correctly
+            print("cam", cam)
+            while True:
+                try:
+                    corrected = main(cam, image_path, True)
+                    cv.imshow('Corrected Image', corrected)
+                    if cv.waitKey(1) & 0xFF == ord('q'):  # Exit loop on 'q' press
                         break
-                cv.destroyAllWindows()
+                except Exception as e:
+                    print("Error during live processing:", e)
+                    break
+            cv.destroyAllWindows()
     
     elif test_method == 'folder':
         folder = 'P3/Results/Data/32th_Milk'
