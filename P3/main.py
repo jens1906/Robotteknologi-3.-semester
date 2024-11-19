@@ -110,7 +110,7 @@ def main(cam=None, image_path=None, detailed=False):
     ## Locate Color Checker
     print("------Locating Color Checker------")
 
-    template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki.png', cv.IMREAD_GRAYSCALE)
+    template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png', cv.IMREAD_GRAYSCALE)
 
     checker, corner, pos = lc.LocateChecker(dehazed_image, template)    
     
@@ -165,11 +165,11 @@ if __name__ == '__main__':
     image_path = None
 
 
-    test_method = 'live'
+    test_method = 'folder'
 
 
     if test_method == 'single':
-        image_path = 'P3/Results/Data/32th_Milk/Beside_Camera_20241611_121710.png'
+        image_path = 'P3\Results\Data\Half_Milk\Beside_Camera_20241611_113210.png'
         main(cam, image_path, True)
 
     if test_method == 'live':
