@@ -121,6 +121,7 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
 
     if len(good_matches) < 4:
         print("Not enough good matches!")
+                
         return None, None, None
 
     # Extract matched keypoints
