@@ -146,7 +146,6 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
     # Warp perspective
     warp_matrix = cv2.getPerspectiveTransform(corners_checker, corners_template)
     colour_checker = cv2.warpPerspective(img, warp_matrix, (w, h))
-    print(colour_checker.shape)
     colour_checker = colour_checker[170: 997,  # y-axis (height)
                                     520: 1705]   # x-axis (width)
 

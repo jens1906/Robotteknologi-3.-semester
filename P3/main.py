@@ -165,7 +165,7 @@ if __name__ == '__main__':
     image_path = None
 
 
-    test_method = 'folder'
+    test_method = 'single'
 
 
     if test_method == 'single':
