@@ -48,14 +48,12 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
 
     if len(good_matches) < 4:
         print("Not enough good matches!")
-
         return None, None, None
 
     # Extract matched keypoints
     points_template = np.float32([kp_template[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
     points_img = np.float32([kp_img[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
 
-    # Find homography
     homography, mask = cv2.findHomography(points_template, points_img, cv2.RANSAC)
 
     if homography is None or np.linalg.det(homography) < 1e-6:
