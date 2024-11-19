@@ -165,11 +165,11 @@ if __name__ == '__main__':
     image_path = None
 
 
-    test_method = 'live'
+    test_method = 'single'
 
 
     if test_method == 'single':
-        image_path = 'P3/Results/Data/32th_Milk/Beside_Camera_20241611_121710.png'
+        image_path = 'P3/Results/Data/16th_Milk/Right_Side_20241611_120159.png'
         main(cam, image_path, True)
 
     if test_method == 'live':
