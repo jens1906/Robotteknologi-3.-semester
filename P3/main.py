@@ -108,12 +108,13 @@ def main(cam=None, image_path=None, detailed=False):
     dehaze_time = time.perf_counter()
     
     ## Locate Color dehazed_checker
-    print("------Locating Color dehazed_checker------")
+    print("------Locating Color Checker------")
 
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png', cv.IMREAD_GRAYSCALE)
-
-    dehazed_checker, corner, pos = lc.LocateChecker(dehazed_image, template)    
     
+    dehazed_checker, corner, pos = lc.LocateChecker(dehazed_image, template)   
+    #print("dehazed checker", dehazed_checker) 
+
     locate_time = time.perf_counter()
 
     ## Color Correction
@@ -144,7 +145,7 @@ def main(cam=None, image_path=None, detailed=False):
     ## Plot Images
     print("------Plotting Images------")
     if detailed:
-        plot_images(image, dehazed_image, corrected_image, original_checker, dehazed_checker, corrected_checker)
+        plot_images(image, dehazed_image, corrected_image, original_checker, dehazed_checker, corrected_checker, )
 
 
     ## Objective Testing
@@ -168,7 +169,7 @@ if __name__ == '__main__':
 
 
     if test_method == 'single':
-        image_path = 'P3\Results\OrgImages\image_20241311_142217.png'
+        image_path = 'P3\Results\Data\cum\Andrefunny_20241811_112431.png'
         main(cam, image_path, True)
 
     elif test_method == 'live':
