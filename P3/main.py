@@ -102,7 +102,7 @@ def main(cam=None, image_path=None, detailed=False):
     ## Dehazing
     print("------Dehazing Image------")
 
-    dehazed_image = dh.dehaze(image) or image # If dehazing fails, use original image
+    dehazed_image = dh.dehaze(image)
 
     dehaze_time = time.perf_counter()
     
