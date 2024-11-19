@@ -85,6 +85,8 @@ def main(cam=None, image_path=None, detailed=False):
             raise Exception(f"Error capturing frame from camera: {e}")
     elif image_path is not None:
         image = cv.imread(image_path)
+        if image is None:
+            raise Exception("Error reading path")
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
     else:
         raise Exception("Camera or image path not initialized")
@@ -100,10 +102,7 @@ def main(cam=None, image_path=None, detailed=False):
     ## Dehazing
     print("------Dehazing Image------")
 
-    dehazed_image = dh.dehaze(image)
-
-    if dehazed_image is None:
-        dehazed_image = image
+    dehazed_image = dh.dehaze(image) or image # If dehazing fails, use original image
 
     dehaze_time = time.perf_counter()
     
@@ -130,7 +129,7 @@ def main(cam=None, image_path=None, detailed=False):
     cc_time = time.perf_counter()
 
     print("------Image Processing Done------")
-    
+
     ## End time
     end_time = time.perf_counter()
     if detailed:
@@ -164,15 +163,13 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-
-    test_method = 'single'
-
+    test_method = 'single' # 'single', 'live', 'folder'
 
     if test_method == 'single':
         image_path = 'P3\Results\Data\cum\Andrefunny_20241811_112431.png'
         main(cam, image_path, True)
 
-    if test_method == 'live':
+    elif test_method == 'live':
         from vmbpy import Vimba  # Import the Vimba API context manager
     
         with Vimba() as vimba:  # Start the Vimba API
