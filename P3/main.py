@@ -7,7 +7,7 @@ sys.path.append(project_root)
 
 from Input import input as im
 from Dehazing import dehaze as dh
-from Palette_detection import LocateChecker, LocateCheckerOriginal as lc
+from Palette_detection import LocateChecker as lc
 from ColorCorrection import ColourCorrectMain as cc
 from Objective_testing import APalTest as apt
 #from Objective_testing import Objective_testing as ot
