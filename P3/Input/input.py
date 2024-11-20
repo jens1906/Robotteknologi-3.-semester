@@ -13,6 +13,7 @@ def initialize_camera():
                 print('No cameras found')
                 exit(1)
             with cams[0] as cam: # This line takes approx 1.0s
+                cam.ExposureAuto.set('Continuous') # Set exposure to auto
                 return cam
     except Exception as e:
         print(e)
@@ -34,4 +35,16 @@ def get_image():
         print(e)
         exit(1)
 
+def get_exposure():
+    try:
+        with VmbSystem.get_instance() as vmb: #This line takes approx 0.7s
+            cams = vmb.get_all_cameras()
+            if len(cams) == 0:
+                print('No cameras found')
+                exit(1)
+            with cams[0] as cam: # This line takes approx 1.0s
+                return cam.ExposureTimeAbs.get()
+    except Exception as e:
+        print(e)
+        exit(1)
 

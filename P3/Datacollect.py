@@ -10,31 +10,25 @@ image = im.get_image()
 
 #   Setup settings
 #Exposure 25k, Gain 0
-#Light = MAX    Overvej at tage billeder med forskellige lysmængder
+#Light = 5,10    Overvej at tage billeder med forskellige lysmængder
+#Exposure target = 15
+#Exposure = Auto
 
 #Light positions: 
-# Pink = Behind_Camera
+# Pink = Underwater_Beside_Camera
 # Dark blue = Beside_Camera
 # Orange = Right_Side
-# Light Green = Left_Side
-# Purple = Top_Down
 # Light Blue = InFront_Camera
 
-#Water
-#1/32 Milk, mixed
-#1/16 Milk, mixed
-#1/8 Milk, mixed
-#1/4 Milk, mixed
-#1/2 Milk, mixed
-#Full Milk, mixed
 
 import matplotlib.pyplot as plt
 plt.imshow(image)
 plt.show()
 
 #make folder in P3/Results/Data
-test_folder = 'cum'
-test_name = 'Andrefunny'
+test_folder = 'Spinach30g'
+test_name = 'InFront_Camera'
+light_intensity = '5'
 
 #make folder in P3/Results/Data
 try:
@@ -43,4 +37,4 @@ except FileExistsError:
     pass
 
 timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
-cv.imwrite(f'P3/Results/Data/{test_folder}/{test_name}_{timestamp}.png', cv.cvtColor(image, cv.COLOR_BGR2RGB))
+cv.imwrite(f'P3/Results/Data/{test_folder}/{test_name}_light{light_intensity}_exp{im.get_exposure()}_{timestamp}.png', cv.cvtColor(image, cv.COLOR_BGR2RGB))
