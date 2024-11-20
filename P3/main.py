@@ -112,7 +112,6 @@ def main(cam=None, image_path=None, detailed=False):
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png', cv.IMREAD_GRAYSCALE)
     
     dehazed_checker, corner, pos = lc.LocateChecker(dehazed_image, template)   
-    #print("dehazed checker", dehazed_checker) 
 
     locate_time = time.perf_counter()
 
@@ -164,10 +163,10 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'single' # 'single', 'live', 'folder'
+    test_method = 'folder' # 'single', 'live', 'folder'
 
     if test_method == 'single':
-        image_path = 'P3\Results\Data\cum\Andrefunny_20241811_112431.png'
+        image_path = 'P3/Results/Data/16th_Milk/Beside_Camera_20241611_120003.png'
         main(cam, image_path, True)
 
     elif test_method == 'live':
@@ -189,18 +188,23 @@ if __name__ == '__main__':
                 cv.destroyAllWindows()
     
     elif test_method == 'folder':
-        folder = 'P3/Results/Data/32th_Milk'
+        folder = 'P3\Results\Data\cum'
         corrected_list = []
         for file in os.listdir(folder):
             if file.endswith('.png'):
                 image_path = f'{folder}/{file}'
-                print("!!!!!!!!!!!Processing: ", file)
+                print("!!!Processing: ", file)
                 try:
                     corrected = main(cam, image_path)
                     corrected_list.append(corrected)
                 except Exception as e:
                     print("Failed", file, "Error:", e)
                     continue
+        #save images
+        timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
+        os.makedirs(f'{folder}/Results', exist_ok=True)
+        for i, img in enumerate(corrected_list):
+            cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_{i}.png', cv.cvtColor(img, cv.COLOR_BGR2RGB))
 
         # Plot all corrected images
         plot_images(corrected_list)
