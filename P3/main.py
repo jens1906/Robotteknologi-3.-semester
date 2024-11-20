@@ -60,11 +60,17 @@ def plot_images(*images):
         #axs[i].axis('off')  # Hide axes
         # Use variable names as titles if they exist
         if i < len(image_names):
-            axs[i].set_title(image_names[i], fontsize=8)
+            axs[i].set_title(image_names[i], fontsize=20)
     
     # Hide any empty subplots
     for j in range(i + 1, len(axs)):
         axs[j].axis('off')
+    #save plot in P3\Results\FullPlots
+    timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
+    plt.savefig(f'P3/Results/FullPlots/FullPlot_{timestamp}.png')
+
+    #remove most of the white space
+    
     
     plt.tight_layout()
     plt.show()
@@ -85,6 +91,8 @@ def main(cam=None, image_path=None, detailed=False):
             raise Exception(f"Error capturing frame from camera: {e}")
     elif image_path is not None:
         image = cv.imread(image_path)
+        if image is None:
+            raise Exception("Error reading path")
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
     else:
         raise Exception("Camera or image path not initialized")
@@ -102,18 +110,15 @@ def main(cam=None, image_path=None, detailed=False):
 
     dehazed_image = dh.dehaze(image)
 
-    if dehazed_image is None:
-        dehazed_image = image
-
     dehaze_time = time.perf_counter()
     
     ## Locate Color dehazed_checker
-    print("------Locating Color dehazed_checker------")
+    print("------Locating Color Checker------")
 
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png', cv.IMREAD_GRAYSCALE)
-
-    dehazed_checker, corner, pos = lc.LocateChecker(dehazed_image, template)    
     
+    dehazed_checker, corner, pos = lc.LocateChecker(dehazed_image, template)   
+
     locate_time = time.perf_counter()
 
     ## Color Correction
@@ -130,7 +135,7 @@ def main(cam=None, image_path=None, detailed=False):
     cc_time = time.perf_counter()
 
     print("------Image Processing Done------")
-    
+
     ## End time
     end_time = time.perf_counter()
     if detailed:
@@ -144,7 +149,7 @@ def main(cam=None, image_path=None, detailed=False):
     ## Plot Images
     print("------Plotting Images------")
     if detailed:
-        plot_images(image, dehazed_image, corrected_image, original_checker, dehazed_checker, corrected_checker)
+        plot_images(image, dehazed_image, corrected_image, original_checker, dehazed_checker, corrected_checker, )
 
 
     ## Objective Testing
@@ -164,11 +169,10 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'single'
-
+    test_method = 'single' # 'single', 'live', 'folder'
 
     if test_method == 'single':
-        image_path = 'P3\Results\OrgImages\image_20241311_142217.png'
+        image_path = 'P3/Results/Data/32th_Milk/Beside_Camera_20241611_121705.png'
         main(cam, image_path, True)
 
     elif test_method == 'live':
@@ -190,15 +194,19 @@ if __name__ == '__main__':
                 cv.destroyAllWindows()
     
     elif test_method == 'folder':
-        folder = 'P3/Results/Data/32th_Milk'
+        folder = 'P3/Results/Data/16th_Milk'
+        os.makedirs(f'{folder}/Results', exist_ok=True)
         corrected_list = []
         for file in os.listdir(folder):
             if file.endswith('.png'):
                 image_path = f'{folder}/{file}'
-                print("!!!!!!!!!!!Processing: ", file)
+                print("!!!Processing: ", file)
                 try:
                     corrected = main(cam, image_path)
                     corrected_list.append(corrected)
+                    
+                    timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
+                    cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
                 except Exception as e:
                     print("Failed", file, "Error:", e)
                     continue
