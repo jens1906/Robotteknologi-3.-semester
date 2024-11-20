@@ -60,14 +60,21 @@ def plot_images(*images):
         #axs[i].axis('off')  # Hide axes
         # Use variable names as titles if they exist
         if i < len(image_names):
-            axs[i].set_title(image_names[i], fontsize=20)
+            axs[i].set_title(image_names[i], fontsize=25)
     
     # Hide any empty subplots
     for j in range(i + 1, len(axs)):
         axs[j].axis('off')
+<<<<<<< Updated upstream
 
     #remove most of the white space
     
+=======
+    #save plot in P3\Results\FullPlots
+    timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
+    plt.tight_layout()
+    plt.savefig(f'P3/Results/FullPlots/FullPlot_{timestamp}.png')
+>>>>>>> Stashed changes
     
     plt.tight_layout()
 
@@ -118,7 +125,9 @@ def main(cam=None, image_path=None, detailed=False):
 
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png', cv.IMREAD_GRAYSCALE)
     
-    dehazed_checker, corner, pos = lc.LocateChecker(dehazed_image, template)   
+    dehazed_checker, corner, pos = lc.LocateChecker(dehazed_image, template)
+
+
 
     locate_time = time.perf_counter()
 
@@ -172,10 +181,14 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'single' # 'single', 'live', 'folder'
+    test_method = 'folder' # 'single', 'live', 'folder'
 
     if test_method == 'single':
+<<<<<<< Updated upstream
         image_path = 'P3\Results\Data\Spinach30g\Beside_Camera_light10_exp49690.0_20242011_102755.png'
+=======
+        image_path = 'P3\Results\Data\Spinach20g\Beside_Camera_light5_20242011_094046.png'
+>>>>>>> Stashed changes
         main(cam, image_path, True)
 
     elif test_method == 'live':
@@ -197,7 +210,7 @@ if __name__ == '__main__':
                 cv.destroyAllWindows()
     
     elif test_method == 'folder':
-        folder = 'P3/Results/Data/16th_Milk'
+        folder = 'P3\Results\Data\Spinach30g'
         os.makedirs(f'{folder}/Results', exist_ok=True)
         corrected_list = []
         for file in os.listdir(folder):
