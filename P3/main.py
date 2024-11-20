@@ -188,7 +188,7 @@ if __name__ == '__main__':
                 cv.destroyAllWindows()
     
     elif test_method == 'folder':
-        folder = 'P3/Results/Data/32th_Milk'
+        folder = 'P3/Results/Data/16th_Milk'
         os.makedirs(f'{folder}/Results', exist_ok=True)
         corrected_list = []
         for file in os.listdir(folder):
