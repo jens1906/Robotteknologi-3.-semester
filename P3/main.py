@@ -60,11 +60,17 @@ def plot_images(*images):
         #axs[i].axis('off')  # Hide axes
         # Use variable names as titles if they exist
         if i < len(image_names):
-            axs[i].set_title(image_names[i], fontsize=8)
+            axs[i].set_title(image_names[i], fontsize=20)
     
     # Hide any empty subplots
     for j in range(i + 1, len(axs)):
         axs[j].axis('off')
+    #save plot in P3\Results\FullPlots
+    timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
+    plt.savefig(f'P3/Results/FullPlots/FullPlot_{timestamp}.png')
+
+    #remove most of the white space
+    
     
     plt.tight_layout()
     plt.show()
@@ -163,10 +169,10 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'folder' # 'single', 'live', 'folder'
+    test_method = 'single' # 'single', 'live', 'folder'
 
     if test_method == 'single':
-        image_path = 'P3/Results/Data/16th_Milk/Beside_Camera_20241611_120003.png'
+        image_path = 'P3/Results/Data/32th_Milk/Beside_Camera_20241611_121705.png'
         main(cam, image_path, True)
 
     elif test_method == 'live':
