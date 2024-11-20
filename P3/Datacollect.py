@@ -3,7 +3,8 @@ import os
 import cv2 as cv
 from datetime import datetime
 
-image = im.get_image()
+exposure = 188553
+image = im.get_image(exposure)
 #Remember.. exposure = 20-30k, gain = 0 i API
 #image = cv.imread('P3\Results\OrgImages\image_20241311_144042.png')
 
@@ -11,7 +12,7 @@ image = im.get_image()
 #   Setup settings
 #Exposure 25k, Gain 0
 #Light = 5,10    Overvej at tage billeder med forskellige lysmængder
-#Exposure target = 15
+#Exposure target = 20
 #Exposure = Auto
 
 #Light positions: 
@@ -26,9 +27,9 @@ plt.imshow(image)
 plt.show()
 
 #make folder in P3/Results/Data
-test_folder = 'Spinach40g'
-test_name = 'Infront_Camera'
-light_intensity = '10'
+test_folder = 'Spinach80g'
+test_name = 'Underwater_Beside_Camera'
+light_intensity = 'x'
 
 #make folder in P3/Results/Data
 try:
