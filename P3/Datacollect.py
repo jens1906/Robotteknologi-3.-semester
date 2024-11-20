@@ -3,7 +3,7 @@ import os
 import cv2 as cv
 from datetime import datetime
 
-exposure = 10421
+exposure = 174946
 image = im.get_image(exposure)
 #Remember.. exposure = 20-30k, gain = 0 i API
 #image = cv.imread('P3\Results\OrgImages\image_20241311_144042.png')
@@ -30,8 +30,8 @@ plt.show()
 
 #make folder in P3/Results/Data
 test_folder = 'Spinach595g'
-test_name = 'Beside_Camera'
-light_intensity = '10'
+test_name = 'Underwater_Beside_Camera'
+light_intensity = 'x'
 
 #make folder in P3/Results/Data
 try:
