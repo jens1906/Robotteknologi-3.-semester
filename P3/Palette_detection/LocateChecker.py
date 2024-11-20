@@ -159,8 +159,21 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    return colour_checker, corners_checker, [[int(corners_checker[0][0][1]), int(corners_checker[2][0][1])],
-                                             [int(corners_checker[0][0][0]), int(corners_checker[2][0][0])]]
+    return colour_checker, corners_checker, warp_matrix, [[int(corners_checker[0][0][1]), int(corners_checker[2][0][1])],
+                                                         [int(corners_checker[0][0][0]), int(corners_checker[2][0][0])]]
+
+def LocateCheckerOriginal(img, template, warp_matrix):
+    # Transform corners
+    h, w = template.shape[:2]
+   
+    # Warp perspective
+    colour_checker = cv2.warpPerspective(img, warp_matrix, (w, h))
+    colour_checker = colour_checker[170: 997,  # y-axis (height)
+                                    520: 1705]   # x-axis (width)
+    
+    return colour_checker
+
+
 
 def LocateChecker(img, template, PreviousLocation=0, Adjustment=100, test=False):
     #return ORBLocateChecker(img, template, PreviousLocation, Adjustment, test)

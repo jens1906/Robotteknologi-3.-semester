@@ -84,7 +84,7 @@ def plot_images(*images):
     plt.show()
 
 
-def main(cam=None, image_path=None, detailed=False):
+def main(cam=None, image_path=None, detailed=True):
     # Start time
     start_time = time.perf_counter()
 
@@ -125,9 +125,7 @@ def main(cam=None, image_path=None, detailed=False):
 
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png', cv.IMREAD_GRAYSCALE)
     
-    dehazed_checker, corner, pos = lc.LocateChecker(dehazed_image, template)
-
-
+    dehazed_checker, corner, pos = lc.LocateChecker(dehazed_image, template)   
 
     locate_time = time.perf_counter()
 
@@ -159,10 +157,8 @@ def main(cam=None, image_path=None, detailed=False):
     ## Plot Images
     print("------Plotting Images------")
     if detailed:
-        try:
-            plot_images(image, dehazed_image, corrected_image, original_checker, dehazed_checker, corrected_checker, )
-        except Exception as e:
-            print("Error plotting images:", e)
+        plot_images(image, dehazed_image, corrected_image, original_checker, dehazed_checker, corrected_checker, )
+
 
     ## Objective Testing
     print("------Objective Testing------")
