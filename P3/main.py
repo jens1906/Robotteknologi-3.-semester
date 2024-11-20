@@ -188,7 +188,8 @@ if __name__ == '__main__':
                 cv.destroyAllWindows()
     
     elif test_method == 'folder':
-        folder = 'P3\Results\Data\cum'
+        folder = 'P3/Results/Data/32th_Milk'
+        os.makedirs(f'{folder}/Results', exist_ok=True)
         corrected_list = []
         for file in os.listdir(folder):
             if file.endswith('.png'):
@@ -197,14 +198,12 @@ if __name__ == '__main__':
                 try:
                     corrected = main(cam, image_path)
                     corrected_list.append(corrected)
+                    
+                    timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
+                    cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
                 except Exception as e:
                     print("Failed", file, "Error:", e)
                     continue
-        #save images
-        timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
-        os.makedirs(f'{folder}/Results', exist_ok=True)
-        for i, img in enumerate(corrected_list):
-            cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_{i}.png', cv.cvtColor(img, cv.COLOR_BGR2RGB))
 
         # Plot all corrected images
         plot_images(corrected_list)
