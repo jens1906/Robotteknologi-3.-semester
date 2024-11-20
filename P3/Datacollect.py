@@ -26,8 +26,8 @@ plt.imshow(image)
 plt.show()
 
 #make folder in P3/Results/Data
-test_folder = 'Spinach30g'
-test_name = 'Right_Side'
+test_folder = 'Spinach40g'
+test_name = 'Infront_Camera'
 light_intensity = '10'
 
 #make folder in P3/Results/Data
