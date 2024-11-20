@@ -65,14 +65,15 @@ def plot_images(*images):
     # Hide any empty subplots
     for j in range(i + 1, len(axs)):
         axs[j].axis('off')
-    #save plot in P3\Results\FullPlots
-    timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
-    plt.savefig(f'P3/Results/FullPlots/FullPlot_{timestamp}.png')
 
     #remove most of the white space
     
     
     plt.tight_layout()
+
+    timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
+    plt.savefig(f'P3/Results/FullPlots/FullPlot_{timestamp}.png', bbox_inches='tight')
+
     plt.show()
 
 
@@ -149,8 +150,10 @@ def main(cam=None, image_path=None, detailed=False):
     ## Plot Images
     print("------Plotting Images------")
     if detailed:
-        plot_images(image, dehazed_image, corrected_image, original_checker, dehazed_checker, corrected_checker, )
-
+        try:
+            plot_images(image, dehazed_image, corrected_image, original_checker, dehazed_checker, corrected_checker, )
+        except Exception as e:
+            print("Error plotting images:", e)
 
     ## Objective Testing
     print("------Objective Testing------")
@@ -172,7 +175,7 @@ if __name__ == '__main__':
     test_method = 'single' # 'single', 'live', 'folder'
 
     if test_method == 'single':
-        image_path = 'P3/Results/Data/32th_Milk/Beside_Camera_20241611_121705.png'
+        image_path = 'P3\Results\Data\Spinach30g\Beside_Camera_light10_exp49690.0_20242011_102755.png'
         main(cam, image_path, True)
 
     elif test_method == 'live':
