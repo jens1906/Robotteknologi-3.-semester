@@ -14,7 +14,10 @@ def initialize_camera():
                 exit(1)
             with cams[0] as cam: # This line takes approx 1.0s
                 cam.ExposureAuto.set('Continuous') # Set exposure to auto
-                return cam
+                cam.GainAuto.set('Off') # Set gain to off
+                cam.Gain.set(0) # Set gain to 0
+                cam.ExposureAutoTarget.set(15) # Set exposure target to 15
+                return cam 
     except Exception as e:
         print(e)
         exit(1)

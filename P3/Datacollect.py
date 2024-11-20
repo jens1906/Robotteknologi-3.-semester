@@ -27,8 +27,8 @@ plt.show()
 
 #make folder in P3/Results/Data
 test_folder = 'Spinach30g'
-test_name = 'InFront_Camera'
-light_intensity = '5'
+test_name = 'Right_Side'
+light_intensity = '10'
 
 #make folder in P3/Results/Data
 try:
