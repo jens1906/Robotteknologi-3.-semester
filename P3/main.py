@@ -7,7 +7,7 @@ sys.path.append(project_root)
 
 from Input import input as im
 from Dehazing import dehaze as dh
-from Palette_detection import LocateChecker as lc
+from Palette_detection import LocateChecker, LocateCheckerOriginal as lc
 from ColorCorrection import ColourCorrectMain as cc
 from Objective_testing import APalTest as apt
 #from Objective_testing import Objective_testing as ot
@@ -76,7 +76,7 @@ def plot_images(*images):
     plt.show()
 
 
-def main(cam=None, image_path=None, detailed=False):
+def main(cam=None, image_path=None, detailed=True):
     # Start time
     start_time = time.perf_counter()
 
@@ -117,7 +117,7 @@ def main(cam=None, image_path=None, detailed=False):
 
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png', cv.IMREAD_GRAYSCALE)
     
-    dehazed_checker, corner, pos = lc.LocateChecker(dehazed_image, template)   
+    dehazed_checker, corner, warp_matrix, pos = lc.LocateChecker(dehazed_image, template)   
 
     locate_time = time.perf_counter()
 
@@ -149,7 +149,7 @@ def main(cam=None, image_path=None, detailed=False):
     ## Plot Images
     print("------Plotting Images------")
     if detailed:
-        plot_images(image, dehazed_image, corrected_image, original_checker, dehazed_checker, corrected_checker, )
+        input_colour_chekcer = lc.LocateCheckerOriginal(image, template, warp_matrix)
 
 
     ## Objective Testing
