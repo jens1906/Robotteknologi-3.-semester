@@ -3,7 +3,7 @@ import os
 import cv2 as cv
 from datetime import datetime
 
-exposure = 66355
+exposure = 231159
 image = im.get_image(exposure)
 
 import matplotlib.pyplot as plt
@@ -12,8 +12,8 @@ plt.show()
 
 #make folder in P3/Results/Data
 test_folder = 'Gypsum55g'
-test_name = 'Right_Side'
-light_intensity = '5'
+test_name = 'Underwater_Beside_Camera'
+light_intensity = 'x'
 
 #make folder in P3/Results/Data
 try:
