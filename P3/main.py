@@ -36,11 +36,11 @@ def plot_images(*images):
     
     # Create a list of (name, image) pairs for each image passed into the function
     for image in images:
+        print(image)
         for name, val in caller_locals.items():
             if isinstance(val, np.ndarray) and np.array_equal(val, image):
                 image_names.append(name)
                 break  # Once we find the name, stop searching
-    
     # Number of images
     n = len(images)
     
@@ -65,26 +65,15 @@ def plot_images(*images):
     # Hide any empty subplots
     for j in range(i + 1, len(axs)):
         axs[j].axis('off')
-<<<<<<< Updated upstream
-
-    #remove most of the white space
-    
-=======
-    #save plot in P3\Results\FullPlots
-    timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
-    plt.tight_layout()
-    plt.savefig(f'P3/Results/FullPlots/FullPlot_{timestamp}.png')
->>>>>>> Stashed changes
-    
     plt.tight_layout()
 
     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
-    plt.savefig(f'P3/Results/FullPlots/FullPlot_{timestamp}.png', bbox_inches='tight')
+    #plt.savefig(f'P3/Results/FullPlots/FullPlot_{timestamp}.png', bbox_inches='tight')
 
     plt.show()
 
 
-def main(cam=None, image_path=None, detailed=True):
+def main(cam=None, image_path=None, detailed=False):
     # Start time
     start_time = time.perf_counter()
 
@@ -125,7 +114,9 @@ def main(cam=None, image_path=None, detailed=True):
 
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png', cv.IMREAD_GRAYSCALE)
     
-    dehazed_checker, corner, pos = lc.LocateChecker(dehazed_image, template)   
+    dehazed_checker, corner, warp_matrix, pos = lc.LocateChecker(dehazed_image, template) 
+
+    input_colour_chekcer = lc.LocateCheckerOriginal(image, template, warp_matrix)
 
     locate_time = time.perf_counter()
 
@@ -157,8 +148,16 @@ def main(cam=None, image_path=None, detailed=True):
     ## Plot Images
     print("------Plotting Images------")
     if detailed:
-        plot_images(image, dehazed_image, corrected_image, original_checker, dehazed_checker, corrected_checker, )
-
+        try:
+            #if corrected_checker.shape != input_colour_chekcer.shape:
+            #    input_colour_chekcer  = cv.resize(input_colour_chekcer, (corrected_checker.shape[1], corrected_checker.shape[0]))
+            plot_images(image, dehazed_image, corrected_image, input_colour_chekcer, dehazed_checker, corrected_checker, None, original_checker)
+            #checker_diff = cv.absdiff(corrected_checker, original_checker)
+            #print(checker_diff)
+            #plot_images(image, dehazed_image, corrected_image, input_colour_chekcer, dehazed_checker, corrected_checker, original_checker, checker_diff)
+        except Exception as e:
+            print("Error plotting images:", e)
+    
 
     ## Objective Testing
     print("------Objective Testing------")
@@ -177,14 +176,10 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'folder' # 'single', 'live', 'folder'
+    test_method = 'single' # 'single', 'live', 'folder'
 
     if test_method == 'single':
-<<<<<<< Updated upstream
         image_path = 'P3\Results\Data\Spinach30g\Beside_Camera_light10_exp49690.0_20242011_102755.png'
-=======
-        image_path = 'P3\Results\Data\Spinach20g\Beside_Camera_light5_20242011_094046.png'
->>>>>>> Stashed changes
         main(cam, image_path, True)
 
     elif test_method == 'live':
