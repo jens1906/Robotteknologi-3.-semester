@@ -118,6 +118,7 @@ if CCTesting:
     plt.show()
 
     #save bad pic, ref pal, corrected checker
-    cv.imwrite(f'P3/Results/ColorCorrection/ColorCorrected.png', cv.cvtColor(corrected_image, cv.COLOR_BGR2RGB))
-    cv.imwrite(f'P3/Results/ColorCorrection/CorrectedChecker.png', cv.cvtColor(ccorrected_checker, cv.COLOR_BGR2RGB))
-    cv.imwrite(f'P3/Results/ColorCorrection/ReferenceChecker.png', cv.cvtColor(ref_pal, cv.COLOR_BGR2RGB))
+    path = 'P3\ColorCorrection'
+    cv.imwrite(f'{path}/ColorCorrected.png', cv.cvtColor(corrected_image, cv.COLOR_BGR2RGB))
+    cv.imwrite(f'{path}/BadChecker.png', cv.cvtColor(bad_pic, cv.COLOR_BGR2RGB))
+    cv.imwrite(f'{path}/ReferenceChecker.png', cv.cvtColor(ref_pal, cv.COLOR_BGR2RGB))
