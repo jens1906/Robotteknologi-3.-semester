@@ -31,10 +31,10 @@ cv.imwrite(f'P3/Results/Data/{test_folder}/{test_name}_light{light_intensity}_ex
 
 
 #   Setup settings
-#Exposure 25k, Gain 0
-#Light = 5,10    Overvej at tage billeder med forskellige lysmængder
+#Gain 0
+#Light = 5,10  
 #Exposure target = 20
-#Exposure = Auto
+#Exposure = Auto/Continuous
 
 #Light positions: 
 # Pink = Underwater_Beside_Camera
