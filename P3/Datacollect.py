@@ -11,8 +11,8 @@ plt.imshow(image)
 plt.show()
 
 #make folder in P3/Results/Data
-test_folder = 'Gypsum65g'
-test_name = 'Right_Side'
+test_folder = 'Clay_ClearWater'
+test_name = 'Beside_Camera'
 light_intensity = '10'
 
 #make folder in P3/Results/Data
