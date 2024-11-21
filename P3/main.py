@@ -181,10 +181,10 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'folder' # 'single', 'live', 'folder'
+    test_method = 'single' # 'single', 'live', 'folder'
 
     if test_method == 'single':
-        image_path = 'P3\Results\Data\Spinat\Spinach30g\Beside_Camera_light5_exp38209.0_20242011_102820.png'
+        image_path = 'P3\Results\Data\Gips\Gypsum18g\Green_Beside_Camera_light5_exp190102.0_20242011_150447.png'
         main(cam, image_path, True)
 
     elif test_method == 'live':
