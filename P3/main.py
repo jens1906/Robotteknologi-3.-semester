@@ -60,7 +60,7 @@ def plot_images(*images):
         #axs[i].axis('off')  # Hide axes
         # Use variable names as titles if they exist
         if i < len(image_names):
-            axs[i].set_title(image_names[i], fontsize=25)
+            axs[i].set_title(image_names[i], fontsize=20)
     
     # Hide any empty subplots
     for j in range(i + 1, len(axs)):
@@ -132,6 +132,13 @@ def main(cam=None, image_path=None, detailed=False):
     except:
         raise Exception("CC Failed")
     
+    if detailed:
+        #locate checker om corrected image
+        corrected_checker_2, corner, warp_matrix, pos = lc.LocateChecker(corrected_image, template)
+        #color correct corrected checker
+        corrected_image_2, cc_matrix, corrected_checker_2_pepe = cc.colour_correct(corrected_image, original_checker, corrected_checker_2)
+
+
     #median filter on corrected image and dehazed_checker
     #corrected_image = cv.medianBlur(corrected_image, 21)
     #dehazed_checker = cv.medianBlur(dehazed_checker, 21)
@@ -154,12 +161,7 @@ def main(cam=None, image_path=None, detailed=False):
     print("------Plotting Images------")
     if detailed:
         try:
-            #if corrected_checker.shape != input_colour_chekcer.shape:
-            #    input_colour_chekcer  = cv.resize(input_colour_chekcer, (corrected_checker.shape[1], corrected_checker.shape[0]))
             plot_images(image, dehazed_image, corrected_image, input_colour_chekcer, dehazed_checker, corrected_checker, original_checker)
-            #checker_diff = cv.absdiff(corrected_checker, original_checker)
-            #print(checker_diff)
-            #plot_images(image, dehazed_image, corrected_image, input_colour_chekcer, dehazed_checker, corrected_checker, original_checker, checker_diff)
         except Exception as e:
             print("Error plotting images:", e)
     
@@ -181,10 +183,10 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'folder' # 'single', 'live', 'folder'
+    test_method = 'single' # 'single', 'live', 'folder'
 
     if test_method == 'single':
-        image_path = 'P3\Results\Data\Gips\Gypsum18g\Green_Beside_Camera_light5_exp190102.0_20242011_150447.png'
+        image_path = 'P3\Results\Data\Gips\Gypsum18g\Green_InFront_Camera_light5_exp100182.0_20242011_150527.png'
         main(cam, image_path, True)
 
     elif test_method == 'live':
