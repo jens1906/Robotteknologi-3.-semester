@@ -3,7 +3,7 @@ import numpy as np
 import time
 import os
 
-test = True
+test = False
 
 if test == True:
     template = cv2.imread("P3/Palette_detection/Colour_checker_from_Vikki.png", cv2.IMREAD_GRAYSCALE)
@@ -44,8 +44,8 @@ def ORBLocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=Fal
                                flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
     # Display the resulting image with matches
-    cv2.imshow("Printed Matches pre", cv2.resize(img_matches, (640, 480)))
-    cv2.waitKey(0)
+    #cv2.imshow("Printed Matches pre", cv2.resize(img_matches, (640, 480)))
+    #cv2.waitKey(0)
 
     # Sort the matches based on distance (best matches first)
     matches = sorted(matches, key=lambda x: x.distance)[:100]
@@ -139,6 +139,11 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
     h, w = template.shape[:2]
     corners_template = np.float32([[0, 0], [w, 0], [w, h], [0, h]]).reshape(-1, 1, 2)
     corners_checker = cv2.perspectiveTransform(corners_template, homography)
+    img_with_box = cv2.polylines(img.copy(), [np.int32(corners_checker)], True, (0, 0, 0), 3, cv2.LINE_AA)
+    #cv2.imwrite("AKAZE_Box.png", img_with_box)
+    #cv2.imshow("Detected Bounding Box", cv2.resize(img_with_box, (640, 480)))
+    #cv2.waitKey(0)
+
 
     if corners_checker is None or len(corners_checker) != 4:
         print("Invalid corners detected!")
@@ -147,6 +152,8 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
     # Warp perspective
     warp_matrix = cv2.getPerspectiveTransform(corners_checker, corners_template)
     colour_checker = cv2.warpPerspective(img, warp_matrix, (w, h))
+    #cv2.imwrite("AKAZE_Warped.png", colour_checker)
+    
     colour_checker = colour_checker[170: 997,  # y-axis (height)
                                     520: 1705]   # x-axis (width)
 
@@ -155,7 +162,9 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
         img_matches = cv2.drawMatches(template, kp_template, img, kp_img, good_matches, None,
                                       flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
         cv2.imshow("Good Matches",  cv2.resize(img_matches, (640, 480)))
+        #cv2.imwrite("AKAZE_Matches.png", img_matches)
         cv2.imshow("Warped Colour Checker", cv2.resize(colour_checker, (640, 480)))
+        #cv2.imwrite("AKAZE_Warped.png", colour_checker)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -235,11 +244,11 @@ def TestImageSmall():
 def DehazeTest():
     temp = cv2.imread("P3/Palette_detection/Colour_checker_from_Vikki_full.png", cv2.IMREAD_GRAYSCALE)
     img = cv2.imread("P3/Palette_detection/Dehazed_image.png")
-    PIC,y,Location = LocateChecker(img, temp, 0, 250, True)
+    PIC,y,WARP,Location = LocateChecker(img, temp, 0, 250, True)
     cv2.imshow(f"Not cropped:", cv2.resize(PIC, (640, 480)))
     cv2.waitKey(0)
 
-DehazeTest()
+#DehazeTest()
 #TestImageFolder()
 #TestImageSmall()
 #TestVideoFile()
