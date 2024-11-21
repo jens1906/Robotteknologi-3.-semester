@@ -36,11 +36,11 @@ def plot_images(*images):
     
     # Create a list of (name, image) pairs for each image passed into the function
     for image in images:
+        #print(image)
         for name, val in caller_locals.items():
             if isinstance(val, np.ndarray) and np.array_equal(val, image):
                 image_names.append(name)
                 break  # Once we find the name, stop searching
-    
     # Number of images
     n = len(images)
     
@@ -60,13 +60,16 @@ def plot_images(*images):
         #axs[i].axis('off')  # Hide axes
         # Use variable names as titles if they exist
         if i < len(image_names):
-            axs[i].set_title(image_names[i], fontsize=8)
+            axs[i].set_title(image_names[i], fontsize=25)
     
     # Hide any empty subplots
     for j in range(i + 1, len(axs)):
         axs[j].axis('off')
-    
     plt.tight_layout()
+
+    timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
+    #plt.savefig(f'P3/Results/FullPlots/FullPlot_{timestamp}.png', bbox_inches='tight')
+
     plt.show()
 
 
@@ -85,6 +88,8 @@ def main(cam=None, image_path=None, detailed=False):
             raise Exception(f"Error capturing frame from camera: {e}")
     elif image_path is not None:
         image = cv.imread(image_path)
+        if image is None:
+            raise Exception("Error reading path")
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
     else:
         raise Exception("Camera or image path not initialized")
@@ -102,18 +107,17 @@ def main(cam=None, image_path=None, detailed=False):
 
     dehazed_image = dh.dehaze(image)
 
-    if dehazed_image is None:
-        dehazed_image = image
-
     dehaze_time = time.perf_counter()
     
     ## Locate Color dehazed_checker
-    print("------Locating Color dehazed_checker------")
+    print("------Locating Color Checker------")
 
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png', cv.IMREAD_GRAYSCALE)
-
-    dehazed_checker, corner, pos = lc.LocateChecker(dehazed_image, template)    
     
+    dehazed_checker, corner, warp_matrix, pos = lc.LocateChecker(dehazed_image, template) 
+
+    input_colour_chekcer = lc.LocateCheckerOriginal(image, template, warp_matrix)
+
     locate_time = time.perf_counter()
 
     ## Color Correction
@@ -127,10 +131,15 @@ def main(cam=None, image_path=None, detailed=False):
         #corrected_image = cv.cvtColor(corrected_image, cv.COLOR_BGR2RGB)
     except:
         raise Exception("CC Failed")
+    
+    #median filter on corrected image and dehazed_checker
+    #corrected_image = cv.medianBlur(corrected_image, 21)
+    #dehazed_checker = cv.medianBlur(dehazed_checker, 21)
+
     cc_time = time.perf_counter()
 
     print("------Image Processing Done------")
-    
+
     ## End time
     end_time = time.perf_counter()
     if detailed:
@@ -144,8 +153,16 @@ def main(cam=None, image_path=None, detailed=False):
     ## Plot Images
     print("------Plotting Images------")
     if detailed:
-        plot_images(image, dehazed_image, corrected_image, original_checker, dehazed_checker, corrected_checker)
-
+        try:
+            #if corrected_checker.shape != input_colour_chekcer.shape:
+            #    input_colour_chekcer  = cv.resize(input_colour_chekcer, (corrected_checker.shape[1], corrected_checker.shape[0]))
+            plot_images(image, dehazed_image, corrected_image, input_colour_chekcer, dehazed_checker, corrected_checker, original_checker)
+            #checker_diff = cv.absdiff(corrected_checker, original_checker)
+            #print(checker_diff)
+            #plot_images(image, dehazed_image, corrected_image, input_colour_chekcer, dehazed_checker, corrected_checker, original_checker, checker_diff)
+        except Exception as e:
+            print("Error plotting images:", e)
+    
 
     ## Objective Testing
     print("------Objective Testing------")
@@ -164,11 +181,10 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'single'
-
+    test_method = 'folder' # 'single', 'live', 'folder'
 
     if test_method == 'single':
-        image_path = 'P3\Results\OrgImages\image_20241311_142217.png'
+        image_path = 'P3\Results\Data\Gips\Gypsum18g\Green_Beside_Camera_light5_exp190102.0_20242011_150447.png'
         main(cam, image_path, True)
 
     elif test_method == 'live':
@@ -190,15 +206,19 @@ if __name__ == '__main__':
                 cv.destroyAllWindows()
     
     elif test_method == 'folder':
-        folder = 'P3/Results/Data/32th_Milk'
+        folder = 'P3\Results\Data\Clay\Clay10g'
+        os.makedirs(f'{folder}/Results', exist_ok=True)
         corrected_list = []
         for file in os.listdir(folder):
             if file.endswith('.png'):
                 image_path = f'{folder}/{file}'
-                print("!!!!!!!!!!!Processing: ", file)
+                print("!!!Processing: ", file)
                 try:
                     corrected = main(cam, image_path)
                     corrected_list.append(corrected)
+                    
+                    timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
+                    cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
                 except Exception as e:
                     print("Failed", file, "Error:", e)
                     continue

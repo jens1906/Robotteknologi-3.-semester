@@ -86,29 +86,39 @@ def colour_correct(image, reference_pal=None, taken_pal=None):
 
 if CCTesting:
     os.system('cls')
-    bad_pic = cv.imread('P3/ColorCorrection/U_Water_Sim_ColourUltimate.png')
+    bad_pic = cv.imread('P3\ColorCorrection\Colour_checker_from_Vikki_Bad.png')
     bad_pic = cv.cvtColor(bad_pic, cv.COLOR_BGR2RGB)
 
-    ref_pal = cv.imread('P3/ColorCorrection/Color-Checker.jpg')
+    ref_pal = cv.imread('P3\ColorCorrection\Colour_checker_from_Vikki.png')
     ref_pal = cv.cvtColor(ref_pal, cv.COLOR_BGR2RGB)
 
-    taken_pal = cv.imread('P3/ColorCorrection/U_Water_Sim_ColourUltimate.png')
-    taken_pal = cv.cvtColor(taken_pal, cv.COLOR_BGR2RGB)
+    taken_pal = bad_pic
+    #taken_pal = cv.cvtColor(taken_pal, cv.COLOR_BGR2RGB)
 
-    corrected, cc_matrix = colour_correct(bad_pic, ref_pal, taken_pal)
+    corrected_image, cc_matrix, ccorrected_checker = colour_correct(bad_pic, ref_pal, taken_pal)
 
-    print(cc_matrix)
+    #print(cc_matrix)
 
-    #show both images
-    plt.figure(figsize=(10, 5))
-    plt.subplot(1, 2, 1)
-    plt.title('Original Image')
-    plt.imshow(bad_pic)
-    plt.axis('off')
+    #show bad pic, ref pal, taken pal, corrected pic
+    fig, axes = plt.subplots(1, 3, figsize=(10, 10))
+    axes[0].imshow(bad_pic)
+    axes[0].set_title('Bad Picture')
+    axes[0].axis('off')
 
-    plt.subplot(1, 2, 2)
-    plt.title('Corrected Image')
-    plt.imshow(corrected)
-    plt.axis('off')
+    axes[1].imshow(ref_pal)
+    axes[1].set_title('Reference Palette')
+    axes[1].axis('off')
+
+    axes[2].imshow(ccorrected_checker)
+    axes[2].set_title('Corrected Palette')
+    axes[2].axis('off')
+
+    plt.tight_layout()
 
     plt.show()
+
+    #save bad pic, ref pal, corrected checker
+    path = 'P3\ColorCorrection'
+    cv.imwrite(f'{path}/ColorCorrected.png', cv.cvtColor(corrected_image, cv.COLOR_BGR2RGB))
+    cv.imwrite(f'{path}/BadChecker.png', cv.cvtColor(bad_pic, cv.COLOR_BGR2RGB))
+    cv.imwrite(f'{path}/ReferenceChecker.png', cv.cvtColor(ref_pal, cv.COLOR_BGR2RGB))

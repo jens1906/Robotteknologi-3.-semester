@@ -10,13 +10,13 @@ if test == True:
     img = cv2.imread("P3/Results/OrgImages/image_20241311_142611.png")
 
     def display(colour_checker):
-            cv2.imshow("Colour Checker", colour_checker)
+            cv2.imshow("Colour Checker", cv2.resize(colour_checker, None, fx=0.3, fy=0.4))    
             cv2.waitKey(0)
             cv2.destroyAllWindows()
 
     def display_box_checker(img,corners_img): # Draws a white box around the detected checkerboard
         img_with_box = cv2.polylines(img.copy(), [np.int32(corners_img)], True, (0, 0, 0), 3, cv2.LINE_AA)
-        cv2.imshow("Detected Bounding Box", img_with_box)
+        cv2.imshow("Detected Bounding Box", cv2.resize(img_with_box, None, fx=0.3, fy=0.4))            
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -44,8 +44,8 @@ def ORBLocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=Fal
                                flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
     # Display the resulting image with matches
-    cv2.imshow("Printed Matches pre", cv2.resize(img_matches, (640, 480)))
-    cv2.waitKey(0)
+    #cv2.imshow("Printed Matches pre", cv2.resize(img_matches, (640, 480)))
+    #cv2.waitKey(0)
 
     # Sort the matches based on distance (best matches first)
     matches = sorted(matches, key=lambda x: x.distance)[:100]
@@ -93,6 +93,7 @@ def ORBLocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=Fal
 
     return colour_checker, corners_checker, FinalLocation
 
+
 def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=False):
     Akaze = cv2.AKAZE_create()  # Use SIFT for better results
 
@@ -112,6 +113,7 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
     # Match features using KNN
     matcher = cv2.BFMatcher(cv2.NORM_L2)  # Use NORM_L2 for SIFT
     knn_matches = matcher.knnMatch(desc_template, desc_img, k=2)
+    
 
     # Lowe's ratio test
     good_matches = []
@@ -121,14 +123,12 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
 
     if len(good_matches) < 4:
         print("Not enough good matches!")
-
         return None, None, None
 
     # Extract matched keypoints
     points_template = np.float32([kp_template[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
     points_img = np.float32([kp_img[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
 
-    # Find homography
     homography, mask = cv2.findHomography(points_template, points_img, cv2.RANSAC)
 
     if homography is None or np.linalg.det(homography) < 1e-6:
@@ -139,6 +139,11 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
     h, w = template.shape[:2]
     corners_template = np.float32([[0, 0], [w, 0], [w, h], [0, h]]).reshape(-1, 1, 2)
     corners_checker = cv2.perspectiveTransform(corners_template, homography)
+    img_with_box = cv2.polylines(img.copy(), [np.int32(corners_checker)], True, (0, 0, 0), 3, cv2.LINE_AA)
+    #cv2.imwrite("AKAZE_Box.png", img_with_box)
+    #cv2.imshow("Detected Bounding Box", cv2.resize(img_with_box, (640, 480)))
+    #cv2.waitKey(0)
+
 
     if corners_checker is None or len(corners_checker) != 4:
         print("Invalid corners detected!")
@@ -147,6 +152,8 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
     # Warp perspective
     warp_matrix = cv2.getPerspectiveTransform(corners_checker, corners_template)
     colour_checker = cv2.warpPerspective(img, warp_matrix, (w, h))
+    #cv2.imwrite("AKAZE_Warped.png", colour_checker)
+    
     colour_checker = colour_checker[170: 997,  # y-axis (height)
                                     520: 1705]   # x-axis (width)
 
@@ -155,20 +162,31 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
         img_matches = cv2.drawMatches(template, kp_template, img, kp_img, good_matches, None,
                                       flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
         cv2.imshow("Good Matches",  cv2.resize(img_matches, (640, 480)))
+        #cv2.imwrite("AKAZE_Matches.png", img_matches)
         cv2.imshow("Warped Colour Checker", cv2.resize(colour_checker, (640, 480)))
+        #cv2.imwrite("AKAZE_Warped.png", colour_checker)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    return colour_checker, corners_checker, [[int(corners_checker[0][0][1]), int(corners_checker[2][0][1])],
-                                             [int(corners_checker[0][0][0]), int(corners_checker[2][0][0])]]
+    return colour_checker, corners_checker, warp_matrix, [[int(corners_checker[0][0][1]), int(corners_checker[2][0][1])],
+                                                         [int(corners_checker[0][0][0]), int(corners_checker[2][0][0])]]
+
+def LocateCheckerOriginal(img, template, warp_matrix):
+    # Transform corners
+    h, w = template.shape[:2]
+   
+    # Warp perspective
+    colour_checker = cv2.warpPerspective(img, warp_matrix, (w, h))
+    colour_checker = colour_checker[170: 997,  # y-axis (height)
+                                    520: 1705]   # x-axis (width)
+    
+    return colour_checker
+
+
 
 def LocateChecker(img, template, PreviousLocation=0, Adjustment=100, test=False):
     #return ORBLocateChecker(img, template, PreviousLocation, Adjustment, test)
     return AKAZELocateChecker(img, template, PreviousLocation, Adjustment, test)
-
-
-
-
 
 
 
@@ -204,7 +222,7 @@ def TestVideoFile():
         else:
             #print(location)
             x,y,location = LocateChecker(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), template, location)
-            cv2.imshow(f"Result:", cv2.resize(img, (640, 480)))
+            cv2.imshow(f"Result:", cv2.resize(img, (968, 632)))
             if cv2.waitKey(1) and 0xFF == ord('q'):
                 break
 
@@ -226,7 +244,7 @@ def TestImageSmall():
 def DehazeTest():
     temp = cv2.imread("P3/Palette_detection/Colour_checker_from_Vikki_full.png", cv2.IMREAD_GRAYSCALE)
     img = cv2.imread("P3/Palette_detection/Dehazed_image.png")
-    PIC,y,Location = LocateChecker(img, temp, 0, 250, True)
+    PIC,y,WARP,Location = LocateChecker(img, temp, 0, 250, True)
     cv2.imshow(f"Not cropped:", cv2.resize(PIC, (640, 480)))
     cv2.waitKey(0)
 
@@ -234,3 +252,9 @@ def DehazeTest():
 #TestImageFolder()
 #TestImageSmall()
 #TestVideoFile()
+
+
+# Previous code - ORB algorithm
+"""
+
+"""
