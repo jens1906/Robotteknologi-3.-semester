@@ -3,20 +3,20 @@ import numpy as np
 import time
 import os
 
-test = False
+test = True
 
 if test == True:
     template = cv2.imread("P3/Palette_detection/Colour_checker_from_Vikki.png", cv2.IMREAD_GRAYSCALE)
     img = cv2.imread("P3/Results/OrgImages/image_20241311_142611.png")
 
     def display(colour_checker):
-            cv2.imshow("Colour Checker", colour_checker)
+            cv2.imshow("Colour Checker", cv2.resize(colour_checker, None, fx=0.3, fy=0.4))    
             cv2.waitKey(0)
             cv2.destroyAllWindows()
 
     def display_box_checker(img,corners_img): # Draws a white box around the detected checkerboard
         img_with_box = cv2.polylines(img.copy(), [np.int32(corners_img)], True, (0, 0, 0), 3, cv2.LINE_AA)
-        cv2.imshow("Detected Bounding Box", img_with_box)
+        cv2.imshow("Detected Bounding Box", cv2.resize(img_with_box, None, fx=0.3, fy=0.4))            
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -213,7 +213,7 @@ def TestVideoFile():
         else:
             #print(location)
             x,y,location = LocateChecker(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), template, location)
-            cv2.imshow(f"Result:", cv2.resize(img, (640, 480)))
+            cv2.imshow(f"Result:", cv2.resize(img, (968, 632)))
             if cv2.waitKey(1) and 0xFF == ord('q'):
                 break
 
@@ -239,7 +239,7 @@ def DehazeTest():
     cv2.imshow(f"Not cropped:", cv2.resize(PIC, (640, 480)))
     cv2.waitKey(0)
 
-#DehazeTest()
+DehazeTest()
 #TestImageFolder()
 #TestImageSmall()
 #TestVideoFile()
