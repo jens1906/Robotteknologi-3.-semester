@@ -2,6 +2,8 @@ import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
+global checkertest
+checkertest = True
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
@@ -31,4 +33,37 @@ def get_pal_diff(ref_pal, checker, corrected_palette):
     ax.set_ylabel('Green')
     ax.set_zlabel('Blue')
 
+    plt.show()
+
+if checkertest:
+    #clear console
+    os.system('cls')
+    import cv2 as cv
+    bad_checker = cv.imread('P3\ColorCorrection\Colour_checker_from_Vikki_Bad.png')
+    bad_checker = cv.cvtColor(bad_checker, cv.COLOR_BGR2RGB)
+
+    ref_checker = cv.imread('P3\ColorCorrection\Colour_checker_from_Vikki.png')
+    ref_checker = cv.cvtColor(ref_checker, cv.COLOR_BGR2RGB)
+
+    corrected_checker = cc.colour_correct(bad_checker, ref_checker, bad_checker)[2]
+    
+    checker_diff_corrected = cv.absdiff(ref_checker, corrected_checker)
+    checker_diff_bad = cv.absdiff(ref_checker, bad_checker)
+
+    #invert both pictures
+    checker_diff_corrected = cv.bitwise_not(checker_diff_corrected)
+    checker_diff_bad = cv.bitwise_not(checker_diff_bad)
+
+
+    #show both
+    fig, axes = plt.subplots(1, 2, figsize=(10, 10))
+    axes[0].imshow(checker_diff_bad)
+    axes[0].set_title('Bad Picture Difference')
+    axes[0].axis('off')
+    
+    axes[1].imshow(checker_diff_corrected)
+    axes[1].set_title('Corrected Picture Difference')
+    axes[1].axis('off')
+
+    plt.tight_layout()
     plt.show()
