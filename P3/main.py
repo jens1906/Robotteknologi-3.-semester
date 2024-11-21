@@ -36,7 +36,7 @@ def plot_images(*images):
     
     # Create a list of (name, image) pairs for each image passed into the function
     for image in images:
-        print(image)
+        #print(image)
         for name, val in caller_locals.items():
             if isinstance(val, np.ndarray) and np.array_equal(val, image):
                 image_names.append(name)
@@ -131,6 +131,11 @@ def main(cam=None, image_path=None, detailed=False):
         #corrected_image = cv.cvtColor(corrected_image, cv.COLOR_BGR2RGB)
     except:
         raise Exception("CC Failed")
+    
+    #median filter on corrected image and dehazed_checker
+    #corrected_image = cv.medianBlur(corrected_image, 21)
+    #dehazed_checker = cv.medianBlur(dehazed_checker, 21)
+
     cc_time = time.perf_counter()
 
     print("------Image Processing Done------")
@@ -151,7 +156,7 @@ def main(cam=None, image_path=None, detailed=False):
         try:
             #if corrected_checker.shape != input_colour_chekcer.shape:
             #    input_colour_chekcer  = cv.resize(input_colour_chekcer, (corrected_checker.shape[1], corrected_checker.shape[0]))
-            plot_images(image, dehazed_image, corrected_image, input_colour_chekcer, dehazed_checker, corrected_checker, None, original_checker)
+            plot_images(image, dehazed_image, corrected_image, input_colour_chekcer, dehazed_checker, corrected_checker, original_checker)
             #checker_diff = cv.absdiff(corrected_checker, original_checker)
             #print(checker_diff)
             #plot_images(image, dehazed_image, corrected_image, input_colour_chekcer, dehazed_checker, corrected_checker, original_checker, checker_diff)
@@ -176,10 +181,10 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'single' # 'single', 'live', 'folder'
+    test_method = 'folder' # 'single', 'live', 'folder'
 
     if test_method == 'single':
-        image_path = 'P3\Results\Data\Spinach30g\Beside_Camera_light10_exp49690.0_20242011_102755.png'
+        image_path = 'P3\Results\Data\Spinat\Spinach30g\Beside_Camera_light5_exp38209.0_20242011_102820.png'
         main(cam, image_path, True)
 
     elif test_method == 'live':
@@ -201,7 +206,7 @@ if __name__ == '__main__':
                 cv.destroyAllWindows()
     
     elif test_method == 'folder':
-        folder = 'P3\Results\Data\Spinach30g'
+        folder = 'P3\Results\Data\Spinat\Spinach595g'
         os.makedirs(f'{folder}/Results', exist_ok=True)
         corrected_list = []
         for file in os.listdir(folder):
