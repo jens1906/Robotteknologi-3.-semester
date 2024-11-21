@@ -181,7 +181,7 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'single' # 'single', 'live', 'folder'
+    test_method = 'folder' # 'single', 'live', 'folder'
 
     if test_method == 'single':
         image_path = 'P3\Results\Data\Gips\Gypsum18g\Green_Beside_Camera_light5_exp190102.0_20242011_150447.png'
@@ -206,7 +206,7 @@ if __name__ == '__main__':
                 cv.destroyAllWindows()
     
     elif test_method == 'folder':
-        folder = 'P3\Results\Data\Spinat\Spinach595g'
+        folder = 'P3\Results\Data\Clay\Clay10g'
         os.makedirs(f'{folder}/Results', exist_ok=True)
         corrected_list = []
         for file in os.listdir(folder):

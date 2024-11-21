@@ -3,7 +3,7 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 global CCTesting
-CCTesting = True
+CCTesting = False
 
 def load_and_convert_image(image_path):
     image = cv.imread(image_path)
