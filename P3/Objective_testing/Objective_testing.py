@@ -4,6 +4,14 @@ import math
 import torch
 import piq
 
+import os
+import sys
+os.system('cls')
+
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(project_root)
+from Palette_detection import LocateChecker as lc
+
 
 # Load the image
 imageBefore = cv2.imread('Objective_testing\Objective_testing_before.jpg')
@@ -20,6 +28,31 @@ def PSNR(imgX, imgY):
     if MSE(imgX, imgY) == 0:
         return float('inf')
     return 20 * math.log10(255.0 / math.sqrt(MSE(imgX, imgY)))
+
+def OPSNR(imgX, imgY):
+
+    return cv2.PSNR(imgX, imgY)
+
+
+#dehazed_checker, corner, warp_matrix, pos = lc.LocateChecker(dehazed_image, template) 
+
+#input_colour_chekcer = lc.LocateCheckerOriginal(image, template, warp_matrix)
+def testOfPSNR():
+    Template = cv2.imread("P3\Palette_detection\Colour_checker_from_Vikki_full.png")
+    original, x2, xx2, xxx2 = lc.LocateChecker(cv2.imread("P3\Results\Data\GroundTruth\Beside_Camera_AutoTarget5_light5_exp29311.0_20242211_103548.png"), Template)
+    After, x4, xx4, xxx4 = lc.LocateChecker(cv2.imread("P3\Results\Data\Gips\Gypsum18g\Results\Beside_Camera_light10_exp100281.0_20242011_151124.png_Result_20242111_085609_.png"), Template)
+    Before = lc.LocateCheckerOriginal(cv2.imread("P3\Results\Data\Gips\Gypsum18g\Beside_Camera_light10_exp100281.0_20242011_151124.png"), Template, xx4)
+    print("Before enhanced: " + str(OPSNR(original, Before)))
+    print("After enhanced: " + str(OPSNR(original, After)))
+    print("Gauss : " + str(OPSNR(original, cv2.GaussianBlur(After, (25,25),sigmaX=0))))
+    #cv2.imshow("No Gauss", After)
+    #cv2.imshow("Gauss", cv2.GaussianBlur(After, (15,15),sigmaX=0))
+    #cv2.imshow("Median", cv2.medianBlur(After, 5))
+    #cv2.waitKey(0)  
+    return
+
+
+
 
 def ssim(imgX, imgY):
     C1 = (0.01 * 255)**2
