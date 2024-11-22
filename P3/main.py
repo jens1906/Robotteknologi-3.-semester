@@ -21,26 +21,22 @@ from vmbpy import *
 from datetime import datetime
 import matplotlib.pyplot as plt
 
-def plot_images(*images):
+def plot_images(images):
     """
-    Plots a given number of images in a grid layout using matplotlib.
+    Plots a given list of images in a grid layout using matplotlib.
     Handles both individual images and lists of images.
     """
-    # If a single list is passed, unpack it
-    if len(images) == 1 and isinstance(images[0], list):
-        images = images[0]
-    
     # Get the names of the variables from the caller's scope
     caller_locals = inspect.currentframe().f_back.f_locals
     image_names = []
     
     # Create a list of (name, image) pairs for each image passed into the function
     for image in images:
-        #print(image)
         for name, val in caller_locals.items():
             if isinstance(val, np.ndarray) and np.array_equal(val, image):
                 image_names.append(name)
                 break  # Once we find the name, stop searching
+
     # Number of images
     n = len(images)
     
@@ -57,7 +53,6 @@ def plot_images(*images):
             axs[i].imshow(img, cmap='gray')
         else:  # Color image
             axs[i].imshow(img)
-        #axs[i].axis('off')  # Hide axes
         # Use variable names as titles if they exist
         if i < len(image_names):
             axs[i].set_title(image_names[i], fontsize=20)
@@ -77,6 +72,9 @@ def main(cam=None, image_path=None, detailed=False):
     # Start time
     start_time = time.perf_counter()
 
+    # Create a list to store images for plotting
+    plot_list = []
+
     ## Get Image
     print("------Getting Image------")
     if cam is not None:
@@ -94,77 +92,56 @@ def main(cam=None, image_path=None, detailed=False):
     else:
         raise Exception("Camera or image path not initialized")
     
-    #save image
-    timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
-    #cv.imwrite(f'P3/Results/OrgImages/image_{timestamp}.png', cv.cvtColor(image, cv.COLOR_BGR2RGB))
-    
-    #get image time
-    image_time = time.perf_counter()
-
+    plot_list.append(image)
 
     ## Dehazing
     print("------Dehazing Image------")
-
     dehazed_image = dh.dehaze(image)
+    plot_list.append(dehazed_image)
 
-    dehaze_time = time.perf_counter()
-    
-    ## Locate Color dehazed_checker
+    ## Locate Color Checker
     print("------Locating Color Checker------")
-
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png', cv.IMREAD_GRAYSCALE)
+    dehazed_checker, corner, warp_matrix, pos = lc.LocateChecker(dehazed_image, template)
+    input_colour_checker = lc.LocateCheckerOriginal(image, template, warp_matrix)
     
-    dehazed_checker, corner, warp_matrix, pos = lc.LocateChecker(dehazed_image, template) 
-
-    input_colour_chekcer = lc.LocateCheckerOriginal(image, template, warp_matrix)
-
-    locate_time = time.perf_counter()
 
     ## Color Correction
     print("------Color Correcting Image------")
-
     original_checker = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki.png')
     original_checker = cv.cvtColor(original_checker, cv.COLOR_BGR2RGB)
-
     try:
         corrected_image, cc_matrix, corrected_checker = cc.colour_correct(dehazed_image, original_checker, dehazed_checker)
-        #corrected_image = cv.cvtColor(corrected_image, cv.COLOR_BGR2RGB)
     except:
-        raise Exception("CC Failed")
+        raise Exception("Color correction failed")
     
     if detailed:
         #locate checker om corrected image
         corrected_checker_2, corner, warp_matrix, pos = lc.LocateChecker(corrected_image, template)
         #color correct corrected checker
         corrected_image_2, cc_matrix, corrected_checker_2_pepe = cc.colour_correct(corrected_image, original_checker, corrected_checker_2)
+        
 
 
-    #median filter on corrected image and dehazed_checker
-    #corrected_image = cv.medianBlur(corrected_image, 21)
-    #dehazed_checker = cv.medianBlur(dehazed_checker, 21)
 
-    cc_time = time.perf_counter()
-
-    print("------Image Processing Done------")
-
-    ## End time
-    end_time = time.perf_counter()
-    if detailed:
-        print(f"Image process took {end_time - start_time:.2f} seconds")
-        print(f'Image loading took {image_time - start_time:.2f} seconds')
-        print(f'Dehazing took {dehaze_time - image_time:.2f} seconds')
-        print(f'Locating dehazed_checker took {locate_time - dehaze_time:.2f} seconds')
-        print(f'Color correction took {cc_time - locate_time:.2f} seconds')
-
- 
     ## Plot Images
-    print("------Plotting Images------")
+    plot_list.append(corrected_image)
+
+    plot_list.append(input_colour_checker)
+    plot_list.append(dehazed_checker)
+
+    plot_list.append(corrected_checker)
+    plot_list.append(original_checker)
     if detailed:
-        try:
-            plot_images(image, dehazed_image, corrected_image, input_colour_chekcer, dehazed_checker, corrected_checker, original_checker)
-        except Exception as e:
-            print("Error plotting images:", e)
-    
+        plot_list.append(corrected_checker_2)
+        plot_list.append(corrected_image_2)
+        
+
+    print("------Plotting Images------")
+    try:
+        plot_images(plot_list)
+    except Exception as e:
+        print("Error plotting images:", e)
 
     ## Objective Testing
     print("------Objective Testing------")
@@ -175,7 +152,6 @@ def main(cam=None, image_path=None, detailed=False):
     #print(cv.PSNR(original_checker, dehazed_checker))
     #print(cv.PSNR(original_checker, corrected_checker))
 
-
     print("------Finished------")
     return corrected_image
 
@@ -183,7 +159,7 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'single' # 'single', 'live', 'folder'
+    test_method = 'single'  # 'single', 'live', 'folder'
 
     if test_method == 'single':
         image_path = 'P3\Results\Data\Gips\Gypsum18g\Green_InFront_Camera_light5_exp100182.0_20242011_150527.png'
