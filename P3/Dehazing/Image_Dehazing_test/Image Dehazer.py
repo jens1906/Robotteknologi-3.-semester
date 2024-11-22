@@ -127,8 +127,8 @@ def calculate_psnr(image1, image2):
 
 # Example usage
 script_dir = os.path.dirname(__file__)
-image_path = os.path.join(script_dir, 'Dehaze_Samples', 'city.png')
-hazy_image = cv.imread("P3/Results/Data/32th_Milk/Beside_Camera_20241611_121705.png")
+image_path = None #os.path.join(script_dir, 'Dehaze_Samples', 'P3\Results\Data\16th_Milk\Behind_Camera_20241611_120040.png')
+hazy_image = cv.imread("P3/Results/Data/32th_Milk/Right_Side_20241611_121508.png")
 if hazy_image is None:
     print(f"Error: Unable to load image at {image_path}")
 else:
@@ -136,6 +136,8 @@ else:
 
     # Convert dehazed image to 8-bit format
     dehazed_image_8bit = np.clip(dehazed_image * 255, 0, 255).astype(np.uint8)
+
+    cv.imwrite('P3\Dehazing\Module test\dehaze.png', dehazed_image_8bit)
 
     plt.figure(figsize=(10, 5))
         
