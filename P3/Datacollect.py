@@ -3,7 +3,7 @@ import os
 import cv2 as cv
 from datetime import datetime
 
-exposure = 293131
+exposure = 97759
 image = im.get_image(exposure)
 
 import matplotlib.pyplot as plt
@@ -11,8 +11,8 @@ plt.imshow(image)
 plt.show()
 
 #make folder in P3/Results/Data
-test_folder = 'Clay1g'
-test_name = 'Test'
+test_folder = 'GroundTruth'
+test_name = 'x_AutoTarget20'
 light_intensity = 'Ambient'
 
 #make folder in P3/Results/Data
