@@ -168,10 +168,6 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
 
     return colour_checker
 
-def LocateCheckerOriginal(img, template):  
-    return LocateChecker(img, template) 
-
-
 def LocateChecker(img, template, PreviousLocation=0, Adjustment=100, test=False):
     #return ORBLocateChecker(img, template, PreviousLocation, Adjustment, test)
     return AKAZELocateChecker(img, template, PreviousLocation, Adjustment, test)
