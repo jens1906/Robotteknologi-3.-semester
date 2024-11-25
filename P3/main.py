@@ -97,13 +97,15 @@ def main(cam=None, image_path=None, detailed=False):
     ## Dehazing
     print("------Dehazing Image------")
     dehazed_image = dh.dehaze(image)
+    if isinstance(dehazed_image, tuple):
+        dehazed_image = [np.array(item) for item in dehazed_image]
     plot_list.append(dehazed_image)
 
     ## Locate Color Checker
     print("------Locating Color Checker------")
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png', cv.IMREAD_GRAYSCALE)
-    dehazed_checker, corner, warp_matrix, pos = lc.LocateChecker(dehazed_image, template)
-    input_colour_checker = lc.LocateCheckerOriginal(image, template, warp_matrix)
+    dehazed_checker = lc.LocateChecker(dehazed_image, template)
+    input_colour_checker = lc.LocateCheckerOriginal(image, template)
     
 
     ## Color Correction
@@ -117,13 +119,10 @@ def main(cam=None, image_path=None, detailed=False):
     
     if detailed:
         #locate checker om corrected image
-        corrected_checker_2, corner, warp_matrix, pos = lc.LocateChecker(corrected_image, template)
+        corrected_checker_2 = lc.LocateChecker(corrected_image, template)
         #color correct corrected checker
         corrected_image_2, cc_matrix, corrected_checker_2_pepe = cc.colour_correct(corrected_image, original_checker, corrected_checker_2)
-        
-
-
-
+    
     ## Plot Images
     plot_list.append(corrected_image)
 

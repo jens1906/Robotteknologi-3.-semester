@@ -114,7 +114,6 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
     matcher = cv2.BFMatcher(cv2.NORM_L2)  # Use NORM_L2 for SIFT
     knn_matches = matcher.knnMatch(desc_template, desc_img, k=2)
     
-
     # Lowe's ratio test
     good_matches = []
     for m, n in knn_matches:
@@ -131,7 +130,7 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
 
     homography, mask = cv2.findHomography(points_template, points_img, cv2.RANSAC)
 
-    if homography is None or np.linalg.det(homography) < 1e-6:
+    if homography is None: #or np.linalg.det(homography) < 1e-6
         print("Invalid homography matrix!")
         return None, None, None
 
@@ -144,7 +143,6 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
     #cv2.imshow("Detected Bounding Box", cv2.resize(img_with_box, (640, 480)))
     #cv2.waitKey(0)
 
-
     if corners_checker is None or len(corners_checker) != 4:
         print("Invalid corners detected!")
         return None, None, None
@@ -153,10 +151,10 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
     warp_matrix = cv2.getPerspectiveTransform(corners_checker, corners_template)
     colour_checker = cv2.warpPerspective(img, warp_matrix, (w, h))
     #cv2.imwrite("AKAZE_Warped.png", colour_checker)
-    
+
     colour_checker = colour_checker[170: 997,  # y-axis (height)
                                     520: 1705]   # x-axis (width)
-
+    
     # Debugging
     if test:
         img_matches = cv2.drawMatches(template, kp_template, img, kp_img, good_matches, None,
@@ -168,26 +166,15 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    return colour_checker, corners_checker, warp_matrix, [[int(corners_checker[0][0][1]), int(corners_checker[2][0][1])],
-                                                         [int(corners_checker[0][0][0]), int(corners_checker[2][0][0])]]
-
-def LocateCheckerOriginal(img, template, warp_matrix):
-    # Transform corners
-    h, w = template.shape[:2]
-   
-    # Warp perspective
-    colour_checker = cv2.warpPerspective(img, warp_matrix, (w, h))
-    colour_checker = colour_checker[170: 997,  # y-axis (height)
-                                    520: 1705]   # x-axis (width)
-    
     return colour_checker
 
+def LocateCheckerOriginal(img, template):  
+    return LocateChecker(img, template) 
 
 
 def LocateChecker(img, template, PreviousLocation=0, Adjustment=100, test=False):
     #return ORBLocateChecker(img, template, PreviousLocation, Adjustment, test)
     return AKAZELocateChecker(img, template, PreviousLocation, Adjustment, test)
-
 
 
 ###
