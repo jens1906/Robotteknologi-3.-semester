@@ -10,7 +10,7 @@ from Dehazing import dehaze as dh
 from Palette_detection import LocateChecker as lc
 from ColorCorrection import ColourCorrectMain as cc
 from Objective_testing import APalTest as apt
-#from Objective_testing import Objective_testing as ot
+from Objective_testing import Objective_testing as ot
 
 import math
 import time
@@ -20,6 +20,8 @@ import numpy as np
 from vmbpy import *
 from datetime import datetime
 import matplotlib.pyplot as plt
+import xlsxwriter
+from openpyxl import load_workbook
 
 def plot_images(images):
     """
@@ -158,7 +160,7 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'single'  # 'single', 'live', 'folder'
+    test_method = 'folder'  # 'single', 'live', 'folder'
 
     if test_method == 'single':
         image_path = 'P3\Results\Data\Gips\Gypsum18g\Green_InFront_Camera_light5_exp100182.0_20242011_150527.png'
@@ -181,10 +183,18 @@ if __name__ == '__main__':
                         print("Error during live processing:", e)
                         break
                 cv.destroyAllWindows()
-    
     elif test_method == 'folder':
-        folder = 'P3\Results\Data\Clay\Clay10g'
+        folder = 'P3/Results/Data/Milk/32th_Milk'
         os.makedirs(f'{folder}/Results', exist_ok=True)
+        #Objective testing excel file
+        workbook = xlsxwriter.Workbook(f'{folder}/Results/OTResults.xlsx')
+        worksheet = workbook.add_worksheet()
+        ot.ReadyExcel(worksheet)
+        workbook.close()
+        workbook = load_workbook(f'{folder}/Results/OTResults.xlsx')
+        worksheet = workbook.active
+
+        
         corrected_list = []
         for file in os.listdir(folder):
             if file.endswith('.png'):
@@ -194,13 +204,20 @@ if __name__ == '__main__':
                     corrected = main(cam, image_path)
                     corrected_list.append(corrected)
                     
+                    #Objective Testing
+                    ot.ObjectiveTesting(file, corrected, image_path, worksheet)
+                    
+                    
                     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
-                    cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
+                    #cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
+
                 except Exception as e:
                     print("Failed", file, "Error:", e)
                     continue
 
         # Plot all corrected images
+        ot.AdjustExcel(worksheet)
+        workbook.save(f'{folder}/Results/OTResults.xlsx')
         plot_images(corrected_list)
     else:
         exit(1)
