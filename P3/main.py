@@ -104,8 +104,8 @@ def main(cam=None, image_path=None, detailed=False):
     ## Locate Color Checker
     print("------Locating Color Checker------")
     template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png', cv.IMREAD_GRAYSCALE)
-    dehazed_checker = lc.LocateChecker(dehazed_image, template)
-    input_colour_checker = lc.LocateChecker(image, template)
+    dehazed_checker, corners, wrap_matrix, loc = lc.LocateChecker(dehazed_image, template)
+    input_colour_checker, corners, wrap_matrix, loc = lc.LocateChecker(image, template)
     
 
     ## Color Correction
@@ -119,7 +119,7 @@ def main(cam=None, image_path=None, detailed=False):
     
     if detailed:
         #locate checker om corrected image
-        corrected_checker_2 = lc.LocateChecker(corrected_image, template)
+        corrected_checker_2, corners, wrap_matrix, loc = lc.LocateChecker(corrected_image, template)
         #color correct corrected checker
         corrected_image_2, cc_matrix, corrected_checker_2_pepe = cc.colour_correct(corrected_image, original_checker, corrected_checker_2)
     
