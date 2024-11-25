@@ -6,6 +6,9 @@ import piq
 
 import os
 import sys
+import main
+
+
 os.system('cls')
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -31,25 +34,8 @@ def PSNR(imgX, imgY):
 
 def OPSNR(imgX, imgY):
 
-    return cv2.PSNR(imgX, imgY)
+    return round(cv2.PSNR(imgX, imgY), 2)
 
-
-#dehazed_checker, corner, warp_matrix, pos = lc.LocateChecker(dehazed_image, template) 
-
-#input_colour_chekcer = lc.LocateCheckerOriginal(image, template, warp_matrix)
-def testOfPSNR():
-    Template = cv2.imread("P3\Palette_detection\Colour_checker_from_Vikki_full.png")
-    original, x2, xx2, xxx2 = lc.LocateChecker(cv2.imread("P3\Results\Data\GroundTruth\Beside_Camera_AutoTarget5_light5_exp29311.0_20242211_103548.png"), Template)
-    After, x4, xx4, xxx4 = lc.LocateChecker(cv2.imread("P3\Results\Data\Gips\Gypsum18g\Results\Beside_Camera_light10_exp100281.0_20242011_151124.png_Result_20242111_085609_.png"), Template)
-    Before = lc.LocateCheckerOriginal(cv2.imread("P3\Results\Data\Gips\Gypsum18g\Beside_Camera_light10_exp100281.0_20242011_151124.png"), Template, xx4)
-    print("Before enhanced: " + str(OPSNR(original, Before)))
-    print("After enhanced: " + str(OPSNR(original, After)))
-    print("Gauss : " + str(OPSNR(original, cv2.GaussianBlur(After, (25,25),sigmaX=0))))
-    #cv2.imshow("No Gauss", After)
-    #cv2.imshow("Gauss", cv2.GaussianBlur(After, (15,15),sigmaX=0))
-    #cv2.imshow("Median", cv2.medianBlur(After, 5))
-    #cv2.waitKey(0)  
-    return
 
 
 
@@ -106,13 +92,15 @@ def MeanBrightnessError(imgX, imgY):
 
     #After the convertion the formula can be calculated for the 2 pictures by doing as seen down under.
     result = round(np.mean(imgXGrey)-np.mean(imgYGrey), 2)
+    """
     if result>0:
         output = f"{result} which means the picture has a lower brightness"
     elif result<0:
         output = f"{result} which means the picture has a higher brightness"
     else:
         output = f"There has been no change"
-    return output 
+    """        
+    return result 
 
 
 def AverageGradient(imgX, imgY):
@@ -138,14 +126,15 @@ def AverageGradient(imgX, imgY):
     
     avgGradientResult = np.round(avgGradientResult, decimals=2)
     avgGradientResultCompare = round(avgGradientResult[0]-avgGradientResult[1],2)
-
+    """
     if avgGradientResultCompare>0:
         output = f"{avgGradientResult} which worse by a difference of {abs(avgGradientResultCompare)}"
     elif avgGradientResultCompare<0:
         output = f"{avgGradientResult} which better by a difference of {abs(avgGradientResultCompare)}"
     else:
         output = f"There has been no change"
-    return output
+    """        
+    return avgGradientResultCompare
 
 
 
@@ -272,7 +261,83 @@ print(f'Underwater colour image quality evaluation metric (UCIQE): {UnderwaterQu
 print(f'Patch-based Contrast Quality Index (PCQI): {CompareContrastQualityIndex(reference, Improved, 32)} with the value {round(ContrastQualityIndex(reference, Improved, 32),2)}')
 """
 
-def ObjectiveTesting(Improved, reference):
+#dehazed_checker, corner, warp_matrix, pos = lc.LocateChecker(dehazed_image, template) 
+
+#input_colour_chekcer = lc.LocateCheckerOriginal(image, template, warp_matrix)
+def testOfPSNR():
+    Template = cv2.imread("P3\Palette_detection\Colour_checker_from_Vikki_full.png")
+    #P3\Results\Data\Milk\32th_Milk\Beside_Camera_20241611_121705.png
+    original, x2, xx2, xxx2 = lc.LocateChecker(cv2.imread("P3\Results\Data\GroundTruth\Beside_Camera_AutoTarget5_light5_exp29311.0_20242211_103548.png"), Template)
+    After, x4, xx4, xxx4 = lc.LocateChecker(cv2.imread("P3\Results\Data\Gips\Gypsum18g\Results\Beside_Camera_light10_exp100281.0_20242011_151124.png_Result_20242111_085609_.png"), Template)
+    Before = lc.LocateCheckerOriginal(cv2.imread("P3\Results\Data\Gips\Gypsum18g\Beside_Camera_light10_exp100281.0_20242011_151124.png"), Template, xx4)
+    print("Before enhanced: " + str(OPSNR(original, Before)))
+    print("After enhanced: " + str(OPSNR(original, After)))
+    print("Gauss : " + str(OPSNR(original, cv2.GaussianBlur(After, (25,25),sigmaX=0))))
+    #cv2.imshow("No Gauss", After)
+    #cv2.imshow("Gauss", cv2.GaussianBlur(After, (15,15),sigmaX=0))
+    #cv2.imshow("Median", cv2.medianBlur(After, 5))
+    #cv2.waitKey(0)  
+    return
+
+
+def ReadyExcel(worksheet):
+    worksheet.write('A1', 'Filename')
+    worksheet.write('B1', 'Psnr Ground diff Reference')
+    worksheet.write('C1', 'Psnr Ground diff Enhanced')
+    worksheet.write('D1', 'Psnr Reference diff Enhanced')
+    worksheet.write('E1', 'MBE Ground diff Reference')
+    worksheet.write('F1', 'MBE Ground diff Enhanced')
+    worksheet.write('G1', 'MBE Reference diff Enhanced')
+    worksheet.write('H1', 'AG Ground diff Reference')
+    worksheet.write('I1', 'AG Ground diff Enhanced')
+    worksheet.write('J1', 'AG Reference diff Enhanced')
+    
+    return
+
+def ObjectiveTesting(File, Improved, reference, worksheet):
+    reference = cv2.imread(reference)
+    Original = cv2.imread("P3\Results\Data\GroundTruth\Beside_Camera_AutoTarget5_light5_exp29311.0_20242211_103548.png")
+    PsnrGroundVSReference = OPSNR(Original, reference)
+    PsnrGroundVSEnhanced = OPSNR(Original, Improved)
+    PsnrReferenceVSEnhanced = OPSNR(reference, Improved)
+    MBEGroundVSReference = MeanBrightnessError(Original, reference)
+    MBEGroundVSEnhanced = MeanBrightnessError(Original, Improved)
+    MBEReferenceVSEnhanced = MeanBrightnessError(reference, Improved)
+    AGGroundVSReference = AverageGradient(Original, reference)
+    AGGroundVSEnhanced = AverageGradient(Original, Improved)
+    AGReferenceVSEnhanced = AverageGradient(reference, Improved)
+
+    next_row = worksheet.max_row + 1    
+    print(next_row)
+    worksheet.cell(row=next_row, column=1, value=File)  # Column A
+    worksheet.cell(row=next_row, column=2, value=PsnrGroundVSReference)  # Column B
+    worksheet.cell(row=next_row, column=3, value=PsnrGroundVSEnhanced)  # Column C
+    worksheet.cell(row=next_row, column=4, value=PsnrReferenceVSEnhanced)  # Column D
+    worksheet.cell(row=next_row, column=5, value=MBEGroundVSReference)  # Column E
+    worksheet.cell(row=next_row, column=6, value=MBEGroundVSEnhanced)  # Column F
+    worksheet.cell(row=next_row, column=7, value=MBEReferenceVSEnhanced)  # Column G
+    worksheet.cell(row=next_row, column=8, value=AGGroundVSReference)  # Column H
+    worksheet.cell(row=next_row, column=9, value=AGGroundVSEnhanced)  # Column I
+    worksheet.cell(row=next_row, column=10, value=AGReferenceVSEnhanced)  # Column J
+
+    return 
+
+def AdjustExcel(worksheet):
+    for column_cells in worksheet.columns:
+        max_length = 0
+        column_letter = column_cells[0].column_letter  # Get the column letter (e.g., A, B, C)
+        for cell in column_cells:
+            try:
+                if cell.value:  # Check if the cell has a value
+                    max_length = max(max_length, len(str(cell.value)))
+            except:
+                pass
+        adjusted_width = max_length + 2  # Add some padding to the width
+        worksheet.column_dimensions[column_letter].width = adjusted_width
+    return    
+
+
+def OLDObjectiveTesting(Improved, reference):
     print(f'Average Gradient: {AverageGradient(reference, Improved)}')
     print(f'Mean Brightness Error: {MeanBrightnessError(reference, Improved)}')
     print(f'Structure Similarity Index Method: {pSSIM(reference, Improved)}')
@@ -287,6 +352,8 @@ def AllObjectiveTesting(Improved, reference):
     print(f'Average Gradient: {AverageGradient(reference, Improved)}')
     print(f'Patch-based Contrast Quality Index (PCQI): {ContrastQualityIndex(reference, Improved, 32)}')
     print(f'Underwater colour image quality evaluation metric (UCIQE): {UnderwaterQualityEvaluation(reference, Improved)}')
+
+
 
 """
 ObjectiveTesting(imageAfter, imageBefore)
