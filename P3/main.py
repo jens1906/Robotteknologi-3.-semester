@@ -26,11 +26,13 @@ def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
     os.system('cls')
 
-install('openpyxl')
-install('xlsxwriter')
-
-import xlsxwriter
-from openpyxl import load_workbook
+try:
+    import xlsxwriter
+    from openpyxl import load_workbook
+except Exception as e:
+    print("Error importing xlsxwriter or openpyxl:", e)
+    install('openpyxl')
+    install('xlsxwriter')
 
 def plot_images(images):
     """

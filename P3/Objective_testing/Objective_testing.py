@@ -10,17 +10,15 @@ def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
     os.system('cls')
 
-install('torch')
-install('piq')
-
-import torch
-import piq
-
+try:
+    import torch
+    import piq
+except Exception as e:
+    print("Error importing torch or piq:", e)
+    install('torch')
+    install('piq')
 
 import main
-
-
-os.system('cls')
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
