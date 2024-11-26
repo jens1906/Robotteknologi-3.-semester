@@ -26,8 +26,8 @@ from Palette_detection import LocateChecker as lc
 
 
 # Load the image
-imageBefore = cv2.imread('Objective_testing\Objective_testing_before.jpg')
-imageAfter = cv2.imread('Objective_testing\Objective_testing_after.jpg')
+#imageBefore = cv2.imread('Objective_testing\Objective_testing_before.jpg')
+#imageAfter = cv2.imread('Objective_testing\Objective_testing_after.jpg')
 
 def MSE(imgX, imgY):
     return np.mean((imgX - imgY)**2)   

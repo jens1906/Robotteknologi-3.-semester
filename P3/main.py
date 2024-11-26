@@ -13,6 +13,7 @@ from ColorCorrection import ColourCorrectMain as cc
 from P3.Objective_testing import APalTest as apt
 from P3.Objective_testing import Objective_testing as ot
 
+
 import math
 import time
 import inspect
@@ -143,10 +144,11 @@ def main(cam=None, image_path=None, detailed=False):
     plot_list.append(dehazed_checker)
 
     plot_list.append(corrected_checker)
-    plot_list.append(original_checker)
+    plot_list.append(original_checker)    
     if detailed:
         plot_list.append(corrected_checker_2)
         plot_list.append(corrected_image_2)
+        pass
         
 
     print("------Plotting Images------")
@@ -175,7 +177,7 @@ if __name__ == '__main__':
     test_method = 'single'  # 'single', 'live', 'folder'
 
     if test_method == 'single':
-        image_path = 'P3\Results\Data\Gips\Gypsum18g\Green_InFront_Camera_light5_exp100182.0_20242011_150527.png'
+        image_path = 'P3/Results/Data/colcaltest/red_beside_light5_exp500005.0_20242611_132609.png'
         main(cam, image_path, True)
 
     elif test_method == 'live':
