@@ -1,11 +1,22 @@
+import os
+import sys
+import subprocess
+
 import cv2
 import numpy as np
 import math
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    os.system('cls')
+
+install('torch')
+install('piq')
+
 import torch
 import piq
 
-import os
-import sys
+
 import main
 
 

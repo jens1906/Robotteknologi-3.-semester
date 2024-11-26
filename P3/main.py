@@ -1,6 +1,7 @@
 import os
 import sys
 os.system('cls')
+import subprocess
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
@@ -9,8 +10,8 @@ from Input import input as im
 from Dehazing import dehaze as dh
 from Palette_detection import LocateChecker as lc
 from ColorCorrection import ColourCorrectMain as cc
-from Objective_testing import APalTest as apt
-from Objective_testing import Objective_testing as ot
+from P3.Objective_testing import APalTest as apt
+from P3.Objective_testing import Objective_testing as ot
 
 import math
 import time
@@ -20,6 +21,14 @@ import numpy as np
 from vmbpy import *
 from datetime import datetime
 import matplotlib.pyplot as plt
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    os.system('cls')
+
+install('openpyxl')
+install('xlsxwriter')
+
 import xlsxwriter
 from openpyxl import load_workbook
 
@@ -65,7 +74,7 @@ def plot_images(images):
     plt.tight_layout()
 
     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
-    #plt.savefig(f'P3/Results/FullPlots/FullPlot_{timestamp}.png', bbox_inches='tight')
+    #plt.savefig(f'P3/Results/FullPlots/FullPlot_{timestamp}.png', bbox_inches='tight') #if you want to save the plot
 
     plt.show()
 
@@ -140,7 +149,7 @@ def main(cam=None, image_path=None, detailed=False):
 
     print("------Plotting Images------")
     try:
-        #plot_images(plot_list)
+        plot_images(plot_list)
         pass
     except Exception as e:
         print("Error plotting images:", e)
@@ -161,7 +170,7 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'folder'  # 'single', 'live', 'folder'
+    test_method = 'single'  # 'single', 'live', 'folder'
 
     if test_method == 'single':
         image_path = 'P3\Results\Data\Gips\Gypsum18g\Green_InFront_Camera_light5_exp100182.0_20242011_150527.png'
@@ -215,10 +224,11 @@ if __name__ == '__main__':
                 except Exception as e:
                     print("Failed", file, "Error:", e)
                     continue
-
-        # Plot all corrected images
+        
         ot.AdjustExcel(worksheet)
         workbook.save(f'{folder}/Results/OTResults.xlsx')
+
+        # Plot all corrected images
         plot_images(corrected_list)
     else:
         exit(1)
