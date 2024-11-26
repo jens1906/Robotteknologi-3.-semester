@@ -140,7 +140,8 @@ def main(cam=None, image_path=None, detailed=False):
 
     print("------Plotting Images------")
     try:
-        plot_images(plot_list)
+        #plot_images(plot_list)
+        pass
     except Exception as e:
         print("Error plotting images:", e)
 
@@ -176,7 +177,7 @@ if __name__ == '__main__':
                 with cams[0] as cam:
                     try:
                         corrected = main(cam, None, True)
-                        cv.imshow('Corrected Image', corrected)
+                        #cv.imshow('Corrected Image', corrected)
                         if cv.waitKey(1) & 0xFF == ord('q'):  # Exit loop on 'q' press
                             break
                     except Exception as e:
