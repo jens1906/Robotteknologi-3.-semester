@@ -1,15 +1,24 @@
+import os
+import sys
+import subprocess
+
 import cv2
 import numpy as np
 import math
-import torch
-import piq
 
-import os
-import sys
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    os.system('cls')
+
+try:
+    import torch
+    import piq
+except Exception as e:
+    print("Error importing torch or piq:", e)
+    install('torch')
+    install('piq')
+
 import main
-
-
-os.system('cls')
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
@@ -17,8 +26,8 @@ from Palette_detection import LocateChecker as lc
 
 
 # Load the image
-imageBefore = cv2.imread('Objective_testing\Objective_testing_before.jpg')
-imageAfter = cv2.imread('Objective_testing\Objective_testing_after.jpg')
+#imageBefore = cv2.imread('Objective_testing\Objective_testing_before.jpg')
+#imageAfter = cv2.imread('Objective_testing\Objective_testing_after.jpg')
 
 def MSE(imgX, imgY):
     return np.mean((imgX - imgY)**2)   
