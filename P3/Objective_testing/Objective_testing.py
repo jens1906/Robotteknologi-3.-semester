@@ -294,27 +294,44 @@ def ReadyExcel(worksheet):
     worksheet.write('B1', 'Psnr Ground diff Reference')
     worksheet.write('C1', 'Psnr Ground diff Enhanced')
     worksheet.write('D1', 'Psnr Reference diff Enhanced')
-    worksheet.write('E1', 'MBE Ground diff Reference')
-    worksheet.write('F1', 'MBE Ground diff Enhanced')
-    worksheet.write('G1', 'MBE Reference diff Enhanced')
-    worksheet.write('H1', 'AG Ground diff Reference')
-    worksheet.write('I1', 'AG Ground diff Enhanced')
-    worksheet.write('J1', 'AG Reference diff Enhanced')
+    worksheet.write('E1', 'Psnr Ground diff Dehazed')
+    worksheet.write('F1', 'Psnr Reference diff Dehazed')
+
+    worksheet.write('G1', 'MBE Ground diff Reference')
+    worksheet.write('H1', 'MBE Ground diff Enhanced')
+    worksheet.write('I1', 'MBE Reference diff Enhanced')
+    worksheet.write('J1', 'MBE Ground diff Dehazed')
+    worksheet.write('K1', 'MBE Reference diff Dehazed')
     
+    
+    worksheet.write('L1', 'AG Ground diff Reference')
+    worksheet.write('M1', 'AG Ground diff Enhanced')
+    worksheet.write('N1', 'AG Reference diff Enhanced')
+    worksheet.write('O1', 'AG Ground diff Dehazed')
+    worksheet.write('P1', 'AG Reference diff Dehazed')
+    
+
+
     return
 
-def ObjectiveTesting(File, Improved, reference, worksheet):
+def ObjectiveTesting(File, Improved, reference, worksheet, dehazed):
     reference = cv2.imread(reference)
     Original = cv2.imread("P3\Results\Data\GroundTruth\Beside_Camera_AutoTarget5_light5_exp29311.0_20242211_103548.png")
     PsnrGroundVSReference = OPSNR(Original, reference)
     PsnrGroundVSEnhanced = OPSNR(Original, Improved)
     PsnrReferenceVSEnhanced = OPSNR(reference, Improved)
+    PsnrGroundVsDehazed = OPSNR(Original, dehazed)
+    PsnrReferenceVsDehazed = OPSNR(reference, dehazed)
     MBEGroundVSReference = MeanBrightnessError(Original, reference)
     MBEGroundVSEnhanced = MeanBrightnessError(Original, Improved)
     MBEReferenceVSEnhanced = MeanBrightnessError(reference, Improved)
+    MBEGroundVsDehazed = MeanBrightnessError(Original, dehazed)
+    MBEReferenceVsDehazed = MeanBrightnessError(reference, dehazed)
     AGGroundVSReference = AverageGradient(Original, reference)
     AGGroundVSEnhanced = AverageGradient(Original, Improved)
     AGReferenceVSEnhanced = AverageGradient(reference, Improved)
+    AGGroundVsDehazed = AverageGradient(Original, dehazed)
+    AGReferenceVsDehazed = AverageGradient(reference, dehazed)
 
     next_row = worksheet.max_row + 1    
     print(next_row)
@@ -322,14 +339,31 @@ def ObjectiveTesting(File, Improved, reference, worksheet):
     worksheet.cell(row=next_row, column=2, value=PsnrGroundVSReference)  # Column B
     worksheet.cell(row=next_row, column=3, value=PsnrGroundVSEnhanced)  # Column C
     worksheet.cell(row=next_row, column=4, value=PsnrReferenceVSEnhanced)  # Column D
-    worksheet.cell(row=next_row, column=5, value=MBEGroundVSReference)  # Column E
-    worksheet.cell(row=next_row, column=6, value=MBEGroundVSEnhanced)  # Column F
-    worksheet.cell(row=next_row, column=7, value=MBEReferenceVSEnhanced)  # Column G
-    worksheet.cell(row=next_row, column=8, value=AGGroundVSReference)  # Column H
-    worksheet.cell(row=next_row, column=9, value=AGGroundVSEnhanced)  # Column I
-    worksheet.cell(row=next_row, column=10, value=AGReferenceVSEnhanced)  # Column J
+    worksheet.cell(row=next_row, column=5, value=PsnrGroundVsDehazed)  # Column D
+    worksheet.cell(row=next_row, column=6, value=PsnrReferenceVsDehazed)  # Column D    
+
+    worksheet.cell(row=next_row, column=7, value=MBEGroundVSReference)  # Column E
+    worksheet.cell(row=next_row, column=8, value=MBEGroundVSEnhanced)  # Column F
+    worksheet.cell(row=next_row, column=9, value=MBEReferenceVSEnhanced)  # Column G
+    worksheet.cell(row=next_row, column=10, value=MBEGroundVsDehazed)  # Column D
+    worksheet.cell(row=next_row, column=11, value=MBEReferenceVsDehazed)  # Column D
+
+    worksheet.cell(row=next_row, column=12, value=AGGroundVSReference)  # Column H
+    worksheet.cell(row=next_row, column=13, value=AGGroundVSEnhanced)  # Column I
+    worksheet.cell(row=next_row, column=14, value=AGReferenceVSEnhanced)  # Column J
+    worksheet.cell(row=next_row, column=15, value=AGGroundVsDehazed)  # Column D
+    worksheet.cell(row=next_row, column=16, value=AGReferenceVsDehazed)  # Column D
+    
 
     return 
+
+def ObjectiveTestingFail(File, worksheet):
+    next_row = worksheet.max_row + 1    
+    print(next_row)
+    worksheet.cell(row=next_row, column=1, value=File)  # Column A
+
+    return 
+
 
 def AdjustExcel(worksheet):
     for column_cells in worksheet.columns:

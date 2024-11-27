@@ -153,7 +153,7 @@ def main(cam=None, image_path=None, detailed=False):
 
     print("------Plotting Images------")
     try:
-        plot_images(plot_list)
+        #plot_images(plot_list)
         pass
     except Exception as e:
         print("Error plotting images:", e)
@@ -168,13 +168,13 @@ def main(cam=None, image_path=None, detailed=False):
     #print(cv.PSNR(original_checker, corrected_checker))
 
     print("------Finished------")
-    return corrected_image
+    return corrected_image, dehazed_image
 
 if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'single'  # 'single', 'live', 'folder'
+    test_method = 'folder'  # 'single', 'live', 'folder'
 
     if test_method == 'single':
         image_path = 'P3/Results/Data/colcaltest/red_beside_light5_exp500005.0_20242611_132609.png'
@@ -189,7 +189,7 @@ if __name__ == '__main__':
                     exit(1)
                 with cams[0] as cam:
                     try:
-                        corrected = main(cam, None, True)
+                        corrected, dehazed = main(cam, None, True)
                         #cv.imshow('Corrected Image', corrected)
                         if cv.waitKey(1) & 0xFF == ord('q'):  # Exit loop on 'q' press
                             break
@@ -198,7 +198,7 @@ if __name__ == '__main__':
                         break
                 cv.destroyAllWindows()
     elif test_method == 'folder':
-        folder = 'P3/Results/Data/Milk/32th_Milk'
+        folder = 'P3\Results\Data\Milk/16th_Milk'
         os.makedirs(f'{folder}/Results', exist_ok=True)
         #Objective testing excel file
         workbook = xlsxwriter.Workbook(f'{folder}/Results/OTResults.xlsx')
@@ -215,21 +215,22 @@ if __name__ == '__main__':
                 image_path = f'{folder}/{file}'
                 print("!!!Processing: ", file)
                 try:
-                    corrected = main(cam, image_path)
+                    corrected, dehazed = main(cam, image_path)
                     corrected_list.append(corrected)
                     
                     #Objective Testing
-                    ot.ObjectiveTesting(file, corrected, image_path, worksheet)
+                    ot.ObjectiveTesting(file, corrected, image_path, worksheet, dehazed)
                     
                     
                     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
                     #cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
 
                 except Exception as e:
+                    ot.ObjectiveTestingFail(file, worksheet)
                     print("Failed", file, "Error:", e)
                     continue
         
-        ot.AdjustExcel(worksheet)
+        #ot.AdjustExcel(worksheet)
         workbook.save(f'{folder}/Results/OTResults.xlsx')
 
         # Plot all corrected images
