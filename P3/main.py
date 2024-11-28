@@ -56,7 +56,10 @@ def plot_images(images):
     
     # Calculate grid size (rows and columns)
     cols = math.ceil(math.sqrt(n))
-    rows = math.ceil(n / cols)
+    if cols > 1:
+        rows = math.ceil(n / cols)
+    else: 
+        return
     
     # Create the plot
     fig, axs = plt.subplots(rows, cols, figsize=(15, 10))
@@ -117,7 +120,7 @@ def main(cam=None, image_path=None, detailed=False):
 
     ## Locate Color Checker
     print("------Locating Color Checker------")
-    template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png', cv.IMREAD_GRAYSCALE)
+    template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png')
     dehazed_checker, corners, wrap_matrix, loc = lc.LocateChecker(dehazed_image, template)
     input_colour_checker, corners, wrap_matrix, loc = lc.LocateChecker(image, template)
     
@@ -198,7 +201,7 @@ if __name__ == '__main__':
                         break
                 cv.destroyAllWindows()
     elif test_method == 'folder':
-        folder = 'P3\Results\Data\Milk/16th_Milk'
+        folder = 'P3\Results\Data\Clay\Clay10g'
         os.makedirs(f'{folder}/Results', exist_ok=True)
         #Objective testing excel file
         workbook = xlsxwriter.Workbook(f'{folder}/Results/OTResults.xlsx')
