@@ -68,12 +68,13 @@ def apply_color_correction(image, color_correction_matrix):
 
 def colour_correct(image, reference_pal=None, taken_pal=None):
 
-    if reference_pal is None:
-        reference_pal_path = 'P3/ColorCorrection/Color-Checker.jpg'
-        reference_pal = load_and_convert_image(reference_pal_path)
-    if taken_pal is None:
-        taken_pal_path = 'P3/ColorCorrection/U_Water_Sim_ColourUltimate.png'
-        taken_pal = load_and_convert_image(taken_pal_path)
+    #if ether reference or taken palette is not provided, raise error
+    if reference_pal is None or taken_pal is None:
+        raise ValueError("At least one of reference_pal and taken_pal must be provided")
+
+    #make reference the same size as taken palette the same size using cv
+    if reference_pal.shape != taken_pal.shape:
+        reference_pal = cv.resize(reference_pal, (taken_pal.shape[1], taken_pal.shape[0]), interpolation=cv.INTER_LINEAR)
     
     reference_patches = get_color_patches(reference_pal)
     target_patches = get_color_patches(taken_pal)
