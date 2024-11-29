@@ -152,8 +152,10 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
     colour_checker = cv2.warpPerspective(img, warp_matrix, (w, h))
     #cv2.imwrite("AKAZE_Warped.png", colour_checker)
 
-    colour_checker = colour_checker[170: 997,  # y-axis (height)
-                                    520: 1705]   # x-axis (width)
+    #colour_checker = colour_checker[170: 997,  # y-axis (height)
+    #                                520: 1705]   # x-axis (width)
+    colour_checker = colour_checker[47: 270,  # y-axis (height)
+                                    139: 459]   # x-axis (width)
     
     # Debugging
     if test:
@@ -174,9 +176,20 @@ def LocateChecker(img, template, PreviousLocation=0, Adjustment=100, test=False)
     #return ORBLocateChecker(img, template, PreviousLocation, Adjustment, test)
     return AKAZELocateChecker(img, template, PreviousLocation, Adjustment, test)
 
-def LocateCheckerOriginal(img, template):
-    colour_checker, corners, wrap_matrix, loc = LocateChecker(img, template)
+
+def LocateCheckerOriginal(img, template, warp_matrix):
+    # Transform corners
+    h, w = template.shape[:2]
+   
+    # Warp perspective
+    colour_checker = cv2.warpPerspective(img, warp_matrix, (w, h))
+    #colour_checker = colour_checker[170: 997,  # y-axis (height)
+    #                                520: 1705]   # x-axis (width)
+    colour_checker = colour_checker[47: 270,  # y-axis (height)
+                                    139: 459]   # x-axis (width)    
+    
     return colour_checker
+
 
 ###
 ### THIS IS TEST FUNCTIONS

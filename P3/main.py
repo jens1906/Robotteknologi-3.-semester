@@ -120,10 +120,14 @@ def main(cam=None, image_path=None, detailed=False):
 
     ## Locate Color Checker
     print("------Locating Color Checker------")
-    template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png')
+    #template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png')
+    template =  cv.resize(cv.imread("P3\Palette_detection\Colour_checker_from_Vikki_full.png"), (606, 318), interpolation=cv.INTER_AREA)
+    #cv.imshow('Template', template)
+    #cv.waitKey(0)
+
     dehazed_checker, corners, wrap_matrix, loc = lc.LocateChecker(dehazed_image, template)
-    input_colour_checker, corners, wrap_matrix, loc = lc.LocateChecker(image, template)
-    
+    input_colour_checker, corners, xx, loc = lc.LocateChecker(image, template)
+    pre_dehazed_checker = lc.LocateCheckerOriginal(image, template, wrap_matrix)
 
     ## Color Correction
     print("------Color Correcting Image------")
@@ -156,7 +160,7 @@ def main(cam=None, image_path=None, detailed=False):
 
     print("------Plotting Images------")
     try:
-        #plot_images(plot_list)
+        plot_images(plot_list)
         pass
     except Exception as e:
         print("Error plotting images:", e)
@@ -171,7 +175,7 @@ def main(cam=None, image_path=None, detailed=False):
     #print(cv.PSNR(original_checker, corrected_checker))
 
     print("------Finished------")
-    return corrected_image, dehazed_image
+    return corrected_image, dehazed_image, corrected_checker, pre_dehazed_checker
 
 if __name__ == '__main__':
     cam = None
@@ -180,7 +184,7 @@ if __name__ == '__main__':
     test_method = 'folder'  # 'single', 'live', 'folder'
 
     if test_method == 'single':
-        image_path = 'P3/Results/Data/colcaltest/red_beside_light5_exp500005.0_20242611_132609.png'
+        image_path = 'P3\Results\Data\Spinat\Spinach20g'
         main(cam, image_path, True)
 
     elif test_method == 'live':
@@ -192,7 +196,7 @@ if __name__ == '__main__':
                     exit(1)
                 with cams[0] as cam:
                     try:
-                        corrected, dehazed = main(cam, None, True)
+                        corrected, dehazed, corrected_checker, pre_dehazed_checker = main(cam, None, True)
                         #cv.imshow('Corrected Image', corrected)
                         if cv.waitKey(1) & 0xFF == ord('q'):  # Exit loop on 'q' press
                             break
@@ -201,7 +205,7 @@ if __name__ == '__main__':
                         break
                 cv.destroyAllWindows()
     elif test_method == 'folder':
-        folder = 'P3\Results\Data\Clay\Clay10g'
+        folder = 'P3\Results\Data\Gips\Gypsum12g'
         os.makedirs(f'{folder}/Results', exist_ok=True)
         #Objective testing excel file
         workbook = xlsxwriter.Workbook(f'{folder}/Results/OTResults.xlsx')
@@ -218,11 +222,17 @@ if __name__ == '__main__':
                 image_path = f'{folder}/{file}'
                 print("!!!Processing: ", file)
                 try:
-                    corrected, dehazed = main(cam, image_path)
+                    corrected, dehazed, corrected_checker, pre_dehazed_checker = main(cam, image_path)
+                    #cv.imshow('Corrected Image', cv.resize(corrected, (0,0), fx=0.5, fy=0.5))
+                    #cv.imshow('Dehazed Image', cv.resize(dehazed, (0,0), fx=0.5, fy=0.5))
+                    #cv.imshow('Corrected Checker', cv.resize(corrected_checker, (0,0), fx=0.5, fy=0.5))
+                    #cv.imshow('Pre Dehazed Checker', cv.resize(pre_dehazed_checker, (0,0), fx=0.5, fy=0.5))
+                    #cv.waitKey(0)
+
                     corrected_list.append(corrected)
                     
                     #Objective Testing
-                    ot.ObjectiveTesting(file, corrected, image_path, worksheet, dehazed)
+                    ot.ObjectiveTesting(file, corrected, image_path, worksheet, dehazed, corrected_checker, pre_dehazed_checker)
                     
                     
                     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
@@ -233,7 +243,7 @@ if __name__ == '__main__':
                     print("Failed", file, "Error:", e)
                     continue
         
-        #ot.AdjustExcel(worksheet)
+        ot.AdjustExcel(worksheet)
         workbook.save(f'{folder}/Results/OTResults.xlsx')
 
         # Plot all corrected images
