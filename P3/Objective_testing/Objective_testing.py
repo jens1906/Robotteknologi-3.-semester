@@ -5,7 +5,7 @@ import subprocess
 import cv2
 import numpy as np
 
-import main
+#import main
 import xlsxwriter
 from openpyxl import load_workbook
 
@@ -107,12 +107,17 @@ def ObjectiveTesting(File, Improved, reference, worksheet, dehazed, enhancedChec
     reference = cv2.imread(reference)
     Original = cv2.imread("P3\Results\Data\GroundTruth\Beside_Camera_AutoTarget5_light5_exp29311.0_20242211_103548.png")
     OriginalChecker = cv2.resize( cv2.imread("P3\Palette_detection\Colour_checker_from_Vikki_full.png")[170: 997, 520: 1705], (enhancedChecker.shape[1],enhancedChecker.shape[0]), interpolation=cv2.INTER_AREA)
+    referenceChecker = cv2.cvtColor(referenceChecker, cv2.COLOR_BGR2RGB)
+    enhancedChecker = cv2.cvtColor(enhancedChecker, cv2.COLOR_BGR2RGB)
 
     try:
-        #PsnrGroundVSReference = OPSNR(OriginalChecker, referenceChecker)
-        PsnrGroundVSReference = OPSNR(cv2.cvtColor(OriginalChecker, cv2.COLOR_BGR2GRAY), cv2.cvtColor(referenceChecker, cv2.COLOR_BGR2GRAY))
-        #PsnrGroundVSEnhanced = OPSNR(OriginalChecker, enhancedChecker)
-        PsnrGroundVSEnhanced = OPSNR(cv2.cvtColor(OriginalChecker, cv2.COLOR_BGR2GRAY), cv2.cvtColor(enhancedChecker, cv2.COLOR_BGR2GRAY))
+        PsnrGroundVSReference = OPSNR(OriginalChecker, referenceChecker)
+        #PsnrGroundVSReference = OPSNR(OriginalChecker, cv2.filter2D(referenceChecker, -1, np.ones((3,3),np.float32)/25))          
+        #PsnrGroundVSReference = OPSNR(cv2.cvtColor(OriginalChecker, cv2.COLOR_BGR2GRAY), cv2.cvtColor(referenceChecker, cv2.COLOR_BGR2GRAY))
+
+        PsnrGroundVSEnhanced = OPSNR(OriginalChecker, enhancedChecker)
+        #PsnrGroundVSEnhanced = OPSNR(OriginalChecker, cv2.filter2D(enhancedChecker, -1, np.ones((3,3),np.float32)/25))
+        #PsnrGroundVSEnhanced = OPSNR(cv2.cvtColor(OriginalChecker, cv2.COLOR_BGR2GRAY), cv2.cvtColor(enhancedChecker, cv2.COLOR_BGR2GRAY))
         
     except:
         print("PSNR FAIL")
@@ -121,9 +126,9 @@ def ObjectiveTesting(File, Improved, reference, worksheet, dehazed, enhancedChec
         print(enhancedChecker.shape)
         pass
 
-    #cv2.imshow('Original Image', cv2.resize(OriginalChecker, (0,0), fx=0.5, fy=0.5))
-    #cv2.imshow('reference Image', cv2.resize(referenceChecker, (0,0), fx=0.5, fy=0.5))
-    #cv2.imshow('dehazed Checker', cv2.resize(enhancedChecker, (0,0), fx=0.5, fy=0.5))
+    #cv2.imshow('Original Image', cv2.resize(OriginalChecker, (0,0), fx=1, fy=1))
+    #cv2.imshow('reference Image', cv2.resize(referenceChecker, (0,0), fx=1, fy=1))
+    #cv2.imshow('dehazed Checker', cv2.resize(enhancedChecker, (0,0), fx=1, fy=1))
     #cv2.waitKey(0)
     MBEGroundVSReference = MeanBrightnessError(Original, reference)
     MBEGroundVSEnhanced = MeanBrightnessError(Original, Improved)
@@ -166,6 +171,18 @@ def ObjectiveTestingFail(File, worksheet):
 
     return 
 
+def average(worksheet):
+    next_row = worksheet.max_row + 1    
+    worksheet.cell(row=next_row, column=2, value="=AVERAGE(B2:B" + str(next_row-1) + ")")
+    worksheet.cell(row=next_row, column=3, value="=AVERAGE(C2:C" + str(next_row-1) + ")")
+    worksheet.cell(row=next_row, column=4, value="=AVERAGE(D2:D" + str(next_row-1) + ")")
+    worksheet.cell(row=next_row, column=5, value="=AVERAGE(E2:E" + str(next_row-1) + ")")
+    worksheet.cell(row=next_row, column=6, value="=AVERAGE(F2:F" + str(next_row-1) + ")")
+    worksheet.cell(row=next_row, column=7, value="=AVERAGE(G2:G" + str(next_row-1) + ")")
+    worksheet.cell(row=next_row, column=8, value="=AVERAGE(H2:H" + str(next_row-1) + ")")
+    worksheet.cell(row=next_row, column=9, value="=AVERAGE(I2:I" + str(next_row-1) + ")")
+    worksheet.cell(row=next_row, column=10, value="=AVERAGE(J2:J" + str(next_row-1) + ")")
+    
 
 def AdjustExcel(worksheet):
     for column_cells in worksheet.columns:
@@ -180,5 +197,4 @@ def AdjustExcel(worksheet):
         adjusted_width = max_length + 2  # Add some padding to the width
         worksheet.column_dimensions[column_letter].width = adjusted_width
     return    
-
 
