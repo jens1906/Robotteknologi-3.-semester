@@ -82,7 +82,7 @@ def OTDatacollection(folder):
     elif '\\' in folder:
         Parentfolder = folder.rsplit('\\', 1)[0]    
         FolderName = folder.rsplit('\\', 1)[-1]            
-    print("Parentfolder:", Parentfolder)
+    #print("Parentfolder:", Parentfolder)
 
     worksheet = None
     ExcelFile = f'{Parentfolder}/AllOTResults.xlsx'
@@ -135,7 +135,7 @@ def ObjectiveTesting(File, Improved, reference, worksheet, dehazed, enhancedChec
     AGDehazed = AverageGradient(dehazed)
 
     next_row = worksheet.max_row + 1    
-    print(next_row)
+    #print(next_row)
     #
     #PSNR
     #
