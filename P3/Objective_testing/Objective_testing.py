@@ -84,8 +84,11 @@ def ObjectiveTesting(File, Improved, reference, worksheet, dehazed, enhancedChec
     OriginalChecker = cv2.resize( cv2.imread("P3\Palette_detection\Colour_checker_from_Vikki_full.png")[170: 997, 520: 1705], (enhancedChecker.shape[1],enhancedChecker.shape[0]), interpolation=cv2.INTER_AREA)
 
     try:
-        PsnrGroundVSReference = OPSNR(OriginalChecker, referenceChecker)
-        PsnrGroundVSEnhanced = OPSNR(OriginalChecker, enhancedChecker)
+        #PsnrGroundVSReference = OPSNR(OriginalChecker, referenceChecker)
+        PsnrGroundVSReference = OPSNR(cv2.cvtColor(OriginalChecker, cv2.COLOR_BGR2GRAY), cv2.cvtColor(referenceChecker, cv2.COLOR_BGR2GRAY))
+        #PsnrGroundVSEnhanced = OPSNR(OriginalChecker, enhancedChecker)
+        PsnrGroundVSEnhanced = OPSNR(cv2.cvtColor(OriginalChecker, cv2.COLOR_BGR2GRAY), cv2.cvtColor(enhancedChecker, cv2.COLOR_BGR2GRAY))
+        
     except:
         print("PSNR FAIL")
         print(OriginalChecker.shape)
