@@ -160,7 +160,7 @@ def main(cam=None, image_path=None, detailed=False):
 
     print("------Plotting Images------")
     try:
-        plot_images(plot_list)
+        #plot_images(plot_list)
         pass
     except Exception as e:
         print("Error plotting images:", e)
@@ -205,17 +205,10 @@ if __name__ == '__main__':
                         break
                 cv.destroyAllWindows()
     elif test_method == 'folder':
-        folder = 'P3\Results\Data\Gips\Gypsum12g'
+        folder = 'P3\Results\Data\Gips/Gypsum6g'
+        workbook, worksheet, ExcelFile = ot.OTDatacollection(folder)
         os.makedirs(f'{folder}/Results', exist_ok=True)
-        #Objective testing excel file
-        workbook = xlsxwriter.Workbook(f'{folder}/Results/OTResults.xlsx')
-        worksheet = workbook.add_worksheet()
-        ot.ReadyExcel(worksheet)
-        workbook.close()
-        workbook = load_workbook(f'{folder}/Results/OTResults.xlsx')
-        worksheet = workbook.active
 
-        
         corrected_list = []
         for file in os.listdir(folder):
             if file.endswith('.png'):
@@ -232,8 +225,7 @@ if __name__ == '__main__':
                     corrected_list.append(corrected)
                     
                     #Objective Testing
-                    ot.ObjectiveTesting(file, corrected, image_path, worksheet, dehazed, corrected_checker, pre_dehazed_checker)
-                    
+                    ot.ObjectiveTesting(file, corrected, image_path, worksheet, dehazed, corrected_checker, pre_dehazed_checker)         
                     
                     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
                     #cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
@@ -244,7 +236,7 @@ if __name__ == '__main__':
                     continue
         
         ot.AdjustExcel(worksheet)
-        workbook.save(f'{folder}/Results/OTResults.xlsx')
+        workbook.save(ExcelFile)
 
         # Plot all corrected images
         plot_images(corrected_list)

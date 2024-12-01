@@ -6,6 +6,8 @@ import cv2
 import numpy as np
 
 import main
+import xlsxwriter
+from openpyxl import load_workbook
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
@@ -52,31 +54,54 @@ def AverageGradient(imgX):
     avgGradientResult = np.round(avgGradientResult, decimals=2)
     return avgGradientResult
 
-
 def ReadyExcel(worksheet):
-    worksheet.write('A1', 'Filename')
+    # Set the values in the cells using openpyxl's .cell() method
+    worksheet.cell(row=1, column=1, value='Filename')
 
-    #
-    #PSNR
-    #
-    worksheet.write('B1', 'PSNR Ground checker diff Reference checker')
-    worksheet.write('C1', 'PSNR Ground checker diff Enhanced checker')
+    # PSNR
+    worksheet.cell(row=1, column=2, value='PSNR Ground checker diff Reference checker')
+    worksheet.cell(row=1, column=3, value='PSNR Ground checker diff Enhanced checker')
 
-    #
-    #MBE
-    #
-    worksheet.write('D1', 'MBE Ground diff Reference')
-    worksheet.write('E1', 'MBE Ground diff Enhanced')
-    worksheet.write('F1', 'MBE Ground diff Dehazed')
+    # MBE
+    worksheet.cell(row=1, column=4, value='MBE Ground diff Reference')
+    worksheet.cell(row=1, column=5, value='MBE Ground diff Enhanced')
+    worksheet.cell(row=1, column=6, value='MBE Ground diff Dehazed')
 
-    #
-    #AG
-    #
-    worksheet.write('G1', 'AG Ground')
-    worksheet.write('H1', 'AG Reference')
-    worksheet.write('I1', 'AG Enhanced')
-    worksheet.write('J1', 'AG Dehazed')
+    # AG
+    worksheet.cell(row=1, column=7, value='AG Ground')
+    worksheet.cell(row=1, column=8, value='AG Reference')
+    worksheet.cell(row=1, column=9, value='AG Enhanced')
+    worksheet.cell(row=1, column=10, value='AG Dehazed')
+
     return
+
+def OTDatacollection(folder):
+    if '/' in folder:
+        Parentfolder = folder.rsplit('/', 1)[0]
+        FolderName = folder.rsplit('/', 1)[-1]
+    elif '\\' in folder:
+        Parentfolder = folder.rsplit('\\', 1)[0]    
+        FolderName = folder.rsplit('\\', 1)[-1]            
+    print("Parentfolder:", Parentfolder)
+
+    worksheet = None
+    ExcelFile = f'{Parentfolder}/AllOTResults.xlsx'
+    if not os.path.isfile(ExcelFile):
+        workbook = xlsxwriter.Workbook(ExcelFile)
+        worksheet = workbook.add_worksheet(FolderName)
+        workbook.close()
+        workbook = load_workbook(ExcelFile)
+        worksheet = workbook.active
+    else:
+        workbook = load_workbook(ExcelFile)
+        if FolderName not in workbook.sheetnames:
+            worksheet = workbook.create_sheet(FolderName)
+        else:
+            SheetLoc = workbook[FolderName]
+            workbook.remove(SheetLoc)
+            worksheet = workbook.create_sheet(FolderName)
+    ReadyExcel(worksheet)
+    return workbook, worksheet, ExcelFile
 
 def ObjectiveTesting(File, Improved, reference, worksheet, dehazed, enhancedChecker, referenceChecker):
     reference = cv2.imread(reference)
