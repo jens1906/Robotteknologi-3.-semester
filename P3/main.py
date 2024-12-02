@@ -170,7 +170,7 @@ def main(cam=None, image_path=None, detailed=False):
         pass
         
     try:
-        plot_images(plot_list)
+        #plot_images(plot_list)
         pass
     except Exception as e:
         print("Error plotting images:", e)
@@ -210,13 +210,6 @@ if __name__ == '__main__':
     elif test_method == 'folder':
         folder = 'P3\Results\Data\Milk/32th_Milk'
         os.makedirs(f'{folder}/Results', exist_ok=True)
-        #Objective testing excel file
-        workbook = xlsxwriter.Workbook(f'{folder}/Results/OTResults.xlsx')
-        worksheet = workbook.add_worksheet()
-        ot.ReadyExcel(worksheet)
-        workbook.close()
-        workbook = load_workbook(f'{folder}/Results/OTResults.xlsx')
-        worksheet = workbook.active
 
         corrected_list = []
         for file in os.listdir(folder):
@@ -237,7 +230,7 @@ if __name__ == '__main__':
                     ot.ObjectiveTesting(file, corrected, image_path, worksheet, dehazed, corrected_checker, pre_dehazed_checker)         
                     
                     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
-                    cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
+                    #cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
 
                 except Exception as e:
                     ot.ObjectiveTestingFail(file, worksheet)

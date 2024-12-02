@@ -112,11 +112,11 @@ def ObjectiveTesting(File, Improved, reference, worksheet, dehazed, enhancedChec
 
     try:
         PsnrGroundVSReference = OPSNR(OriginalChecker, referenceChecker)
-        #PsnrGroundVSReference = OPSNR(OriginalChecker, cv2.filter2D(referenceChecker, -1, np.ones((3,3),np.float32)/25))          
+        #PsnrGroundVSReference = OPSNR(OriginalChecker, cv2.filter2D(referenceChecker, -1, np.ones((5,5),np.float32)/25))          
         #PsnrGroundVSReference = OPSNR(cv2.cvtColor(OriginalChecker, cv2.COLOR_BGR2GRAY), cv2.cvtColor(referenceChecker, cv2.COLOR_BGR2GRAY))
 
         PsnrGroundVSEnhanced = OPSNR(OriginalChecker, enhancedChecker)
-        #PsnrGroundVSEnhanced = OPSNR(OriginalChecker, cv2.filter2D(enhancedChecker, -1, np.ones((3,3),np.float32)/25))
+        #PsnrGroundVSEnhanced = OPSNR(OriginalChecker, cv2.filter2D(enhancedChecker, -1, np.ones((5,5),np.float32)/25))
         #PsnrGroundVSEnhanced = OPSNR(cv2.cvtColor(OriginalChecker, cv2.COLOR_BGR2GRAY), cv2.cvtColor(enhancedChecker, cv2.COLOR_BGR2GRAY))
         
     except:
@@ -125,7 +125,8 @@ def ObjectiveTesting(File, Improved, reference, worksheet, dehazed, enhancedChec
         print(referenceChecker.shape)
         print(enhancedChecker.shape)
         pass
-
+    #print("PSNR Ground vs Reference:", PsnrGroundVSReference)
+    #print("PSNR Ground vs Enhanced:", PsnrGroundVSEnhanced)
     #cv2.imshow('Original Image', cv2.resize(OriginalChecker, (0,0), fx=1, fy=1))
     #cv2.imshow('reference Image', cv2.resize(referenceChecker, (0,0), fx=1, fy=1))
     #cv2.imshow('dehazed Checker', cv2.resize(enhancedChecker, (0,0), fx=1, fy=1))
