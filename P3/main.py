@@ -156,6 +156,7 @@ def main(cam=None, image_path=None, detailed=False):
         corrected_image_2, cc_matrix, corrected_checker_2_pepe = cc.colour_correct(corrected_image, original_checker, corrected_checker_2)
     
     ## Plot Images
+    print("------Plotting Images------")
     plot_list.append(corrected_image)
 
     plot_list.append(input_colour_checker)
@@ -168,8 +169,6 @@ def main(cam=None, image_path=None, detailed=False):
         plot_list.append(corrected_image_2)
         pass
         
-
-    print("------Plotting Images------")
     try:
         plot_images(plot_list)
         pass
@@ -183,7 +182,7 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'single'  # 'single', 'live', 'folder'
+    test_method = 'folder'  # 'single', 'live', 'folder'
 
     if test_method == 'single':
         #image_path = 'P3\Results\Data\Gips\Gypsum12g\Beside_Camera_light5_exp112596.0_20242011_145005.png'
@@ -209,7 +208,7 @@ if __name__ == '__main__':
                         break
                 cv.destroyAllWindows()
     elif test_method == 'folder':
-        folder = 'P3\Results\Data\Gips\Gypsum30g'
+        folder = 'P3\Results\Data\Milk/32th_Milk'
         os.makedirs(f'{folder}/Results', exist_ok=True)
         #Objective testing excel file
         workbook = xlsxwriter.Workbook(f'{folder}/Results/OTResults.xlsx')
