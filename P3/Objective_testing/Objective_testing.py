@@ -173,7 +173,7 @@ def ObjectiveTestingFail(File, worksheet):
 
 def average(worksheet):
     next_row = worksheet.max_row + 1
-    worksheet.cell(row=next_row, column=1, value="=COUNT(B2:B" + str(next_row-1) + ")")  
+    worksheet.cell(row=next_row, column=1, value='=COUNT(B2:B' + str(next_row - 1) + ') & " / " & '+ str(next_row - 2) + '')
     worksheet.cell(row=next_row, column=2, value="=AVERAGE(B2:B" + str(next_row-1) + ")")
     worksheet.cell(row=next_row, column=3, value="=AVERAGE(C2:C" + str(next_row-1) + ")")
     worksheet.cell(row=next_row, column=4, value="=AVERAGE(D2:D" + str(next_row-1) + ")")
