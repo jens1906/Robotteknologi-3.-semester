@@ -208,7 +208,8 @@ if __name__ == '__main__':
                         break
                 cv.destroyAllWindows()
     elif test_method == 'folder':
-        folder = 'P3\Results\Data\Milk/32th_Milk'
+        folder = 'P3\Results\Data\Gips\Gypsum45g'
+        workbook, worksheet, ExcelFile = ot.OTDatacollection(folder)
         os.makedirs(f'{folder}/Results', exist_ok=True)
 
         corrected_list = []
