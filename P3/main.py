@@ -171,7 +171,7 @@ def main(cam=None, image_path=None, detailed=False):
 
     print("------Plotting Images------")
     try:
-        plot_images(plot_list)
+        #plot_images(plot_list)
         pass
     except Exception as e:
         print("Error plotting images:", e)
@@ -192,7 +192,7 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'single'  # 'single', 'live', 'folder'
+    test_method = 'folder'  # 'single', 'live', 'folder'
 
     if test_method == 'single':
         #image_path = 'P3\Results\Data\Gips\Gypsum12g\Beside_Camera_light5_exp112596.0_20242011_145005.png'
@@ -218,16 +218,10 @@ if __name__ == '__main__':
                         break
                 cv.destroyAllWindows()
     elif test_method == 'folder':
-        folder = 'P3\Results\Data\Gips\Gypsum30g'
+        folder = 'P3\Results\Data\Gips\Gypsum45g'
+        workbook, worksheet, ExcelFile = ot.OTDatacollection(folder)
         os.makedirs(f'{folder}/Results', exist_ok=True)
-        #Objective testing excel file
-        workbook = xlsxwriter.Workbook(f'{folder}/Results/OTResults.xlsx')
-        worksheet = workbook.add_worksheet()
-        ot.ReadyExcel(worksheet)
-        workbook.close()
-        workbook = load_workbook(f'{folder}/Results/OTResults.xlsx')
-        worksheet = workbook.active
-        
+
         corrected_list = []
         for file in os.listdir(folder):
             if file.endswith('.png'):
@@ -247,7 +241,7 @@ if __name__ == '__main__':
                     ot.ObjectiveTesting(file, corrected, image_path, worksheet, dehazed, corrected_checker, pre_dehazed_checker)         
                     
                     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
-                    cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
+                    #cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
 
                 except Exception as e:
                     ot.ObjectiveTestingFail(file, worksheet)
