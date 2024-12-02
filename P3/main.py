@@ -158,14 +158,14 @@ def main(cam=None, image_path=None, detailed=False):
     ## Plot Images
     plot_list.append(corrected_image)
 
-    #plot_list.append(input_colour_checker)
-    #plot_list.append(dehazed_checker)
+    plot_list.append(input_colour_checker)
+    plot_list.append(dehazed_checker)
 
-    #plot_list.append(corrected_checker)
-    #plot_list.append(original_checker)    
+    plot_list.append(corrected_checker)
+    plot_list.append(original_checker)    
     if detailed:
-        #plot_list.append(corrected_checker_2)
-        #plot_list.append(corrected_image_2)
+        plot_list.append(corrected_checker_2)
+        plot_list.append(corrected_image_2)
         pass
         
 
@@ -218,7 +218,18 @@ if __name__ == '__main__':
                         break
                 cv.destroyAllWindows()
     elif test_method == 'folder':
-        folder = 'P3\Results\Data\Spinat\Spinach20g'
+        folder = 'P3\Results\Data\Gips\Gypsum30g'
+        os.makedirs(f'{folder}/Results', exist_ok=True)
+        #Objective testing excel file
+        workbook = xlsxwriter.Workbook(f'{folder}/Results/OTResults.xlsx')
+        worksheet = workbook.add_worksheet()
+        ot.ReadyExcel(worksheet)
+        workbook.close()
+        workbook = load_workbook(f'{folder}/Results/OTResults.xlsx')
+        worksheet = workbook.active
+        
+        corrected_list = []
+        for file in os.listdir(folder):
             if file.endswith('.png'):
                 image_path = f'{folder}/{file}'
                 print("!!!Processing: ", file)
