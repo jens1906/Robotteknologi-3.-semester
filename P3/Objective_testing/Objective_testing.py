@@ -107,6 +107,7 @@ def ObjectiveTesting(File, Improved, reference, worksheet, dehazed, enhancedChec
     reference = cv2.imread(reference)
     Original = cv2.imread("P3\Results\Data\GroundTruth\Beside_Camera_AutoTarget5_light5_exp29311.0_20242211_103548.png")
     OriginalChecker = cv2.resize( cv2.imread("P3\Palette_detection\Colour_checker_from_Vikki_full.png")[170: 997, 520: 1705], (enhancedChecker.shape[1],enhancedChecker.shape[0]), interpolation=cv2.INTER_AREA)
+    #OriginalChecker = cv2.resize( cv2.imread("P3\Palette_detection\Colour_checker_from_Vikki_full_test_enviorment.png")[39: 211, 108: 360], (enhancedChecker.shape[1],enhancedChecker.shape[0]), interpolation=cv2.INTER_AREA)
     referenceChecker = cv2.cvtColor(referenceChecker, cv2.COLOR_BGR2RGB)
     enhancedChecker = cv2.cvtColor(enhancedChecker, cv2.COLOR_BGR2RGB)
 

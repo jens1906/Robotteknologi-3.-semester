@@ -35,7 +35,7 @@ except Exception as e:
     install('openpyxl')
     install('xlsxwriter')
 
-def plot_images(images):
+def plot_images(images, savefile=None):
     #if the list is empty raise error
     if len(images) == 0:
         raise ValueError("No images to plot")
@@ -93,7 +93,10 @@ def plot_images(images):
     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
     #plt.savefig(f'P3/Results/FullPlots/FullPlot_{timestamp}.png', bbox_inches='tight') #if you want to save the plot
 
+    if savefile is not None:
+        plt.savefig(savefile, bbox_inches='tight')
     plt.show()
+    return
 
 
 def main(cam=None, image_path=None, detailed=False):
@@ -133,6 +136,7 @@ def main(cam=None, image_path=None, detailed=False):
     print("------Locating Color Checker------")
     #template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png')
     template =  cv.resize(cv.imread("P3\Palette_detection\Colour_checker_from_Vikki_full.png"), (606, 318), interpolation=cv.INTER_AREA)
+    #template =  cv.resize(cv.imread("P3\Palette_detection\Colour_checker_from_Vikki_full_test_enviorment.png"), (606, 318), interpolation=cv.INTER_AREA)
     #cv.imshow('Template', template)
     #cv.waitKey(0)
 
@@ -208,7 +212,7 @@ if __name__ == '__main__':
                         break
                 cv.destroyAllWindows()
     elif test_method == 'folder':
-        folder = 'P3\Results\Data\Gips\Gypsum45g'
+        folder = 'P3\Results\Data\Gips\Gypsum65g'
         workbook, worksheet, ExcelFile = ot.OTDatacollection(folder)
         os.makedirs(f'{folder}/Results', exist_ok=True)
 
@@ -242,7 +246,18 @@ if __name__ == '__main__':
         ot.average(worksheet)
         workbook.save(ExcelFile)
 
-        # Plot all corrected images
+            # Plot all corrected images
+        if '/' in folder:
+            Parentfolder = folder.rsplit('/', 1)[0]
+            FolderName = folder.rsplit('/', 1)[-1]
+        elif '\\' in folder:
+            Parentfolder = folder.rsplit('\\', 1)[0]    
+            FolderName = folder.rsplit('\\', 1)[-1]            
+        #print("Parentfolder:", Parentfolder)
+
+        worksheet = None
+        Plotfile = f'{Parentfolder}/Results_with_brightness/{FolderName}.png'
+
         plot_images(corrected_list)
     else:
         exit(1)
