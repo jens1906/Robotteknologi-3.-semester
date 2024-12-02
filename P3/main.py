@@ -120,10 +120,14 @@ def main(cam=None, image_path=None, detailed=False):
 
     ## Locate Color Checker
     print("------Locating Color Checker------")
-    template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png')
+    #template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png')
+    template =  cv.resize(cv.imread("P3\Palette_detection\Colour_checker_from_Vikki_full.png"), (606, 318), interpolation=cv.INTER_AREA)
+    #cv.imshow('Template', template)
+    #cv.waitKey(0)
+
     dehazed_checker, corners, wrap_matrix, loc = lc.LocateChecker(dehazed_image, template)
-    input_colour_checker, corners, wrap_matrix, loc = lc.LocateChecker(image, template)
-    
+    input_colour_checker, corners, xx, loc = lc.LocateChecker(image, template)
+    pre_dehazed_checker = lc.LocateCheckerOriginal(image, template, wrap_matrix)
 
     ## Color Correction
     print("------Color Correcting Image------")
@@ -171,16 +175,16 @@ def main(cam=None, image_path=None, detailed=False):
     #print(cv.PSNR(original_checker, corrected_checker))
 
     print("------Finished------")
-    return corrected_image, dehazed_image
+    return corrected_image, dehazed_image, corrected_checker, pre_dehazed_checker
 
 if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'single'  # 'single', 'live', 'folder'
+    test_method = 'folder'  # 'single', 'live', 'folder'
 
     if test_method == 'single':
-        image_path = 'P3\Results\Data\Clay\Clay1g\Green_Right_Side_light10_exp73625.0_20242111_115328.png'
+        image_path = 'P3\Results\Data\Spinat\Spinach20g'
         main(cam, image_path, True)
 
     elif test_method == 'live':
@@ -192,7 +196,7 @@ if __name__ == '__main__':
                     exit(1)
                 with cams[0] as cam:
                     try:
-                        corrected, dehazed = main(cam, None, True)
+                        corrected, dehazed, corrected_checker, pre_dehazed_checker = main(cam, None, True)
                         #cv.imshow('Corrected Image', corrected)
                         if cv.waitKey(1) & 0xFF == ord('q'):  # Exit loop on 'q' press
                             break
@@ -201,29 +205,27 @@ if __name__ == '__main__':
                         break
                 cv.destroyAllWindows()
     elif test_method == 'folder':
-        folder = 'P3\Results\Data\Clay\Clay10g'
+        folder = 'P3\Results\Data\Spinat\Spinach20g'
+        workbook, worksheet, ExcelFile = ot.OTDatacollection(folder)
         os.makedirs(f'{folder}/Results', exist_ok=True)
-        #Objective testing excel file
-        workbook = xlsxwriter.Workbook(f'{folder}/Results/OTResults.xlsx')
-        worksheet = workbook.add_worksheet()
-        ot.ReadyExcel(worksheet)
-        workbook.close()
-        workbook = load_workbook(f'{folder}/Results/OTResults.xlsx')
-        worksheet = workbook.active
 
-        
         corrected_list = []
         for file in os.listdir(folder):
             if file.endswith('.png'):
                 image_path = f'{folder}/{file}'
                 print("!!!Processing: ", file)
                 try:
-                    corrected, dehazed = main(cam, image_path)
+                    corrected, dehazed, corrected_checker, pre_dehazed_checker = main(cam, image_path)
+                    #cv.imshow('Corrected Image', cv.resize(corrected, (0,0), fx=0.5, fy=0.5))
+                    #cv.imshow('Dehazed Image', cv.resize(dehazed, (0,0), fx=0.5, fy=0.5))
+                    #cv.imshow('Corrected Checker', cv.resize(corrected_checker, (0,0), fx=0.5, fy=0.5))
+                    #cv.imshow('Pre Dehazed Checker', cv.resize(pre_dehazed_checker, (0,0), fx=0.5, fy=0.5))
+                    #cv.waitKey(0)
+
                     corrected_list.append(corrected)
                     
                     #Objective Testing
-                    ot.ObjectiveTesting(file, corrected, image_path, worksheet, dehazed)
-                    
+                    ot.ObjectiveTesting(file, corrected, image_path, worksheet, dehazed, corrected_checker, pre_dehazed_checker)         
                     
                     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
                     #cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
@@ -233,8 +235,9 @@ if __name__ == '__main__':
                     print("Failed", file, "Error:", e)
                     continue
         
-        #ot.AdjustExcel(worksheet)
-        workbook.save(f'{folder}/Results/OTResults.xlsx')
+        ot.AdjustExcel(worksheet)
+        ot.average(worksheet)
+        workbook.save(ExcelFile)
 
         # Plot all corrected images
         plot_images(corrected_list)
