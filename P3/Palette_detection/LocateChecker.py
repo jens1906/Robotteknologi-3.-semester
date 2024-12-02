@@ -122,7 +122,7 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
 
     if len(good_matches) < 4:
         print("Not enough good matches!")
-        return None, None, None
+        return None, None, None, None
 
     # Extract matched keypoints
     points_template = np.float32([kp_template[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
@@ -132,7 +132,7 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
 
     if homography is None: #or np.linalg.det(homography) < 1e-6
         print("Invalid homography matrix!")
-        return None, None, None
+        return None, None, None, None
 
     # Transform corners
     h, w = template.shape[:2]
@@ -145,7 +145,7 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
 
     if corners_checker is None or len(corners_checker) != 4:
         print("Invalid corners detected!")
-        return None, None, None
+        return None, None, None, None
 
     # Warp perspective
     warp_matrix = cv2.getPerspectiveTransform(corners_checker, corners_template)

@@ -1,3 +1,4 @@
+
 import os
 import sys
 os.system('cls')
@@ -12,7 +13,6 @@ from Palette_detection import LocateChecker as lc
 from ColorCorrection import ColourCorrectMain as cc
 from P3.Objective_testing import APalTest as apt
 from P3.Objective_testing import Objective_testing as ot
-
 
 import math
 import time
@@ -36,6 +36,17 @@ except Exception as e:
     install('xlsxwriter')
 
 def plot_images(images):
+    #if the list is empty raise error
+    if len(images) == 0:
+        raise ValueError("No images to plot")
+    
+    #if None in images print the index of None and pop the None
+    for i, img in enumerate(images):
+        if img is None:
+            print(f"None in images at index {i}")
+            images.pop(i)
+            break  # Exit the loop and re-check, as modifying the list in-place affects iteration
+
     """
     Plots a given list of images in a grid layout using matplotlib.
     Handles both individual images and lists of images.
@@ -143,20 +154,20 @@ def main(cam=None, image_path=None, detailed=False):
     ## Plot Images
     plot_list.append(corrected_image)
 
-    plot_list.append(input_colour_checker)
-    plot_list.append(dehazed_checker)
+    #plot_list.append(input_colour_checker)
+    #plot_list.append(dehazed_checker)
 
-    plot_list.append(corrected_checker)
-    plot_list.append(original_checker)    
+    #plot_list.append(corrected_checker)
+    #plot_list.append(original_checker)    
     if detailed:
-        plot_list.append(corrected_checker_2)
-        plot_list.append(corrected_image_2)
+        #plot_list.append(corrected_checker_2)
+        #plot_list.append(corrected_image_2)
         pass
         
 
     print("------Plotting Images------")
     try:
-        #plot_images(plot_list)
+        plot_images(plot_list)
         pass
     except Exception as e:
         print("Error plotting images:", e)
@@ -177,10 +188,12 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'folder'  # 'single', 'live', 'folder'
+    test_method = 'single'  # 'single', 'live', 'folder'
 
     if test_method == 'single':
-        image_path = 'P3/Results/Data/colcaltest/red_beside_light5_exp500005.0_20242611_132609.png'
+        #image_path = 'P3\Results\Data\Gips\Gypsum12g\Beside_Camera_light5_exp112596.0_20242011_145005.png'
+        image_path = 'P3\Results\Data\colcaltest/red_beside_light5_exp500005.0_20242611_132609.png'
+        #image_path = 'P3\Results\Data\Milk/32th_Milk\Beside_Camera_20241611_121705.png'
         main(cam, image_path, True)
 
     elif test_method == 'live':
@@ -201,7 +214,7 @@ if __name__ == '__main__':
                         break
                 cv.destroyAllWindows()
     elif test_method == 'folder':
-        folder = 'P3\Results\Data\Clay\Clay10g'
+        folder = 'P3\Results\Data\Gips\Gypsum30g'
         os.makedirs(f'{folder}/Results', exist_ok=True)
         #Objective testing excel file
         workbook = xlsxwriter.Workbook(f'{folder}/Results/OTResults.xlsx')
@@ -222,11 +235,11 @@ if __name__ == '__main__':
                     corrected_list.append(corrected)
                     
                     #Objective Testing
-                    ot.ObjectiveTesting(file, corrected, image_path, worksheet, dehazed)
+                    #ot.ObjectiveTesting(file, corrected, image_path, worksheet, dehazed)
                     
                     
                     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
-                    #cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
+                    cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
 
                 except Exception as e:
                     ot.ObjectiveTestingFail(file, worksheet)
