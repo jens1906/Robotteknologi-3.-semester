@@ -176,15 +176,6 @@ def main(cam=None, image_path=None, detailed=False):
     except Exception as e:
         print("Error plotting images:", e)
 
-    ## Objective Testing
-    print("------Objective Testing------")
-    #print("Image diff")
-    #ot.ObjectiveTesting(corrected_image, image) #AG, MBE, PCQI
-    #print("dehazed_checker diff")
-    #apt.get_pal_diff(original_checker, dehazed_checker, corrected_checker) #Pal diff
-    #print(cv.PSNR(original_checker, dehazed_checker))
-    #print(cv.PSNR(original_checker, corrected_checker))
-
     print("------Finished------")
     return corrected_image, dehazed_image, corrected_checker, pre_dehazed_checker
 
@@ -227,7 +218,7 @@ if __name__ == '__main__':
         workbook.close()
         workbook = load_workbook(f'{folder}/Results/OTResults.xlsx')
         worksheet = workbook.active
-        
+
         corrected_list = []
         for file in os.listdir(folder):
             if file.endswith('.png'):
