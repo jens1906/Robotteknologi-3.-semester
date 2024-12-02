@@ -117,7 +117,7 @@ def AKAZELocateChecker(img, template, PreviousLocation=0, Adjustment=250, test=F
     # Lowe's ratio test
     good_matches = []
     for m, n in knn_matches:
-        if m.distance < 0.75 * n.distance:
+        if m.distance < 0.80 * n.distance:
             good_matches.append(m)
 
     if len(good_matches) < 4:
