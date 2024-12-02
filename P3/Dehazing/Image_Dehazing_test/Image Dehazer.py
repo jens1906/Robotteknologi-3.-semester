@@ -108,18 +108,13 @@ def dehaze(hazy_image):
 
     dehazed_image = cv.merge(dehazed_channels)
 
-    # Part for adding satuation
-    saturation = True
+    # Part for adding brightness
     brightness = True  
-    if saturation or brightness:
+    if brightness:
         dehazed_image = np.clip(dehazed_image * 255, 0, 255).astype(np.uint8)
         dehazed_image = cv.cvtColor(dehazed_image, cv.COLOR_BGR2HSV)
-        
-        if saturation:
-            dehazed_image[:, :, 1] = np.clip(dehazed_image[:, :, 1] * 2.5, 0, 255)  # Adjust saturation
-        
-        if brightness:
-            dehazed_image[:, :, 2] = np.clip(dehazed_image[:, :, 2] * 2.5, 0, 255)  # Adjust brightness (increase factor as needed)
+
+        dehazed_image[:, :, 2] = np.clip(dehazed_image[:, :, 2] * 2.5, 0, 255)  # Adjust brightness (increase factor as needed)
         
         dehazed_image = cv.cvtColor(dehazed_image, cv.COLOR_HSV2BGR)
         dehazed_image = dehazed_image / 255.0  # Normalize back to [0, 1] range
@@ -144,7 +139,7 @@ def calculate_psnr(image1, image2):
 # Example usage
 script_dir = os.path.dirname(__file__)
 image_path = None #os.path.join(script_dir, 'Dehaze_Samples', 'P3\Results\Data\16th_Milk\Behind_Camera_20241611_120040.png')
-hazy_image = cv.imread("P3\Results\Data\Clay\Clay1g\Green_Right_Side_light10_exp73625.0_20242111_115328.png")
+hazy_image = cv.imread("P3\Results\Data\Clay\Clay1g\Green_Beside_Camera_light5_exp111285.0_20242111_115220.png")
 if hazy_image is None:
     print(f"Error: Unable to load image at {image_path}")
 else:
