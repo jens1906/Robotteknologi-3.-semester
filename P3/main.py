@@ -177,10 +177,10 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'folder'  # 'single', 'live', 'folder'
+    test_method = 'single'  # 'single', 'live', 'folder'
 
     if test_method == 'single':
-        image_path = 'P3/Results/Data/colcaltest/red_beside_light5_exp500005.0_20242611_132609.png'
+        image_path = 'P3\Results\Data\Clay\Clay1g\Green_Right_Side_light10_exp73625.0_20242111_115328.png'
         main(cam, image_path, True)
 
     elif test_method == 'live':
