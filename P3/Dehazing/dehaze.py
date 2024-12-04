@@ -128,7 +128,7 @@ def dehaze(hazy_image):
     dehazed_image = cv.merge(dehazed_channels)
 
     # Add brightness to the dehazed image
-    brightness = True  
+    brightness = False  
     if brightness:
         dehazed_image = np.clip(dehazed_image * 255, 0, 255).astype(np.uint8)
         dehazed_image = cv.cvtColor(dehazed_image, cv.COLOR_BGR2HSV)
