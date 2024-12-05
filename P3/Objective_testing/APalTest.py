@@ -29,9 +29,15 @@ def get_pal_diff(ref_pal, checker, corrected_palette):
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(found_pal[:,0], found_pal[:,1], found_pal[:,2], c='r', marker='o')
     ax.scatter(cc_pal[:,0], cc_pal[:,1], cc_pal[:,2], c='b', marker='o')
+    #write underneath the plot that the blue is the found and red is the corrected
+    ax.text2D(0.05, -0.05, "Red = Corrected Palette", transform=ax.transAxes)
+    ax.text2D(0.05, -0.1, "Blue = Found Palette", transform=ax.transAxes)
+
     ax.set_xlabel('Red')
     ax.set_ylabel('Green')
     ax.set_zlabel('Blue')
+
+    #
 
     plt.show()
 
