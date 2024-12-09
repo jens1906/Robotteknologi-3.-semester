@@ -9,7 +9,7 @@ def dark_channel(image, size=15):
     min_channel = np.min(image, axis=2)
     kernel = cv.getStructuringElement(cv.MORPH_RECT, (size, size))
     dark_channel = cv.erode(min_channel, kernel)
-    cv.imshow('dark_channel', dark_channel)
+    #cv.imshow('dark_channel', dark_channel)
     return dark_channel
 
 def atmospheric_light(image, dark_channel):
@@ -33,7 +33,7 @@ def transmission_map(image, A, omega=0.95, size=15):
     norm_image = image / A
     dark_channel_norm = dark_channel(norm_image, size)
     transmission = 1 - omega * dark_channel_norm
-    cv.imshow('transmission', transmission)
+    #cv.imshow('transmission', transmission)
     return transmission
 
 def guided_filter(im, p, r, eps):
@@ -62,7 +62,7 @@ def refine_transmission_map(image, estimated_transmission):
     radius = 60
     epsilon = 0.0001
     refined_transmission = guided_filter(normalized_grayscale, estimated_transmission, radius, epsilon)
-    cv.imshow('refined_transmission', refined_transmission)
+    #cv.imshow('refined_transmission', refined_transmission)
     return refined_transmission
 
 def recover_image(image, transmission, A, transmission_threshold=0.1):
@@ -108,30 +108,73 @@ def calculate_psnr(image1, image2):
     return psnr_value
 
 # Example usage
-script_dir = os.path.dirname(__file__)
-image_path = "P3/Dehazing/Image_Dehazing_test/Dehaze_Samples/underwater.jpg"
-hazy_image = cv.imread(image_path)
-if hazy_image is None:
-    print(f"Error: Unable to load image at {image_path}")
-else:
-    dehazed_image = dehaze(hazy_image)
+testmethod = 'folder' # 'folder' or 'single'
 
-    # Convert dehazed image to 8-bit format
-    dehazed_image_8bit = np.clip(dehazed_image * 255, 0, 255).astype(np.uint8)
+if testmethod == 'single':
 
-    cv.imwrite('P3/Dehazing/Module test/dehaze.png', dehazed_image_8bit)
+    script_dir = os.path.dirname(__file__)
+    image_path = "P3\Results\Data\Gips\Gypsum45g\Green_Beside_Camera_light10_exp95713.0_20242011_153324.png"
+    hazy_image = cv.imread(image_path)
+    if hazy_image is None:
+        print(f"Error: Unable to load image at {image_path}")
+    else:
+        dehazed_image = dehaze(hazy_image)
 
-    plt.figure(figsize=(10, 5))
+        # Convert dehazed image to 8-bit format
+        dehazed_image_8bit = np.clip(dehazed_image * 255, 0, 255).astype(np.uint8)
+
+        cv.imwrite('P3/Dehazing/Module test/dehaze.png', dehazed_image_8bit)
+
+        plt.figure(figsize=(10, 5))
+            
+        plt.subplot(1, 2, 1)
+        plt.title('Hazy Image')
+        plt.imshow(cv.cvtColor(hazy_image, cv.COLOR_BGR2RGB))
+        plt.axis('off')
+            
+        plt.subplot(1, 2, 2)
+        plt.title('Dehazed Image')
+        plt.imshow(cv.cvtColor(dehazed_image_8bit, cv.COLOR_BGR2RGB))
+        plt.axis('off')
+            
+        plt.tight_layout()
+        plt.show()
+
+elif testmethod == 'folder':
+    # folder path
+    folder = 'P3\Results\Data\Gips\Gypsum45g'
+
+    original_list = []
+    corrected_list = []
+    for file in os.listdir(folder):
+        if file.endswith('.png'):
+            image_path = f'{folder}/{file}'
+            print("!!!Processing: ", file)
+            try:
+                image = cv.imread(image_path)
+                dehazed = dehaze(image)		# Remove Haze
+                cv.destroyAllWindows()
+                original_list.append(image)
+                corrected_list.append(dehazed)
+
+            except Exception as e:
+                print("Failed", file, "Error:", e)
+                continue
+
+    print("Printing the images")
+
+    for i in range(len(original_list)):
+        plt.figure(figsize=(10, 5))
         
-    plt.subplot(1, 2, 1)
-    plt.title('Hazy Image')
-    plt.imshow(cv.cvtColor(hazy_image, cv.COLOR_BGR2RGB))
-    plt.axis('off')
+        plt.subplot(1, 2, 1)
+        plt.title('Original Image')
+        plt.imshow(cv.cvtColor(original_list[i], cv.COLOR_BGR2RGB))
+        plt.axis('off')
         
-    plt.subplot(1, 2, 2)
-    plt.title('Dehazed Image')
-    plt.imshow(cv.cvtColor(dehazed_image_8bit, cv.COLOR_BGR2RGB))
-    plt.axis('off')
+        plt.subplot(1, 2, 2)
+        plt.title('Dehazed Image')
+        plt.imshow(cv.cvtColor(np.clip(corrected_list[i] * 255, 0, 255).astype(np.uint8), cv.COLOR_BGR2RGB))
+        plt.axis('off')
         
-    plt.tight_layout()
-    plt.show()
+        plt.tight_layout()
+        plt.show()

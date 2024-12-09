@@ -27,28 +27,44 @@ def get_pal_diff(ref_pal, checker, corrected_palette):
     found_pal_diff = (org_pal - found_pal)
     cc_pal_diff = (org_pal - cc_pal)
     #get the sum of each color channel
-    found_pal_diff = np.mean(found_pal_diff, axis=0).astype(int)
-    cc_pal_diff = np.mean(cc_pal_diff, axis=0).astype(int)
-    print("Found pal avr diff", found_pal_diff)
-    print("cc pal avr diff", cc_pal_diff)
+    #print("Found pal diff", found_pal_diff)
+    found_pal_diff_mean = np.mean(found_pal_diff, axis=0).astype(int)
+    cc_pal_diff_mean = np.mean(cc_pal_diff, axis=0).astype(int)
+    print("Found pal avr diff", found_pal_diff_mean)
+    print("cc pal avr diff", cc_pal_diff_mean)
 
     #make a 3d plot of all points for found diff and cc diff
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(found_pal[:,0], found_pal[:,1], found_pal[:,2], c='r', marker='o')
-    ax.scatter(cc_pal[:,0], cc_pal[:,1], cc_pal[:,2], c='b', marker='o')
+    ax.scatter(found_pal_diff[:,0], found_pal_diff[:,1], found_pal_diff[:,2], c='b', marker='o')
+    ax.scatter(cc_pal_diff[:,0], cc_pal_diff[:,1], cc_pal_diff[:,2], c='r', marker='o')
     #write underneath the plot that the blue is the found and red is the corrected
-    ax.text2D(0.05, -0.05, "Red = Corrected Palette", transform=ax.transAxes)
-    ax.text2D(0.05, -0.1, "Blue = Found Palette", transform=ax.transAxes)
+    ax.text2D(-0.2, -0.05, "Blue = Original - Found", transform=ax.transAxes)
+    ax.text2D(-0.2, -0.1, "Red = Original - Corrected", transform=ax.transAxes)
+    #add the x,y,z axis line at 0,0,0
+    #get the higest positive value of either found or corrected for all 3 channels
+    max_diffx = max(max(found_pal_diff[:,0]), max(cc_pal_diff[:,0]))
+    max_diffy = max(max(found_pal_diff[:,1]), max(cc_pal_diff[:,1]))
+    max_diffz = max(max(found_pal_diff[:,2]), max(cc_pal_diff[:,2]))
+
+    ax.plot([0, max_diffx], [0, 0], [0, 0], c='black')
+    ax.plot([0, 0], [0, max_diffy], [0, 0], c='black')
+    ax.plot([0, 0], [0, 0], [0, max_diffz], c='black')
+
 
     #set plot title
-    ax.set_title('Yellow Checker Difference')
+    ax.set_title('(Yellow Light) Deviation in RGB Space Before and After Correction')
 
-    ax.set_xlabel('Red')
-    ax.set_ylabel('Green')
-    ax.set_zlabel('Blue')
+    ax.set_xlabel('Difference in Red')
+    ax.set_ylabel('Difference in Green')
+    ax.set_zlabel('Difference in Blue')
+
+    #save the plot at P3\Results\Data\colcaltest\results as a png with the name *color*_plot.png
+    #plt.savefig('P3\Results\Data\colcaltest/results/yellow_plot.png')
+
 
     plt.show()
+    
 
 if checkertest:
     #clear console
