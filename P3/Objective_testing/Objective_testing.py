@@ -75,15 +75,24 @@ def ReadyExcel(worksheet):
 
     return
 
-def OTDatacollection(folder):
+def OTDatacollection(folder, Foldername = None):
     if '/' in folder:
         Parentfolder = folder.rsplit('/', 1)[0]
-        FolderName = folder.rsplit('/', 1)[-1]
+        if Foldername == None:
+            FolderName = folder.rsplit('/', 1)[-1]
     elif '\\' in folder:
-        Parentfolder = folder.rsplit('\\', 1)[0]    
-        FolderName = folder.rsplit('\\', 1)[-1]            
+        Parentfolder = folder.rsplit('\\', 1)[0] 
+        if Foldername == None:   
+            FolderName = folder.rsplit('\\', 1)[-1]            
     #print("Parentfolder:", Parentfolder)
-
+    if Foldername != None:
+        if '/' in folder:
+            Parentfolder = folder
+            FolderName = Foldername.rsplit('/', 1)[-1]
+        elif '\\' in folder:
+            FolderName = Foldername.rsplit('\\', 1)[-1]   
+            Parentfolder = folder   
+    
     worksheet = None
     ExcelFile = f'{Parentfolder}/AllOTResults.xlsx'
     if not os.path.isfile(ExcelFile):

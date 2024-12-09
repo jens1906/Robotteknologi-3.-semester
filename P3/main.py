@@ -35,10 +35,13 @@ except Exception as e:
     install('openpyxl')
     install('xlsxwriter')
 
-def plot_images(images, savefile=None):
+def plot_images(images, savefile=None, showplot=True):
     #if the list is empty raise error
     if len(images) == 0:
+        print("ERROR: No images to plot")
+        return
         raise ValueError("No images to plot")
+    
     
     #if None in images print the index of None and pop the None
     for i, img in enumerate(images):
@@ -95,7 +98,9 @@ def plot_images(images, savefile=None):
 
     if savefile is not None:
         plt.savefig(savefile, bbox_inches='tight')
-    plt.show()
+
+    if showplot:
+        plt.show()
     return
 
 
@@ -186,11 +191,11 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-    test_method = 'folder'  # 'single', 'live', 'folder'
+    test_method = 'testset'  # 'single', 'live', 'folder', 'testset'
 
     if test_method == 'single':
-        #image_path = 'P3\Results\Data\Gips\Gypsum12g\Beside_Camera_light5_exp112596.0_20242011_145005.png'
-        image_path = 'P3\Results\Data\colcaltest/red_beside_light5_exp500005.0_20242611_132609.png'
+        image_path = 'P3\Results\Data\Gips\Gypsum12g\Beside_Camera_light5_exp112596.0_20242011_145005.png'
+        #image_path = 'P3\Results\Data\colcaltest/red_beside_light5_exp500005.0_20242611_132609.png'
         #image_path = 'P3\Results\Data\Milk/32th_Milk\Beside_Camera_20241611_121705.png'
         main(cam, image_path, True)
 
@@ -259,5 +264,65 @@ if __name__ == '__main__':
         Plotfile = f'{Parentfolder}/Results_with_brightness/{FolderName}.png'
 
         plot_images(corrected_list)
+
+    elif test_method == 'testset':
+        ClayFolders = ['P3\Results\Data\Clay\Clay0.5g', 
+                       'P3\Results\Data\Clay\Clay1g', 
+                       'P3\Results\Data\Clay\Clay10g']
+        GypsumFolders = ['P3\Results\Data\Gips\Gypsum6g', 
+                         'P3\Results\Data\Gips\Gypsum12g', 
+                         'P3\Results\Data\Gips\Gypsum18g', 
+                         'P3\Results\Data\Gips\Gypsum30g', 
+                         'P3\Results\Data\Gips\Gypsum45g', 
+                         'P3\Results\Data\Gips\Gypsum55g',
+                         'P3\Results\Data\Gips\Gypsum65g']
+        SpinachFolders = ['P3\Results\Data\Spinat\Spinach20g', 
+                          'P3\Results\Data\Spinat\Spinach30g', 
+                          'P3\Results\Data\Spinat\Spinach40g',
+                          'P3\Results\Data\Spinat\Spinach80g',
+                          'P3\Results\Data\Spinat\Spinach120g',
+                          'P3\Results\Data\Spinat\Spinach160g',
+                          'P3\Results\Data\Spinat\Spinach595g']
+        Results = 'P3\Results\Data\Results'
+        Folders = ClayFolders + GypsumFolders + SpinachFolders
+
+        for folder in Folders:
+            print("###############################################")
+            print("Processing Folder:", folder)
+            print("###############################################")
+            corrected_list = []
+            workbook, worksheet, ExcelFile = ot.OTDatacollection(Results, folder)
+            for file in os.listdir(folder):
+                if file.endswith('.png'):
+                    image_path = f'{folder}/{file}'
+                    print("!!!Processing: ", file)
+                    try:
+                        corrected, dehazed, corrected_checker, pre_dehazed_checker = main(cam, image_path)
+
+                        corrected_list.append(corrected)
+                        
+                        #Objective Testing
+                        ot.ObjectiveTesting(file, corrected, image_path, worksheet, dehazed, corrected_checker, pre_dehazed_checker)         
+                        
+                        #timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
+                        #cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
+
+                    except Exception as e:
+                        ot.ObjectiveTestingFail(file, worksheet)
+                        print("Failed", file, "Error:", e)
+                        continue
+                            # Plot all corrected images
+            if '/' in folder:
+                Parentfolder = folder.rsplit('/', 1)[0]
+                FolderName = folder.rsplit('/', 1)[-1]
+            elif '\\' in folder:
+                Parentfolder = folder.rsplit('\\', 1)[0]    
+                FolderName = folder.rsplit('\\', 1)[-1]     
+            ot.AdjustExcel(worksheet)
+            ot.average(worksheet)
+            workbook.save(ExcelFile)
+            worksheet = None
+            Plotfile = f'{Results}/{FolderName}.jpg'
+            plot_images(corrected_list, Plotfile, False)
     else:
         exit(1)

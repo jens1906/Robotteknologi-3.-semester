@@ -2,6 +2,7 @@ import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2 as cv
 global checkertest
 checkertest = False
 
@@ -10,6 +11,13 @@ sys.path.append(project_root)
 from P3.ColorCorrection import ColourCorrectMain as cc
 
 def get_pal_diff(ref_pal, checker, corrected_palette):
+    ref_pal = cv.cvtColor(ref_pal, cv.COLOR_BGR2RGB)
+    checker = cv.cvtColor(checker, cv.COLOR_BGR2RGB)
+    corrected_palette = cv.cvtColor(corrected_palette, cv.COLOR_BGR2RGB)
+
+
+
+
     ## get palette difference
     print("Getting Checker Difference")
     org_pal = cc.get_color_patches(ref_pal)
@@ -33,11 +41,12 @@ def get_pal_diff(ref_pal, checker, corrected_palette):
     ax.text2D(0.05, -0.05, "Red = Corrected Palette", transform=ax.transAxes)
     ax.text2D(0.05, -0.1, "Blue = Found Palette", transform=ax.transAxes)
 
+    #set plot title
+    ax.set_title('Yellow Checker Difference')
+
     ax.set_xlabel('Red')
     ax.set_ylabel('Green')
     ax.set_zlabel('Blue')
-
-    #
 
     plt.show()
 
