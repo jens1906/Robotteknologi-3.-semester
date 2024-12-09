@@ -164,6 +164,8 @@ def main(cam=None, image_path=None, detailed=False):
         #color correct corrected checker
         corrected_image_2, cc_matrix, corrected_checker_2_pepe = cc.colour_correct(corrected_image, original_checker, corrected_checker_2)
     
+    #apt.get_pal_diff(original_checker, input_colour_checker, corrected_checker)
+
     ## Plot Images
     print("------Plotting Images------")
     plot_list.append(corrected_image)
@@ -191,7 +193,11 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
+<<<<<<< Updated upstream
     test_method = 'testset'  # 'single', 'live', 'folder', 'testset'
+=======
+    test_method = 'single'  # 'single', 'live', 'folder'
+>>>>>>> Stashed changes
 
     if test_method == 'single':
         image_path = 'P3\Results\Data\Gips\Gypsum12g\Beside_Camera_light5_exp112596.0_20242011_145005.png'
