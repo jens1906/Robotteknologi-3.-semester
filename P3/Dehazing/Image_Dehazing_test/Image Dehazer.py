@@ -109,7 +109,7 @@ def calculate_psnr(image1, image2):
 
 # Example usage
 script_dir = os.path.dirname(__file__)
-image_path = "P3/Results/Data/Clay/Clay1g/Green_Beside_Camera_light5_exp111285.0_20242111_115220.png"
+image_path = "P3/Dehazing/Image_Dehazing_test/Dehaze_Samples/underwater.jpg"
 hazy_image = cv.imread(image_path)
 if hazy_image is None:
     print(f"Error: Unable to load image at {image_path}")
