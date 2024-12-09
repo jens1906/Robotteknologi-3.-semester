@@ -212,7 +212,7 @@ if __name__ == '__main__':
                         break
                 cv.destroyAllWindows()
     elif test_method == 'folder':
-        folder = 'P3\Results\Data\Gips\Gypsum65g'
+        folder = 'P3\Results\Data\Subjective test\Original'
         workbook, worksheet, ExcelFile = ot.OTDatacollection(folder)
         os.makedirs(f'{folder}/Results', exist_ok=True)
 
@@ -232,10 +232,10 @@ if __name__ == '__main__':
                     corrected_list.append(corrected)
                     
                     #Objective Testing
-                    ot.ObjectiveTesting(file, corrected, image_path, worksheet, dehazed, corrected_checker, pre_dehazed_checker)         
+                    #ot.ObjectiveTesting(file, corrected, image_path, worksheet, dehazed, corrected_checker, pre_dehazed_checker)         
                     
                     timestamp = datetime.now().strftime("%Y%d%m_%H%M%S")
-                    #cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
+                    cv.imwrite(f'{folder}/Results/{file}_Result_{timestamp}_.png', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
 
                 except Exception as e:
                     ot.ObjectiveTestingFail(file, worksheet)
