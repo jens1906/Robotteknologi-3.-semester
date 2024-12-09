@@ -142,7 +142,7 @@ if testmethod == 'single':
 
 elif testmethod == 'folder':
     # folder path
-    folder = 'P3\Results\Data\Gips\Gypsum6g'
+    folder = 'P3\Results\Data\Gips\Gypsum45g'
 
     original_list = []
     corrected_list = []
