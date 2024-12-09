@@ -164,6 +164,17 @@ elif testmethod == 'folder':
     print("Printing the images")
 
     for i in range(len(original_list)):
-        cv.imshow('original_image', original_list[i]);			# display the original image
-        cv.imshow('enhanced_image', corrected_list[i]);			# display the result
-        cv.waitKey(0)				        					# hold the display window
+        plt.figure(figsize=(10, 5))
+        
+        plt.subplot(1, 2, 1)
+        plt.title('Original Image')
+        plt.imshow(cv.cvtColor(original_list[i], cv.COLOR_BGR2RGB))
+        plt.axis('off')
+        
+        plt.subplot(1, 2, 2)
+        plt.title('Dehazed Image')
+        plt.imshow(cv.cvtColor(np.clip(corrected_list[i] * 255, 0, 255).astype(np.uint8), cv.COLOR_BGR2RGB))
+        plt.axis('off')
+        
+        plt.tight_layout()
+        plt.show()
