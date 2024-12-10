@@ -54,6 +54,37 @@ def AverageGradient(imgX):
     avgGradientResult = np.round(avgGradientResult, decimals=2)
     return avgGradientResult
 
+def OTmethodsSingleImage(reference, dehazed):
+    reference = cv2.imread(reference)
+    Original = cv2.imread("P3\Results\Data\GroundTruth\Beside_Camera_AutoTarget5_light5_exp29311.0_20242211_103548.png")
+    #OriginalChecker = cv2.resize( cv2.imread("P3\Palette_detection\Colour_checker_from_Vikki_full.png")[170: 997, 520: 1705], (enhancedChecker.shape[1],enhancedChecker.shape[0]), interpolation=cv2.INTER_AREA)
+    #referenceChecker = cv2.cvtColor(referenceChecker, cv2.COLOR_BGR2RGB)
+    #enhancedChecker = cv2.cvtColor(enhancedChecker, cv2.COLOR_BGR2RGB)
+
+    #PsnrGroundVSReference = OPSNR(OriginalChecker, referenceChecker)
+    #PsnrGroundVSEnhanced = OPSNR(OriginalChecker, enhancedChecker)
+    MBEGroundVSReference = MeanBrightnessError(Original, reference)
+    #MBEGroundVSEnhanced = MeanBrightnessError(Original, Improved)
+    MBEGroundVsDehazed = MeanBrightnessError(Original, dehazed)
+
+    AGGround = AverageGradient(Original)
+    AGReference = AverageGradient(reference)
+    #AGEnhanced = AverageGradient(Improved)
+    AGDehazed = AverageGradient(dehazed)
+
+    #print("PSNR Ground vs Reference:", PsnrGroundVSReference)
+    #print("PSNR Ground vs Enhanced:", PsnrGroundVSEnhanced)
+    print("MBE Ground vs Reference:", MBEGroundVSReference)
+    #print("MBE Ground vs Enhanced:", MBEGroundVSEnhanced)
+    print("MBE Ground vs Dehazed:", MBEGroundVsDehazed)
+    print("AG Ground:", AGGround)
+    print("AG Reference:", AGReference)
+    #print("AG Enhanced:", AGEnhanced)
+    print("AG Dehazed:", AGDehazed)
+    return
+
+
+
 def ReadyExcel(worksheet):
     # Set the values in the cells using openpyxl's .cell() method
     worksheet.cell(row=1, column=1, value='Filename')

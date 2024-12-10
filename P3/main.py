@@ -193,17 +193,23 @@ if __name__ == '__main__':
     cam = None
     image_path = None
 
-<<<<<<< Updated upstream
-    test_method = 'testset'  # 'single', 'live', 'folder', 'testset'
-=======
-    test_method = 'single'  # 'single', 'live', 'folder'
->>>>>>> Stashed changes
+    test_method = 'single'  # 'single', 'live', 'folder', 'testset'
 
     if test_method == 'single':
-        image_path = 'P3\Results\Data\Gips\Gypsum12g\Beside_Camera_light5_exp112596.0_20242011_145005.png'
+        #image_path = 'P3\Results\Data\Gips\Gypsum12g\Beside_Camera_light5_exp112596.0_20242011_145005.png'
         #image_path = 'P3\Results\Data\colcaltest/red_beside_light5_exp500005.0_20242611_132609.png'
         #image_path = 'P3\Results\Data\Milk/32th_Milk\Beside_Camera_20241611_121705.png'
-        main(cam, image_path, True)
+
+        #image_path = 'P3\Results\Data\Milk/32th_Milk\Behind_Camera_20241611_121741.png'
+        #image_path = 'P3\Results\Data\Milk/32th_Milk\Beside_Camera_20241611_121705.png'
+        #image_path = 'P3\Results\Data\Milk/32th_Milk\Right_Side_20241611_121508.png'
+        image_path = 'P3\Results\Data\Milk/32th_Milk\InFront_Camera_20241611_121413.png'
+
+        corrected, dehazed, corrected_checker, pre_dehazed_checker = main(cam, image_path,True)
+        print("###############################################")
+        print(image_path)
+        print("###############################################")
+        ot.OTmethodsSingleImage(image_path, dehazed)
 
     elif test_method == 'live':
         with VmbSystem.get_instance() as vmb:
