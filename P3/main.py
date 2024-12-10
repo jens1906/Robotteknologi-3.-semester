@@ -246,20 +246,11 @@ if __name__ == '__main__':
                     print("Failed", file, "Error:", e)
                     continue
         
-        ot.AdjustExcel(worksheet)
-        ot.average(worksheet)
-        workbook.save(ExcelFile)
+        ot.FinalizeOTExcel(worksheet, workbook, ExcelFile)
 
-            # Plot all corrected images
-        if '/' in folder:
-            Parentfolder = folder.rsplit('/', 1)[0]
-            FolderName = folder.rsplit('/', 1)[-1]
-        elif '\\' in folder:
-            Parentfolder = folder.rsplit('\\', 1)[0]    
-            FolderName = folder.rsplit('\\', 1)[-1]            
-        #print("Parentfolder:", Parentfolder)
 
         worksheet = None
+        Parentfolder, FolderName = ot.foldernames(folder)
         Plotfile = f'{Parentfolder}/Results_with_brightness/{FolderName}.png'
 
         plot_images(corrected_list)
@@ -311,15 +302,8 @@ if __name__ == '__main__':
                         print("Failed", file, "Error:", e)
                         continue
                             # Plot all corrected images
-            if '/' in folder:
-                Parentfolder = folder.rsplit('/', 1)[0]
-                FolderName = folder.rsplit('/', 1)[-1]
-            elif '\\' in folder:
-                Parentfolder = folder.rsplit('\\', 1)[0]    
-                FolderName = folder.rsplit('\\', 1)[-1]     
-            ot.AdjustExcel(worksheet)
-            ot.average(worksheet)
-            workbook.save(ExcelFile)
+            Parentfolder, FolderName = ot.foldernames(folder)
+            ot.FinalizeOTExcel(worksheet, workbook, ExcelFile)
             worksheet = None
             Plotfile = f'{Results}/{FolderName}.jpg'
             plot_images(corrected_list, Plotfile, False)

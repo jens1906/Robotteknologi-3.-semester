@@ -1,11 +1,8 @@
 import os
 import sys
 import subprocess
-
 import cv2
 import numpy as np
-
-#import main
 import xlsxwriter
 from openpyxl import load_workbook
 
@@ -14,9 +11,16 @@ sys.path.append(project_root)
 from Palette_detection import LocateChecker as lc
 
 
-# Load the image
-#imageBefore = cv2.imread('Objective_testing\Objective_testing_before.jpg')
-#imageAfter = cv2.imread('Objective_testing\Objective_testing_after.jpg')
+def foldernames(folder):
+    if '/' in folder:
+        Parentfolder = folder.rsplit('/', 1)[0]
+        FolderName = folder.rsplit('/', 1)[-1]
+    elif '\\' in folder:
+        Parentfolder = folder.rsplit('\\', 1)[0]    
+        FolderName = folder.rsplit('\\', 1)[-1]   
+    return Parentfolder, FolderName
+
+
 
 
 def OPSNR(imgX, imgY):
@@ -243,3 +247,8 @@ def AdjustExcel(worksheet):
         worksheet.column_dimensions[column_letter].width = adjusted_width
     return    
 
+def FinalizeOTExcel(worksheet, workbook, ExcelFile):
+    AdjustExcel(worksheet)
+    average(worksheet)
+    workbook.save(ExcelFile)    
+    return
