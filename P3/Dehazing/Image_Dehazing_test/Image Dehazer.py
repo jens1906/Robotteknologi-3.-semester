@@ -108,22 +108,18 @@ def calculate_psnr(image1, image2):
     return psnr_value
 
 # Example usage
-testmethod = 'folder' # 'folder' or 'single'
+testmethod = 'single' # 'folder' or 'single'
+saveImages = True
 
 if testmethod == 'single':
 
     script_dir = os.path.dirname(__file__)
-    image_path = "P3\Results\Data\Gips\Gypsum45g\Green_Beside_Camera_light10_exp95713.0_20242011_153324.png"
+    image_path = "P3\Results\Data\GroundTruth\Beside_Camera_AutoTarget5_light10_exp17095.0_20242211_103630.png"
     hazy_image = cv.imread(image_path)
     if hazy_image is None:
         print(f"Error: Unable to load image at {image_path}")
     else:
         dehazed_image = dehaze(hazy_image)
-
-        # Convert dehazed image to 8-bit format
-        dehazed_image_8bit = np.clip(dehazed_image * 255, 0, 255).astype(np.uint8)
-
-        cv.imwrite('P3/Dehazing/Module test/dehaze.png', dehazed_image_8bit)
 
         plt.figure(figsize=(10, 5))
             
