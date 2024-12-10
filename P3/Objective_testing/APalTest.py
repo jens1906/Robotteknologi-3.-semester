@@ -38,9 +38,10 @@ def get_pal_diff(ref_pal, checker, corrected_palette):
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(found_pal_diff[:,0], found_pal_diff[:,1], found_pal_diff[:,2], c='b', marker='o')
     ax.scatter(cc_pal_diff[:,0], cc_pal_diff[:,1], cc_pal_diff[:,2], c='r', marker='o')
-    #write underneath the plot that the blue is the found and red is the corrected
-    ax.text2D(-0.2, -0.05, "Blue = Original - Found", transform=ax.transAxes)
-    ax.text2D(-0.2, -0.1, "Red = Original - Corrected", transform=ax.transAxes)
+    #add legend
+    ax.legend(['Original - Found', 'Original - Corrected'])
+
+
     #add the x,y,z axis line at 0,0,0
     #get the higest positive value of either found or corrected for all 3 channels
     max_diffx = max(max(found_pal_diff[:,0]), max(cc_pal_diff[:,0]))
@@ -51,19 +52,50 @@ def get_pal_diff(ref_pal, checker, corrected_palette):
     ax.plot([0, 0], [0, max_diffy], [0, 0], c='black')
     ax.plot([0, 0], [0, 0], [0, max_diffz], c='black')
 
+    #find the center for both red and blue
+    center_found = np.mean(found_pal_diff, axis=0)
+    center_cc = np.mean(cc_pal_diff, axis=0)
+    #plot the center for both red and blue larger and on top of the other points
+    ax.scatter(center_found[0], center_found[1], center_found[2], c='black', marker='x', s=200, label='linear')
+    ax.scatter(center_cc[0], center_cc[1], center_cc[2], c='black', marker='x', s=200, label='linearx')
+    #plot a line from the center to 0,0,0
+    ax.plot([center_found[0], 0], [center_found[1], 0], [center_found[2], 0], c='black')
+    ax.plot([center_cc[0], 0], [center_cc[1], 0], [center_cc[2], 0], c='black')
+
+    #print the length of the line from the center to 0,0,0
+    #ax.text2D(-0.2, -0.02, "Blue Center to origo: " + str(round(np.linalg.norm(center_found))), transform=ax.transAxes)
+    ax.text2D(-0.2, -0.05, "Blue Center: " + str(np.round(center_found)), transform=ax.transAxes)
+    ax.text2D(-0.2, -0.1, "Red Center: " + str(np.round(center_cc)), transform=ax.transAxes)
+
+    MSE_found = np.mean(np.square(found_pal_diff), axis=0)
+    MSE_cc = np.mean(np.square(cc_pal_diff), axis=0)
+    RMSE_found = np.sqrt(MSE_found)
+    RMSE_cc = np.sqrt(MSE_cc)
+    print("RMSE Found", RMSE_found)
+    print("RMSE CC", RMSE_cc)
+    RMSE_improvement = (RMSE_found - RMSE_cc) / RMSE_found * 100
+
+    ax.text2D(0.5, -0.1, "RMSE Improvement: " + str(np.round(RMSE_improvement)) + "%", transform=ax.transAxes)
+
+    #ax.text2D(-0.2, -0.12, "Average Improvement: " + str(round(improvement)) + "%", transform=ax.transAxes)
+
+    
+
 
     #set plot title
-    ax.set_title('(Yellow Light) Deviation in RGB Space Before and After Correction')
+    ax.set_title('RGB Deviation (Yellow Light): Before vs. After Correction')
 
-    ax.set_xlabel('Difference in Red')
-    ax.set_ylabel('Difference in Green')
-    ax.set_zlabel('Difference in Blue')
+    ax.set_xlabel('Deviation in Red')
+    ax.set_ylabel('Deviation in Green')
+    ax.set_zlabel('Deviation in Blue')
 
     #save the plot at P3\Results\Data\colcaltest\results as a png with the name *color*_plot.png
-    #plt.savefig('P3\Results\Data\colcaltest/results/yellow_plot.png')
+    #plt.savefig('P3\Results\Data\colcaltest/results/yellow_plot.png', bbox_inches='tight')
 
 
-    plt.show()
+    #plt.show()
+
+
     
 
 if checkertest:

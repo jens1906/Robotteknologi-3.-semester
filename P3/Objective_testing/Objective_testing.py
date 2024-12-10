@@ -56,31 +56,44 @@ def AverageGradient(imgX):
 
 def OTmethodsSingleImage(reference, dehazed):
     reference = cv2.imread(reference)
-    Original = cv2.imread("P3\Results\Data\GroundTruth\Beside_Camera_AutoTarget5_light5_exp29311.0_20242211_103548.png")
+    Original = cv2.cvtColor(cv2.imread("P3\Results\Data\GroundTruth\Beside_Camera_AutoTarget5_light5_exp29311.0_20242211_103548.png"), cv2.COLOR_BGR2RGB)
+    import matplotlib.pyplot as plt
+
     #OriginalChecker = cv2.resize( cv2.imread("P3\Palette_detection\Colour_checker_from_Vikki_full.png")[170: 997, 520: 1705], (enhancedChecker.shape[1],enhancedChecker.shape[0]), interpolation=cv2.INTER_AREA)
     #referenceChecker = cv2.cvtColor(referenceChecker, cv2.COLOR_BGR2RGB)
     #enhancedChecker = cv2.cvtColor(enhancedChecker, cv2.COLOR_BGR2RGB)
 
     #PsnrGroundVSReference = OPSNR(OriginalChecker, referenceChecker)
     #PsnrGroundVSEnhanced = OPSNR(OriginalChecker, enhancedChecker)
+
+
     MBEGroundVSReference = MeanBrightnessError(Original, reference)
-    #MBEGroundVSEnhanced = MeanBrightnessError(Original, Improved)
     MBEGroundVsDehazed = MeanBrightnessError(Original, dehazed)
 
     AGGround = AverageGradient(Original)
     AGReference = AverageGradient(reference)
-    #AGEnhanced = AverageGradient(Improved)
     AGDehazed = AverageGradient(dehazed)
 
-    #print("PSNR Ground vs Reference:", PsnrGroundVSReference)
-    #print("PSNR Ground vs Enhanced:", PsnrGroundVSEnhanced)
+    #checker comparison
+    template = cv2.resize(cv2.imread("P3\Palette_detection\Colour_checker_from_Vikki_full.png"), (606, 318), interpolation=cv2.INTER_AREA)
+
+    original_checker, corners, wrap_matrix, loc= lc.LocateChecker(Original, template)
+    reference_checker, corners, wrap_matrix, loc= lc.LocateChecker(reference, template)
+    dehazed_checker, corners, wrap_matrix, loc= lc.LocateChecker(dehazed, template)
+
+    PSNRGroundVSReference = OPSNR(original_checker, reference_checker)
+    PSNRGroundVsDehazed = OPSNR(original_checker, dehazed_checker)
+
     print("MBE Ground vs Reference:", MBEGroundVSReference)
-    #print("MBE Ground vs Enhanced:", MBEGroundVSEnhanced)
     print("MBE Ground vs Dehazed:", MBEGroundVsDehazed)
+    print("----------------------")
     print("AG Ground:", AGGround)
     print("AG Reference:", AGReference)
-    #print("AG Enhanced:", AGEnhanced)
     print("AG Dehazed:", AGDehazed)
+    print("----------------------")
+    print("PSNR Checker Ground vs Reference:", PSNRGroundVSReference)
+    print("PSNR Checker Ground vs Dehazed:", PSNRGroundVsDehazed)
+
     return
 
 
