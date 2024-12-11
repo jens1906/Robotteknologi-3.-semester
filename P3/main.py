@@ -195,12 +195,11 @@ if __name__ == '__main__':
     test_method = 'single'  # 'single', 'live', 'folder', 'testset'
 
     if test_method == 'single':
-        image_path = 'P3\Results\Data\GroundTruth\Beside_Camera_AutoTarget5_light5_exp29311.0_20242211_103548.png'
+        image_path = 'P3\Results\Data\colcaltest\greenyellow_beside_light5_exp500005.0_20242611_132536.png'
         print("###############################################")
         print(image_path)
         print("###############################################")
         corrected, dehazed, corrected_checker, pre_dehazed_checker = main(cam, image_path,True)
-        cv.imshow('Dehazed Checker', corrected)
         cv.imwrite('P3\ground truth.jpg', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
         cv.waitKey(0)
         ot.OTmethodsSingleImage(image_path, dehazed)

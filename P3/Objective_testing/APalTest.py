@@ -3,6 +3,8 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2 as cv
+from P3.main import plot_images
+
 global checkertest
 checkertest = False
 
@@ -11,10 +13,9 @@ sys.path.append(project_root)
 from P3.ColorCorrection import ColourCorrectMain as cc
 
 def get_pal_diff(ref_pal, checker, corrected_palette):
-    ref_pal = cv.cvtColor(ref_pal, cv.COLOR_BGR2RGB)
-    checker = cv.cvtColor(checker, cv.COLOR_BGR2RGB)
-    corrected_palette = cv.cvtColor(corrected_palette, cv.COLOR_BGR2RGB)
-
+    #ref_pal = cv.cvtColor(ref_pal, cv.COLOR_BGR2RGB)
+    #checker = cv.cvtColor(checker, cv.COLOR_BGR2RGB)
+    #corrected_palette = cv.cvtColor(corrected_palette, cv.COLOR_BGR2RGB)
 
 
 
@@ -80,20 +81,20 @@ def get_pal_diff(ref_pal, checker, corrected_palette):
     #ax.text2D(-0.2, -0.12, "Average Improvement: " + str(round(improvement)) + "%", transform=ax.transAxes)
 
     
-
+    current_color = 'Yellow'
 
     #set plot title
-    ax.set_title('RGB Deviation (Yellow Light): Before vs. After Correction')
+    ax.set_title(f'RGB Deviation ({current_color} Light): Before vs. After Correction')
 
     ax.set_xlabel('Deviation in Red')
     ax.set_ylabel('Deviation in Green')
     ax.set_zlabel('Deviation in Blue')
 
     #save the plot at P3\Results\Data\colcaltest\results as a png with the name *color*_plot.png
-    #plt.savefig('P3\Results\Data\colcaltest/results/yellow_plot.png', bbox_inches='tight')
+    #plt.savefig(f'P3\Results\Data\colcaltest/results/{current_color}_plot.png', bbox_inches='tight')
 
 
-    #plt.show()
+    plt.show()
 
 
     
