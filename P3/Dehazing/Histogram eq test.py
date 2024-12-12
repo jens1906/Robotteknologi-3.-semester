@@ -1,6 +1,17 @@
+import os
+import sys
+os.system('cls')
+import subprocess
+
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt
+
+project_root = 'C:\Users\Mads\OneDrive\Dokumenter\GitHub\Robotteknologi-3.-semester\P3'
+sys.path.append(project_root)
+
+
+from P3.Objective_testing import Objective_testing as ot
 
 def histogram_equalization(img_in):
     # Segregate color streams
