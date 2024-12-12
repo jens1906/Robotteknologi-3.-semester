@@ -254,3 +254,34 @@ def AdjustExcel(worksheet):
         worksheet.column_dimensions[column_letter].width = adjusted_width
     return    
 
+
+
+def Dehazetest():
+    folder = 'P3\Results\Dehaze_test_set\Histogram_equalised_images'
+    workbook, worksheet, ExcelFile = OTDatacollection(folder)
+    os.makedirs(f'{folder}/Results', exist_ok=True)
+
+    corrected_list = []
+    for file in os.listdir(folder):
+        if file.endswith('.png'):
+            image_path = f'{folder}/{file}'
+            corrected = cv2.imread(image_path)
+            corrected = cv2.cvtColor(corrected, cv2.COLOR_BGR2RGB)
+            ObjectiveTesting(file, corrected, image_path, worksheet, corrected, corrected, corrected)         
+
+    AdjustExcel(worksheet)
+    average(worksheet)
+    workbook.save(ExcelFile)
+
+        # Plot all corrected images
+    if '/' in folder:
+        Parentfolder = folder.rsplit('/', 1)[0]
+        FolderName = folder.rsplit('/', 1)[-1]
+    elif '\\' in folder:
+        Parentfolder = folder.rsplit('\\', 1)[0]    
+        FolderName = folder.rsplit('\\', 1)[-1]            
+    #print("Parentfolder:", Parentfolder)
+
+    worksheet = None
+    Plotfile = f'{Parentfolder}/Results_with_brightness/{FolderName}.png'
+
