@@ -196,6 +196,7 @@ if __name__ == '__main__':
     test_method = 'single'  # 'single', 'live', 'folder', 'testset'
 
     if test_method == 'single':
+        image_path = 'P3\Results\Data\Clay\Clay0.5g\Beside_Camera_light5_exp112596.0_20242011_144938.png'
         #image_path = 'P3\Results\Data\Gips\Gypsum12g\Beside_Camera_light5_exp112596.0_20242011_145005.png'
         #image_path = 'P3\Results\Data\colcaltest/red_beside_light5_exp500005.0_20242611_132609.png'
         #image_path = 'P3\Results\Data\Milk/32th_Milk\Beside_Camera_20241611_121705.png'
