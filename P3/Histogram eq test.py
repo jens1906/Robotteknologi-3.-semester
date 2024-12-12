@@ -55,9 +55,9 @@ def histogram_equalization(img_in):
 
     return img_out
 
-input_folder = 'Results\Dehaze test set'
+input_folder = 'Results\Dehaze test set\Dehazed images'
 output_folder = 'Results\Dehaze test set\Dehazed images'
-type = 'dehaze' # 'Histogram equalisation' or 'dehaze'
+type = 'premade' # 'Histogram equalisation', 'dehaze' or 'premade'
 
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
@@ -81,3 +81,11 @@ if type == 'dehaze':
             output_path = os.path.join(output_folder, filename)
             cv2.imwrite(output_path, dhz)
             #ot.OTmethodsSingleImage(img_path,dhz)
+
+if type == 'premade':
+    for filename in os.listdir(input_folder):
+        if filename.endswith('.png'):
+            img_path_dehazed = os.path.join('Results\Dehaze test set\Dehazed images', filename)
+            img_dehazed = cv2.imread(img_path_dehazed)
+            img_path_original = os.path.join('Results\Dehaze test set', filename)
+            ot.OTmethodsSingleImage(img_path_dehazed,img_path_original)
