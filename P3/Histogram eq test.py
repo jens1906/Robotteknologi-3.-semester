@@ -10,6 +10,7 @@ from matplotlib import pyplot as plt
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
 
+from Dehazing import dehaze as dh
 from P3.Objective_testing import Objective_testing as ot
 
 def histogram_equalization(img_in):
@@ -55,17 +56,28 @@ def histogram_equalization(img_in):
     return img_out
 
 input_folder = 'Results\Dehaze test set'
-output_folder = 'Results\Dehaze test set\Histogram equalised images'
+output_folder = 'Results\Dehaze test set\Dehazed images'
+type = 'dehaze' # 'Histogram equalisation' or 'dehaze'
 
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 
-for filename in os.listdir(input_folder):
-    if filename.endswith('.png'):
-        img_path = os.path.join(input_folder, filename)
-        img = cv2.imread(img_path)
-        equ = histogram_equalization(img)
-        output_path = os.path.join(output_folder, filename)
-        cv2.imwrite(output_path, equ)
-        ot.OTmethodsSingleImage(img,equ)
+if  type == 'Histogram equalisation':
+    for filename in os.listdir(input_folder):
+        if filename.endswith('.png'):
+            img_path = os.path.join(input_folder, filename)
+            img = cv2.imread(img_path)
+            equ = histogram_equalization(img)
+            output_path = os.path.join(output_folder, filename)
+            cv2.imwrite(output_path, equ)
+            #ot.OTmethodsSingleImage(img_path,equ)
 
+if type == 'dehaze':
+    for filename in os.listdir(input_folder):
+        if filename.endswith('.png'):
+            img_path = os.path.join(input_folder, filename)
+            img = cv2.imread(img_path)
+            dhz = dh.dehaze(img)
+            output_path = os.path.join(output_folder, filename)
+            cv2.imwrite(output_path, dhz)
+            #ot.OTmethodsSingleImage(img_path,dhz)
