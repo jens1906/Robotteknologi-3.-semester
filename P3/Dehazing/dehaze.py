@@ -86,13 +86,4 @@ def dehaze(hazy_image):
     # Recover the dehazed image
     dehazed_image = recover_image(image, refined_transmission, A)
 
-    brightness = False  
-    if brightness:
-        dehazed_image = np.clip(dehazed_image * 255, 0, 255).astype(np.uint8)
-        dehazed_image = cv.cvtColor(dehazed_image, cv.COLOR_BGR2HSV)
-        dehazed_image[:, :, 2] = np.clip(dehazed_image[:, :, 2] * 2.5, 0, 255)  # Adjust brightness (increase factor as needed)
-        
-        dehazed_image = cv.cvtColor(dehazed_image, cv.COLOR_HSV2BGR)
-        dehazed_image = dehazed_image / 255.0  # Normalize back to [0, 1] range
-
     return np.clip(dehazed_image * 255, 0, 255).astype(np.uint8)

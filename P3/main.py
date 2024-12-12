@@ -139,14 +139,15 @@ def main(cam=None, image_path=None, detailed=False):
 
     ## Locate Color Checker
     print("------Locating Color Checker------")
+    #template = cv.imread('P3\Palette_detection\Colour_checker_from_Vikki_full.png')
     template =  cv.resize(cv.imread("P3\Palette_detection\Colour_checker_from_Vikki_full.png"), (606, 318), interpolation=cv.INTER_AREA)
-    print("Dehazed Image Locating Checker")
-    dehazed_checker, corners, wrap_matrix, loc = lc.LocateChecker(dehazed_image, template, 0, 100, False, False)
-    print("Original Image Locating Checker")
-    input_colour_checker, corners, xx, loc = lc.LocateChecker(image, template, 0, 100, False, True)
-    print("Pre Image Locating Checker")
-    pre_dehazed_checker = lc.LocateCheckerOriginal(image, template, wrap_matrix)
+    #template =  cv.resize(cv.imread("P3\Palette_detection\Colour_checker_from_Vikki_full_test_enviorment.png"), (606, 318), interpolation=cv.INTER_AREA)
+    #cv.imshow('Template', template)
+    #cv.waitKey(0)
 
+    dehazed_checker, corners, wrap_matrix, loc = lc.LocateChecker(dehazed_image, template)
+    input_colour_checker, corners, xx, loc = lc.LocateChecker(image, template)
+    pre_dehazed_checker = lc.LocateCheckerOriginal(image, template, wrap_matrix)
 
     ## Color Correction
     print("------Color Correcting Image------")
@@ -195,14 +196,20 @@ if __name__ == '__main__':
     test_method = 'single'  # 'single', 'live', 'folder', 'testset'
 
     if test_method == 'single':
-        image_path = 'P3\Results\Data\GroundTruth\Beside_Camera_AutoTarget5_light5_exp29311.0_20242211_103548.png'
+        image_path = 'P3\Results\Data\Clay\Clay0.5g\Beside_Camera_light5_exp112596.0_20242011_144938.png'
+        #image_path = 'P3\Results\Data\Gips\Gypsum12g\Beside_Camera_light5_exp112596.0_20242011_145005.png'
+        #image_path = 'P3\Results\Data\colcaltest/red_beside_light5_exp500005.0_20242611_132609.png'
+        #image_path = 'P3\Results\Data\Milk/32th_Milk\Beside_Camera_20241611_121705.png'
+
+        #image_path = 'P3\Results\Data\Milk/32th_Milk\Behind_Camera_20241611_121741.png'
+        #image_path = 'P3\Results\Data\Milk/32th_Milk\Beside_Camera_20241611_121705.png'
+        #image_path = 'P3\Results\Data\Milk/32th_Milk\Right_Side_20241611_121508.png'
+        image_path = 'P3\Results\Data\Milk/32th_Milk\InFront_Camera_20241611_121413.png'
+
+        corrected, dehazed, corrected_checker, pre_dehazed_checker = main(cam, image_path,True)
         print("###############################################")
         print(image_path)
         print("###############################################")
-        corrected, dehazed, corrected_checker, pre_dehazed_checker = main(cam, image_path,True)
-        cv.imshow('Dehazed Checker', corrected)
-        cv.imwrite('P3\ground truth.jpg', cv.cvtColor(corrected, cv.COLOR_BGR2RGB))
-        cv.waitKey(0)
         ot.OTmethodsSingleImage(image_path, dehazed)
 
     elif test_method == 'live':
@@ -215,6 +222,7 @@ if __name__ == '__main__':
                 with cams[0] as cam:
                     try:
                         corrected, dehazed, corrected_checker, pre_dehazed_checker = main(cam, None, True)
+                        #cv.imshow('Corrected Image', corrected)
                         if cv.waitKey(1) & 0xFF == ord('q'):  # Exit loop on 'q' press
                             break
                     except Exception as e:
@@ -222,7 +230,7 @@ if __name__ == '__main__':
                         break
                 cv.destroyAllWindows()
     elif test_method == 'folder':
-        folder = 'P3\Results\Data\Gips\Gypsum6g'
+        folder = 'P3\Results\Data\Subjective test\Original'
         workbook, worksheet, ExcelFile = ot.OTDatacollection(folder)
         os.makedirs(f'{folder}/Results', exist_ok=True)
 
@@ -233,6 +241,12 @@ if __name__ == '__main__':
                 print("!!!Processing: ", file)
                 try:
                     corrected, dehazed, corrected_checker, pre_dehazed_checker = main(cam, image_path)
+                    #cv.imshow('Corrected Image', cv.resize(corrected, (0,0), fx=0.5, fy=0.5))
+                    #cv.imshow('Dehazed Image', cv.resize(dehazed, (0,0), fx=0.5, fy=0.5))
+                    #cv.imshow('Corrected Checker', cv.resize(corrected_checker, (0,0), fx=0.5, fy=0.5))
+                    #cv.imshow('Pre Dehazed Checker', cv.resize(pre_dehazed_checker, (0,0), fx=0.5, fy=0.5))
+                    #cv.waitKey(0)
+
                     corrected_list.append(corrected)
                     
                     #Objective Testing
@@ -246,11 +260,20 @@ if __name__ == '__main__':
                     print("Failed", file, "Error:", e)
                     continue
         
-        ot.FinalizeOTExcel(worksheet, workbook, ExcelFile)
+        ot.AdjustExcel(worksheet)
+        ot.average(worksheet)
+        workbook.save(ExcelFile)
 
+            # Plot all corrected images
+        if '/' in folder:
+            Parentfolder = folder.rsplit('/', 1)[0]
+            FolderName = folder.rsplit('/', 1)[-1]
+        elif '\\' in folder:
+            Parentfolder = folder.rsplit('\\', 1)[0]    
+            FolderName = folder.rsplit('\\', 1)[-1]            
+        #print("Parentfolder:", Parentfolder)
 
         worksheet = None
-        Parentfolder, FolderName = ot.foldernames(folder)
         Plotfile = f'{Parentfolder}/Results_with_brightness/{FolderName}.png'
 
         plot_images(corrected_list)
@@ -302,8 +325,15 @@ if __name__ == '__main__':
                         print("Failed", file, "Error:", e)
                         continue
                             # Plot all corrected images
-            Parentfolder, FolderName = ot.foldernames(folder)
-            ot.FinalizeOTExcel(worksheet, workbook, ExcelFile)
+            if '/' in folder:
+                Parentfolder = folder.rsplit('/', 1)[0]
+                FolderName = folder.rsplit('/', 1)[-1]
+            elif '\\' in folder:
+                Parentfolder = folder.rsplit('\\', 1)[0]    
+                FolderName = folder.rsplit('\\', 1)[-1]     
+            ot.AdjustExcel(worksheet)
+            ot.average(worksheet)
+            workbook.save(ExcelFile)
             worksheet = None
             Plotfile = f'{Results}/{FolderName}.jpg'
             plot_images(corrected_list, Plotfile, False)
