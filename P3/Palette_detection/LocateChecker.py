@@ -98,3 +98,4 @@ def LocateCheckerOriginal(img, template, warp_matrix):
                                     139: 459]   # x-axis (width)    
     
     return colour_checker
+
