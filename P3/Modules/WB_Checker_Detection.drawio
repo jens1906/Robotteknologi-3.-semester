@@ -1,43 +1,34 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" version="24.8.6">
-  <diagram id="0WV-e1CkucXSKFazAjO2" name="WB_Checker_Detection">
-    <mxGraphModel dx="1461" dy="725" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-        <mxCell id="AqDWA0jNtJOZt3h9N-a1-28" value="Crop of colour board" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="260" y="120" width="70" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="8JnmPzc3ZblM6caSnYar-1" value="" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="80" y="40" width="180" height="110" as="geometry" />
-        </mxCell>
-        <mxCell id="8JnmPzc3ZblM6caSnYar-24" value="&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;&quot;&gt;- Crop around prior location&lt;/span&gt;&lt;span style=&quot;&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;span style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;- Collect features from image&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;&quot;&gt;- Compare template with best features&lt;/span&gt;&lt;span style=&quot;&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;&quot;&gt;- Extract location of colour board&lt;/span&gt;&lt;span style=&quot;text-align: left;&quot;&gt;&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="90" y="60" width="170" height="70" as="geometry" />
-        </mxCell>
-        <mxCell id="8JnmPzc3ZblM6caSnYar-25" value="Dehazed 8 bit rgb&lt;div&gt;image&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="20" y="50" width="60" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="8JnmPzc3ZblM6caSnYar-26" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="8JnmPzc3ZblM6caSnYar-1" edge="1">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="10" y="95" as="sourcePoint" />
-            <mxPoint x="90" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="8JnmPzc3ZblM6caSnYar-27" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;" parent="1" source="8JnmPzc3ZblM6caSnYar-24" edge="1">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="280" y="150" as="sourcePoint" />
-            <mxPoint x="330" y="113" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="8JnmPzc3ZblM6caSnYar-28" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" parent="1" source="8JnmPzc3ZblM6caSnYar-24" edge="1">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="230" y="50" as="sourcePoint" />
-            <mxPoint x="330" y="78" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="8JnmPzc3ZblM6caSnYar-29" value="colour board location" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="260" y="40" width="70" height="30" as="geometry" />
-        </mxCell>
-      </root>
-    </mxGraphModel>
-  </diagram>
+<mxfile host="65bd71144e">
+    <diagram id="0WV-e1CkucXSKFazAjO2" name="WB_Checker_Detection">
+        <mxGraphModel dx="1019" dy="661" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#ffffff" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="AqDWA0jNtJOZt3h9N-a1-28" value="&lt;font color=&quot;#080808&quot;&gt;Colour checker&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="260" y="50" width="70" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="8JnmPzc3ZblM6caSnYar-1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#030303;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="40" width="180" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="8JnmPzc3ZblM6caSnYar-24" value="&lt;div style=&quot;text-align: left;&quot;&gt;&lt;font color=&quot;#0d0d0d&quot;&gt;&lt;span style=&quot;&quot;&gt;- Crop around prior location&lt;/span&gt;&lt;span style=&quot;&quot;&gt;&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;span style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;font color=&quot;#0d0d0d&quot;&gt;- Collect features from image&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;font color=&quot;#0d0d0d&quot;&gt;&lt;span style=&quot;&quot;&gt;- Compare template with best features&lt;/span&gt;&lt;span style=&quot;&quot;&gt;&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;&quot;&gt;&lt;font color=&quot;#0d0d0d&quot;&gt;- Extract location of colour board&lt;/font&gt;&lt;/span&gt;&lt;span style=&quot;text-align: left;&quot;&gt;&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="90" y="60" width="170" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="8JnmPzc3ZblM6caSnYar-25" value="&lt;font color=&quot;#000000&quot;&gt;8-bit&lt;br&gt;Image&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="20" y="50" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="8JnmPzc3ZblM6caSnYar-26" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#030303;" parent="1" target="8JnmPzc3ZblM6caSnYar-1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="10" y="95" as="sourcePoint"/>
+                        <mxPoint x="90" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="8JnmPzc3ZblM6caSnYar-27" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;strokeColor=#030303;" parent="1" source="8JnmPzc3ZblM6caSnYar-24" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="280" y="150" as="sourcePoint"/>
+                        <mxPoint x="330" y="95" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
 </mxfile>
