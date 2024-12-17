@@ -1,0 +1,84 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36" version="24.8.4">
+  <diagram name="Page-1" id="icqaqd0mnLHS3gHDpJoX">
+    <mxGraphModel dx="956" dy="497" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="eX5zwzEdhs4EydVumEh_-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="eX5zwzEdhs4EydVumEh_-1" target="eX5zwzEdhs4EydVumEh_-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-1" value="&lt;b&gt;Start&lt;/b&gt;" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="90" y="240" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="eX5zwzEdhs4EydVumEh_-2" target="eX5zwzEdhs4EydVumEh_-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-2" value="Fill tank with 70L water" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="230" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="eX5zwzEdhs4EydVumEh_-4" target="eX5zwzEdhs4EydVumEh_-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-4" value="Measure amount of ingridient and add it to the existing tub" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="230" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="eX5zwzEdhs4EydVumEh_-7" target="eX5zwzEdhs4EydVumEh_-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-7" value="Place light" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="390.5" y="230" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="eX5zwzEdhs4EydVumEh_-9" target="eX5zwzEdhs4EydVumEh_-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="eX5zwzEdhs4EydVumEh_-9" target="eX5zwzEdhs4EydVumEh_-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-9" value="Take images with half and full brightness with white and green light" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="490" y="230" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="eX5zwzEdhs4EydVumEh_-13" target="eX5zwzEdhs4EydVumEh_-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="eX5zwzEdhs4EydVumEh_-13" target="eX5zwzEdhs4EydVumEh_-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-13" value="Have images &lt;br&gt;been taken in all 4 &lt;br&gt;light placement?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="640" y="200" width="130" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-17" value="Save the taken images &lt;br&gt;to allocated folder" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="477.5" y="150" width="155" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-20" value="&lt;b&gt;No&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="650" y="300" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-21" value="&lt;b&gt;Yes&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="750" y="230" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="eX5zwzEdhs4EydVumEh_-22" target="eX5zwzEdhs4EydVumEh_-4">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="860" y="350" />
+              <mxPoint x="310" y="350" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-27" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="eX5zwzEdhs4EydVumEh_-22" target="eX5zwzEdhs4EydVumEh_-26">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-22" value="Should there be &lt;br&gt;run more test?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="800" y="210" width="120" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-25" value="&lt;b&gt;Yes&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="810" y="320" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-26" value="&lt;b&gt;Stop&lt;/b&gt;" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="950" y="240" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="eX5zwzEdhs4EydVumEh_-28" value="&lt;b&gt;No&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="900" y="230" width="60" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
