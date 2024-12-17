@@ -1,5 +1,5 @@
 # Robotteknologi-3.-semester
-In this repository you find our solution for a system that takes input images from underwater enviorments, and enhance them to remove noise and correct colours. This repository consist of our solution and data collected from a test enviorment, there are also some of our results both as output images and image validation metric results.¨
+In this repository you find our solution for a system that takes input images from underwater enviorments, and enhance them to remove noise and correct colours. This repository consist of our solution and data collected from a test enviorment, there are also some of our results both as output images and image validation metric results.
 
 ## Folder Structure
 Downunder you can see the repository structure for making it easier to navigate
@@ -13,7 +13,7 @@ P3/
 ├── Objective_testing/
 ├── Palette_detection/
 ├── Results/
-│   ├── Data/                       #Collected data and results from this data
+│   ├── Data/             #Collected data and results from this data
 │   │   ├── Clay/
 │   │   ├── Gips/
 │   │   ├── Milk/
